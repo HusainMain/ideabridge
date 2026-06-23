@@ -4,72 +4,57 @@ export type AnalysisStatus = 'idle' | 'analyzing' | 'success' | 'error';
 
 export interface IdeaInputs {
   idea: string;
+  industry: string;
   audience: string;
-  stage: string;
-}
-
-export interface Mentor {
-  id: string;
-  name: string;
-  role: string;
-  whyMatched: string;
-  avatarUrl?: string;
-}
-
-export interface FundingSource {
-  id: string;
-  name: string;
-  type: string;
-  eligibility: string;
-  fitScore: number;
-  deadline?: string;
-}
-
-export interface Incubator {
-  id: string;
-  name: string;
-  stage: string;
-  location: string;
-  benefits: string[];
+  problem: string;
+  country: string;
+  budget: string;
+  teamSize: string;
 }
 
 export interface ResultsData {
-  readinessScore: number;
-  topRecommendation: {
-    nextStep: string;
-    actions: string[];
-  };
-  dosAndDonts: {
-    dos: string[];
-    donts: string[];
-  };
-  mentors: Mentor[];
-  funding: FundingSource[];
-  incubators: Incubator[];
+  summary: string[];
+  validation: string[];
+  customers: string[];
+  revenue: string[];
+  competitors: string[];
+  roadmap: string[];
+  funding: string[];
+  risks: string[];
+  actions: string[];
 }
 
 interface JourneyState {
   inputs: IdeaInputs;
   analysisStatus: AnalysisStatus;
   results: ResultsData | null;
+  errorMessage: string | null;
   setInputs: (inputs: Partial<IdeaInputs>) => void;
   setAnalysisStatus: (status: AnalysisStatus) => void;
   setResults: (results: ResultsData) => void;
+  setErrorMessage: (msg: string | null) => void;
   resetJourney: () => void;
 }
 
 const initialInputs: IdeaInputs = {
   idea: '',
+  industry: '',
   audience: '',
-  stage: 'Just an idea',
+  problem: '',
+  country: '',
+  budget: '',
+  teamSize: '',
 };
 
 export const useJourneyStore = create<JourneyState>((set) => ({
   inputs: initialInputs,
   analysisStatus: 'idle',
   results: null,
+  errorMessage: null,
   setInputs: (inputs) => set((state) => ({ inputs: { ...state.inputs, ...inputs } })),
   setAnalysisStatus: (status) => set({ analysisStatus: status }),
-  setResults: (results) => set({ results, analysisStatus: 'success' }),
-  resetJourney: () => set({ inputs: initialInputs, analysisStatus: 'idle', results: null }),
+  setResults: (results) => set({ results, analysisStatus: 'success', errorMessage: null }),
+  setErrorMessage: (msg) => set({ errorMessage: msg, analysisStatus: 'error' }),
+  resetJourney: () => set({ inputs: initialInputs, analysisStatus: 'idle', results: null, errorMessage: null }),
 }));
+

@@ -3,29 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useJourneyStore } from '../stores/useJourneyStore';
 
-const QUESTIONS = [
-  {
-    id: 'idea',
-    step: 1,
-    label: 'What is your idea?',
-    sublabel: 'One clear sentence. The simpler, the better.',
-    placeholder: 'e.g. A marketplace for local artisanal coffee roasters',
-    type: 'text',
-  },
-  {
-    id: 'audience',
-    step: 2,
-    label: 'Who are you building this for?',
-    sublabel: 'Describe the person who has this problem right now.',
-    placeholder: 'e.g. Coffee lovers in cities who want to support local roasters',
-    type: 'text',
-  },
+const BUDGET_OPTIONS = [
+  { value: 'Bootstrap / Low (<$5k)', label: 'Bootstrap / Low', sub: 'Budget is under $5k' },
+  { value: 'Seed / Medium ($5k - $50k)', label: 'Seed / Medium', sub: 'Budget between $5k and $50k' },
+  { value: 'Venture / High (>$50k)', label: 'Venture / High', sub: 'Budget is over $50k' },
 ];
 
-const STAGES = [
-  { value: 'Just an idea', label: 'Just an idea', sub: 'I haven\'t built anything yet' },
-  { value: 'Building a prototype', label: 'Prototype', sub: 'Something exists I can show people' },
-  { value: 'Launched', label: 'Launched', sub: 'Real users, real feedback' },
+const TEAM_SIZE_OPTIONS = [
+  { value: 'Solo Founder', label: 'Solo Founder', sub: '1 person working on it' },
+  { value: 'Small Team (2-5 people)', label: 'Small Team', sub: '2-5 builders/operators' },
+  { value: 'Growing Startup (6+ people)', label: 'Growing Startup', sub: '6+ active members' },
 ];
 
 export function IdeaInputFlow() {
@@ -33,11 +20,15 @@ export function IdeaInputFlow() {
   const { inputs, setInputs } = useJourneyStore();
 
   const [step, setStep] = useState(1);
-  const [idea, setIdea] = useState(inputs.idea);
-  const [audience, setAudience] = useState(inputs.audience);
-  const [stage, setStage] = useState(inputs.stage || 'Just an idea');
+  const [idea, setIdea] = useState(inputs.idea || '');
+  const [industry, setIndustry] = useState(inputs.industry || '');
+  const [problem, setProblem] = useState(inputs.problem || '');
+  const [audience, setAudience] = useState(inputs.audience || '');
+  const [country, setCountry] = useState(inputs.country || '');
+  const [budget, setBudget] = useState(inputs.budget || '');
+  const [teamSize, setTeamSize] = useState(inputs.teamSize || '');
 
-  const totalSteps = 3;
+  const totalSteps = 7;
 
   const handleNext = () => {
     if (step < totalSteps) setStep(step + 1);
@@ -50,13 +41,19 @@ export function IdeaInputFlow() {
   };
 
   const handleSubmit = () => {
-    setInputs({ idea, audience, stage });
+    setInputs({ idea, industry, problem, audience, country, budget, teamSize });
     navigate('/analysis');
   };
 
   const canAdvance = () => {
-    if (step === 1) return idea.trim().length > 0;
-    if (step === 2) return audience.trim().length > 0;
+    const trimmedIdea = idea.trim();
+    if (step === 1) return trimmedIdea.length >= 10 && trimmedIdea.length <= 500;
+    if (step === 2) return industry.trim().length > 0 && industry.trim().length <= 100;
+    if (step === 3) return problem.trim().length > 0 && problem.trim().length <= 300;
+    if (step === 4) return audience.trim().length > 0 && audience.trim().length <= 200;
+    if (step === 5) return country.trim().length > 0 && country.trim().length <= 100;
+    if (step === 6) return budget.trim().length > 0 && budget.trim().length <= 100;
+    if (step === 7) return teamSize.trim().length > 0 && teamSize.trim().length <= 100;
     return true;
   };
 
@@ -89,9 +86,9 @@ export function IdeaInputFlow() {
         {/* Step 1: Idea */}
         {step === 1 && (
           <div className="act-question" key="q1">
-            <span className="act-question__step">01 / 03</span>
-            <h1 className="act-question__heading">{QUESTIONS[0].label}</h1>
-            <p className="act-question__sub">{QUESTIONS[0].sublabel}</p>
+            <span className="act-question__step">01 / 07</span>
+            <h1 className="act-question__heading">What is your startup idea?</h1>
+            <p className="act-question__sub">Describe the startup you want to build. (Between 10 and 500 characters)</p>
             <input
               id="idea-input"
               autoFocus
@@ -99,18 +96,65 @@ export function IdeaInputFlow() {
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={QUESTIONS[0].placeholder}
+              placeholder="e.g. A marketplace for local artisanal coffee roasters"
               className="act-question__input"
             />
+            <span className="act-input-hint" style={{ marginTop: '1rem' }}>
+              {idea.length} / 500 characters {idea.length < 10 && '(minimum 10 required)'}
+            </span>
           </div>
         )}
 
-        {/* Step 2: Audience */}
+        {/* Step 2: Industry */}
         {step === 2 && (
           <div className="act-question" key="q2">
-            <span className="act-question__step">02 / 03</span>
-            <h1 className="act-question__heading">{QUESTIONS[1].label}</h1>
-            <p className="act-question__sub">{QUESTIONS[1].sublabel}</p>
+            <span className="act-question__step">02 / 07</span>
+            <h1 className="act-question__heading">What is the industry?</h1>
+            <p className="act-question__sub">E.g. EdTech, FinTech, E-commerce, CleanTech, Food & Beverage (Max 100 characters)</p>
+            <input
+              id="industry-input"
+              autoFocus
+              type="text"
+              value={industry}
+              onChange={(e) => setIndustry(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="e.g. Food & Beverage"
+              className="act-question__input"
+            />
+            <span className="act-input-hint" style={{ marginTop: '1rem' }}>
+              {industry.length} / 100 characters
+            </span>
+          </div>
+        )}
+
+        {/* Step 3: Problem */}
+        {step === 3 && (
+          <div className="act-question" key="q3">
+            <span className="act-question__step">03 / 07</span>
+            <h1 className="act-question__heading">What problem are you solving?</h1>
+            <p className="act-question__sub">Describe the customer pain point in detail. (Max 300 characters)</p>
+            <input
+              id="problem-input"
+              autoFocus
+              type="text"
+              value={problem}
+              onChange={(e) => setProblem(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="e.g. Local roasters struggle to reach urban customers, and coffee lovers can't find fresh local beans."
+              className="act-question__input"
+            />
+            <span className="act-input-hint" style={{ marginTop: '1rem' }}>
+              {problem.length} / 300 characters
+            </span>
+          </div>
+        )}
+
+        {/* Step 4: Audience */}
+        {step === 4 && (
+          <div className="act-question" key="q4">
+            <span className="act-question__step">04 / 07</span>
+            <h1 className="act-question__heading">Who is your target audience?</h1>
+            <p className="act-question__sub">Describe the specific group of people experiencing this problem. (Max 200 characters)</p>
             <input
               id="audience-input"
               autoFocus
@@ -118,27 +162,73 @@ export function IdeaInputFlow() {
               value={audience}
               onChange={(e) => setAudience(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={QUESTIONS[1].placeholder}
+              placeholder="e.g. Urban coffee enthusiasts who care about supporting local businesses"
               className="act-question__input"
             />
+            <span className="act-input-hint" style={{ marginTop: '1rem' }}>
+              {audience.length} / 200 characters
+            </span>
           </div>
         )}
 
-        {/* Step 3: Stage */}
-        {step === 3 && (
-          <div className="act-question" key="q3">
-            <span className="act-question__step">03 / 03</span>
-            <h1 className="act-question__heading">Where are you right now?</h1>
-            <p className="act-question__sub">Be honest. There's no wrong answer.</p>
+        {/* Step 5: Country */}
+        {step === 5 && (
+          <div className="act-question" key="q5">
+            <span className="act-question__step">05 / 07</span>
+            <h1 className="act-question__heading">Which country are you launching in?</h1>
+            <p className="act-question__sub">Where is your primary target market located? (Max 100 characters)</p>
+            <input
+              id="country-input"
+              autoFocus
+              type="text"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="e.g. United States"
+              className="act-question__input"
+            />
+            <span className="act-input-hint" style={{ marginTop: '1rem' }}>
+              {country.length} / 100 characters
+            </span>
+          </div>
+        )}
+
+        {/* Step 6: Budget */}
+        {step === 6 && (
+          <div className="act-question" key="q6">
+            <span className="act-question__step">06 / 07</span>
+            <h1 className="act-question__heading">What is your budget level?</h1>
+            <p className="act-question__sub">Estimate the startup capital you have access to right now.</p>
             <div className="act-stage-grid">
-              {STAGES.map((s) => (
+              {BUDGET_OPTIONS.map((opt) => (
                 <button
-                  key={s.value}
-                  onClick={() => setStage(s.value)}
-                  className={`act-stage-card ${stage === s.value ? 'act-stage-card--active' : ''}`}
+                  key={opt.value}
+                  onClick={() => setBudget(opt.value)}
+                  className={`act-stage-card ${budget === opt.value ? 'act-stage-card--active' : ''}`}
                 >
-                  <span className="act-stage-card__label">{s.label}</span>
-                  <span className="act-stage-card__sub">{s.sub}</span>
+                  <span className="act-stage-card__label">{opt.label}</span>
+                  <span className="act-stage-card__sub">{opt.sub}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 7: Team Size */}
+        {step === 7 && (
+          <div className="act-question" key="q7">
+            <span className="act-question__step">07 / 07</span>
+            <h1 className="act-question__heading">What is your team size?</h1>
+            <p className="act-question__sub">How many core team members are building this startup?</p>
+            <div className="act-stage-grid">
+              {TEAM_SIZE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setTeamSize(opt.value)}
+                  className={`act-stage-card ${teamSize === opt.value ? 'act-stage-card--active' : ''}`}
+                >
+                  <span className="act-stage-card__label">{opt.label}</span>
+                  <span className="act-stage-card__sub">{opt.sub}</span>
                 </button>
               ))}
             </div>
@@ -155,7 +245,7 @@ export function IdeaInputFlow() {
             {step < totalSteps ? (
               <>Continue <ArrowRight size={16} strokeWidth={1.5} /></>
             ) : (
-              <>Analyze my idea <ArrowRight size={16} strokeWidth={1.5} /></>
+              <>Analyze my startup <ArrowRight size={16} strokeWidth={1.5} /></>
             )}
           </button>
           {step < totalSteps && (
@@ -166,3 +256,4 @@ export function IdeaInputFlow() {
     </div>
   );
 }
+

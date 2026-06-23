@@ -1,20 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useJourneyStore } from '../stores/useJourneyStore';
-
-const ANALYSIS_STEPS = [
-  "Parsing your idea...",
-  "Evaluating market readiness...",
-  "Matching with industry mentors...",
-  "Scanning for eligible funding...",
-  "Identifying ideal incubators...",
-  "Finalizing your workspace..."
-];
+import { AlertCircle, ArrowLeft, RotateCcw } from 'lucide-react';
 
 export function AnalysisScreen() {
   const navigate = useNavigate();
-  const { setResults, inputs } = useJourneyStore();
-  const [currentStep, setCurrentStep] = useState(0);
+  const { inputs, setResults, setAnalysisStatus, setErrorMessage, errorMessage, analysisStatus } = useJourneyStore();
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+  const requestTriggered = useRef(false);
+
+  // Cooldown countdown timer
+  useEffect(() => {
+    const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
+    if (cooldownEnd) {
+      const remaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
+      if (remaining > 0) {
+        setCooldownRemaining(remaining);
+        const timer = setInterval(() => {
+          const currentRemaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
+          if (currentRemaining <= 0) {
+            setCooldownRemaining(0);
+            clearInterval(timer);
+          } else {
+            setCooldownRemaining(currentRemaining);
+          }
+        }, 1000);
+        return () => clearInterval(timer);
+      }
+    }
+  }, []);
 
   // Guard: redirect if no inputs are present
   useEffect(() => {
@@ -24,75 +38,130 @@ export function AnalysisScreen() {
   }, [inputs.idea, navigate]);
 
   useEffect(() => {
-    // Simulate API calls and progression
-    const interval = setInterval(() => {
-      setCurrentStep((prev) => {
-        if (prev < ANALYSIS_STEPS.length - 1) {
-          return prev + 1;
+    if (!inputs.idea || requestTriggered.current) return;
+
+    const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
+    if (cooldownEnd && parseInt(cooldownEnd, 10) > Date.now()) {
+      // Cooldown active, show error message instead of calling API
+      setAnalysisStatus('error');
+      setErrorMessage(`Please wait ${Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000)}s before making another request.`);
+      return;
+    }
+
+    // Set 30-second cooldown in localStorage
+    localStorage.setItem('ideabridge_cooldown_end', (Date.now() + 30000).toString());
+    setCooldownRemaining(30);
+
+    const performAnalysis = async () => {
+      requestTriggered.current = true;
+      setAnalysisStatus('analyzing');
+      setErrorMessage(null);
+
+      try {
+        const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+        const response = await fetch(`${apiBase}/api/analyze`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(inputs),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Something went wrong.');
         }
-        return prev;
-      });
-    }, 1500);
 
-    // After all steps, generate mock data and transition
-    const totalTime = (ANALYSIS_STEPS.length * 1500) + 1000;
-    const timeout = setTimeout(() => {
-      setResults({
-        readinessScore: 78,
-        topRecommendation: {
-          nextStep: "Validate with target audience",
-          actions: ["Build a simple landing page", "Run targeted ads for 3 days", "Collect 50 email signups"]
-        },
-        dosAndDonts: {
-          dos: ["Focus on finding a technical co-founder", "Keep your initial feature set minimal"],
-          donts: ["Don't spend money on marketing yet", "Don't build mobile apps natively right away"]
-        },
-        mentors: [
-          { id: '1', name: "Sarah Jenkins", role: "Product Manager at TechFlow", whyMatched: "Experience in your exact industry sector." },
-          { id: '2', name: "David Chen", role: "2x Exit Founder", whyMatched: "Previously built and sold a similar marketplace." }
-        ],
-        funding: [
-          { id: '1', name: "Micro-Grant Initiative", type: "Grant", eligibility: "Pre-seed, solo founders", fitScore: 92, deadline: "Oct 15" },
-          { id: '2', name: "Seed Angel Syndicate", type: "Equity", eligibility: "Working prototype", fitScore: 75, deadline: "Rolling" }
-        ],
-        incubators: [
-          { id: '1', name: "LaunchPad Tech", stage: "Idea Stage", location: "Remote", benefits: ["$10k stipend", "AWS credits", "Weekly mentorship"] },
-          { id: '2', name: "Urban Innovators", stage: "Prototype", location: "New York", benefits: ["Co-working space", "Legal assistance"] }
-        ]
-      });
-      navigate('/results');
-    }, totalTime);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
+        setResults(data);
+        navigate('/results');
+      } catch (err: any) {
+        console.error('Analysis API Call failed:', err);
+        setAnalysisStatus('error');
+        setErrorMessage(err.message || 'Something went wrong.');
+      }
     };
-  }, [navigate, setResults]);
+
+    performAnalysis();
+  }, [inputs, navigate, setAnalysisStatus, setErrorMessage, setResults]);
+
+  const handleRetry = () => {
+    // Check if cooldown is finished before allowing retry
+    const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
+    if (cooldownEnd && parseInt(cooldownEnd, 10) > Date.now()) {
+      alert(`Please wait for the 30-second cooldown to end (${cooldownRemaining}s remaining).`);
+      return;
+    }
+    requestTriggered.current = false;
+    // Clear cooldown to start fresh
+    localStorage.removeItem('ideabridge_cooldown_end');
+    // Force re-execution by updating triggering flag
+    window.location.reload();
+  };
 
   return (
     <div className="min-h-screen bg-black text-white font-sans flex flex-col items-center justify-center p-6">
-      <div className="relative w-32 h-32 mb-12">
-        <div className="absolute inset-0 border-4 border-white/10 rounded-full"></div>
-        <div 
-          className="absolute inset-0 border-4 border-[#00f0ff] rounded-full border-t-transparent animate-spin"
-          style={{ animationDuration: '2s' }}
-        ></div>
-        {/* Pulsing inner core */}
-        <div className="absolute inset-4 bg-[#00f0ff] rounded-full blur-xl opacity-20 animate-pulse"></div>
-      </div>
       
-      <div className="h-16 flex items-center justify-center overflow-hidden">
-        <p key={currentStep} className="text-2xl font-light text-center animate-pulse">
-          {ANALYSIS_STEPS[currentStep]}
-        </p>
-      </div>
-      
-      <div className="w-64 h-1 bg-white/10 rounded-full mt-8 overflow-hidden">
-        <div 
-          className="h-full bg-[#00f0ff] transition-all duration-1000 ease-out"
-          style={{ width: `${((currentStep + 1) / ANALYSIS_STEPS.length) * 100}%` }}
-        ></div>
-      </div>
+      {/* ── Loading View ── */}
+      {analysisStatus === 'analyzing' && (
+        <div className="flex flex-col items-center justify-center">
+          <div className="relative w-32 h-32 mb-12">
+            <div className="absolute inset-0 border-4 border-white/10 rounded-full"></div>
+            <div 
+              className="absolute inset-0 border-4 border-[#00f0ff] rounded-full border-t-transparent animate-spin"
+              style={{ animationDuration: '2s' }}
+            ></div>
+            <div className="absolute inset-4 bg-[#00f0ff] rounded-full blur-xl opacity-20 animate-pulse"></div>
+          </div>
+          
+          <div className="h-16 flex items-center justify-center overflow-hidden">
+            <p className="text-2xl font-light text-center animate-pulse text-[#00f0ff]">
+              Analyzing your startup...
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Error View (Elegantly Styled Card) ── */}
+      {analysisStatus === 'error' && (
+        <div className="glass-panel--elevated max-w-md w-full p-8 border border-red-500/20 rounded-xl bg-neutral-900/80 backdrop-blur-md flex flex-col items-center text-center">
+          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-500">
+            <AlertCircle size={32} />
+          </div>
+          
+          <h2 className="text-2xl font-semibold mb-3 text-white">Analysis Failed</h2>
+          <p className="text-neutral-400 mb-6 text-sm leading-relaxed">
+            {errorMessage || 'Something went wrong.'}
+          </p>
+
+          {cooldownRemaining > 0 && (
+            <div className="text-xs text-neutral-500 mb-6">
+              Request Cooldown: {cooldownRemaining}s remaining
+            </div>
+          )}
+
+          <div className="flex gap-4 w-full justify-center">
+            <button 
+              onClick={() => navigate('/input')} 
+              className="px-5 py-2.5 rounded-lg border border-white/10 text-neutral-300 hover:bg-white/5 transition flex items-center gap-2 text-sm"
+            >
+              <ArrowLeft size={16} /> Edit Inputs
+            </button>
+            <button 
+              onClick={handleRetry} 
+              disabled={cooldownRemaining > 0}
+              className={`px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 text-sm ${
+                cooldownRemaining > 0 
+                  ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' 
+                  : 'bg-[#00f0ff] text-black hover:opacity-90'
+              }`}
+            >
+              <RotateCcw size={16} /> Try Again
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
