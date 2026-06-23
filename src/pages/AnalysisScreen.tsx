@@ -56,9 +56,9 @@ export function AnalysisScreen() {
       requestTriggered.current = true;
       setAnalysisStatus('analyzing');
       setErrorMessage(null);
-
       try {
         const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+        console.log("API_BASE =", API_BASE);
         const cleanBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
         const response = await fetch(`${cleanBase}/api/analyze`, {
           method: 'POST',
