@@ -71,7 +71,7 @@ export function AnalysisScreen() {
         const text = await response.text();
 
         console.log("HTTP Method:", "POST");
-        console.log("Final URL:", `${cleanBase}/api/analyze`);
+        console.log("Final URL =", `${cleanBase}/api/analyze`);
         console.log("Response Status:", response.status);
         console.log("Response Body:", text);
 
