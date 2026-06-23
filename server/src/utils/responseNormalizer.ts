@@ -1,5 +1,35 @@
 import { StartupAnalysisResponse } from '../types/types';
 
+export function truncateWords(text: string, maxWords = 25): string {
+  const trimmed = text.trim();
+  if (!trimmed) return '';
+  const words = trimmed.split(/\s+/);
+  if (words.length > maxWords) {
+    return words.slice(0, maxWords).join(' ') + '...';
+  }
+  return trimmed;
+}
+
+export function normalizeSection(items: string[]): string[] {
+  if (!Array.isArray(items)) {
+    return ['Information unavailable.'];
+  }
+
+  const cleaned = items
+    .map((item) => String(item).trim())
+    .filter(Boolean)
+    .map((item) => truncateWords(item, 25))
+    .filter(Boolean);
+
+  const limited = cleaned.slice(0, 2);
+
+  if (limited.length === 0) {
+    return ['Information unavailable.'];
+  }
+
+  return limited;
+}
+
 export function normalizeResponse(rawOutput: string): StartupAnalysisResponse {
   let parsed: any = {};
   
@@ -33,21 +63,7 @@ export function normalizeResponse(rawOutput: string): StartupAnalysisResponse {
   const normalized: Partial<StartupAnalysisResponse> = {};
 
   keys.forEach((key) => {
-    const value = parsed[key];
-    if (Array.isArray(value) && value.length > 0) {
-      // Ensure all items are strings and cleaned of unnecessary spaces
-      const stringArr = value
-        .map((item: any) => String(item).trim())
-        .filter((item: string) => item.length > 0);
-      
-      if (stringArr.length > 0) {
-        normalized[key] = stringArr;
-      } else {
-        normalized[key] = ['Information unavailable.'];
-      }
-    } else {
-      normalized[key] = ['Information unavailable.'];
-    }
+    normalized[key] = normalizeSection(parsed[key]);
   });
 
   return normalized as StartupAnalysisResponse;
