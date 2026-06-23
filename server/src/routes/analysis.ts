@@ -8,9 +8,12 @@ import { normalizeResponse } from '../utils/responseNormalizer';
 const router = Router();
 
 router.post('/analyze', analysisLimiter, async (req, res) => {
+  console.log("Incoming Request");
+
   // 1. Zod input validation
   const parseResult = analysisSchema.safeParse(req.body);
   if (!parseResult.success) {
+    console.log("Response Sent");
     return res.status(400).json({ error: 'Please fill all required fields correctly.' });
   }
 
@@ -19,6 +22,7 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
   const cachedData = analysisCache.get(cacheKey);
   if (cachedData) {
     console.log('Cache HIT');
+    console.log("Response Sent");
     return res.json(cachedData);
   }
 
@@ -32,10 +36,12 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
     // 5. Save normalized data to cache (TTL = 3600 seconds)
     analysisCache.set(cacheKey, normalizedResult);
 
+    console.log("Response Sent");
     return res.json(normalizedResult);
   } catch (error: any) {
     console.error('API analyze route error:', error.message || error);
     
+    console.log("Response Sent");
     if (error.message === 'AI is taking longer than expected.') {
       return res.status(408).json({ error: 'AI is taking longer than expected.' });
     }

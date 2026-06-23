@@ -21,10 +21,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Default error handler to prevent stack traces leaking to client
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Unhandled Server Error:', err);
-  res.status(500).json({ error: 'Something went wrong.' });
+  console.error(err);
+  res.status(500).json({
+    error: "Something went wrong."
+  });
 });
 
 app.listen(PORT, () => {

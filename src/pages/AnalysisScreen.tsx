@@ -59,7 +59,8 @@ export function AnalysisScreen() {
 
       try {
         const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
-        const response = await fetch(`${API_BASE}/api/analyze`, {
+        const cleanBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+        const response = await fetch(`${cleanBase}/api/analyze`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -67,10 +68,40 @@ export function AnalysisScreen() {
           body: JSON.stringify(inputs),
         });
 
-        const data = await response.json();
+        const text = await response.text();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Something went wrong.');
+          let errorMsg = "";
+          try {
+            const errorData = JSON.parse(text);
+            errorMsg = errorData.error;
+          } catch (e) {
+            // Ignore parse error, fall back to status code
+          }
+
+          if (!errorMsg) {
+            if (response.status === 429) {
+              errorMsg = "Too many requests. Please try again later.";
+            } else if (response.status === 408 || response.status === 504) {
+              errorMsg = "AI is taking longer than expected.";
+            } else if (response.status === 503 || response.status === 500) {
+              errorMsg = "AI service is currently unavailable.";
+            } else {
+              errorMsg = "Server error. Please try again later.";
+            }
+          }
+          throw new Error(errorMsg);
+        }
+
+        if (!text || text.trim() === "") {
+          throw new Error("Empty response from server.");
+        }
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error("Server returned invalid data.");
         }
 
         setResults(data);
@@ -78,7 +109,25 @@ export function AnalysisScreen() {
       } catch (err: any) {
         console.error('Analysis API Call failed:', err);
         setAnalysisStatus('error');
-        setErrorMessage(err.message || 'Something went wrong.');
+        
+        let userMessage = "Something went wrong.";
+        const msg = err.message || "";
+        
+        if (msg.includes("Too many requests")) {
+          userMessage = "Too many requests. Please try again later.";
+        } else if (msg.includes("longer than expected")) {
+          userMessage = "AI is taking longer than expected.";
+        } else if (msg.includes("currently unavailable")) {
+          userMessage = "AI service is currently unavailable.";
+        } else if (msg.includes("invalid data") || msg.includes("invalid JSON") || msg.includes("JSON") || msg.includes("Unexpected end of JSON")) {
+          userMessage = "Server returned invalid data.";
+        } else if (msg.includes("Empty response")) {
+          userMessage = "Empty response from server.";
+        } else if (msg && msg !== "Something went wrong.") {
+          userMessage = msg;
+        }
+        
+        setErrorMessage(userMessage);
       }
     };
 
