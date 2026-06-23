@@ -58,8 +58,8 @@ export function AnalysisScreen() {
       setErrorMessage(null);
 
       try {
-        const apiBase = import.meta.env.VITE_API_BASE_URL || '';
-        const response = await fetch(`${apiBase}/api/analyze`, {
+        const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+        const response = await fetch(`${API_BASE}/api/analyze`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

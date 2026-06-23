@@ -20,6 +20,7 @@ Budget Level: ${data.budget}
 Team Size: ${data.teamSize}`;
 
   const callApi = async (): Promise<string> => {
+    console.log("Gemini Request");
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: promptContent,
@@ -37,6 +38,7 @@ Team Size: ${data.teamSize}`;
   try {
     return await withTimeout(callApi(), 15000, 'AI is taking longer than expected.');
   } catch (error: any) {
+    console.log("Retry Attempt");
     console.warn('First Gemini call failed or timed out. Retrying once after 2 seconds...', error.message || error);
     
     // Wait for 2 seconds

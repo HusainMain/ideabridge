@@ -3,6 +3,7 @@ export function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutEr
   
   const timeoutPromise = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => {
+      console.error("Timeout Error");
       reject(new Error(timeoutErrorMsg));
     }, timeoutMs);
   });

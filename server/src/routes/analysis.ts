@@ -18,7 +18,7 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
   const cacheKey = JSON.stringify(req.body);
   const cachedData = analysisCache.get(cacheKey);
   if (cachedData) {
-    console.log('Cache hit - returning cached response');
+    console.log('Cache HIT');
     return res.json(cachedData);
   }
 
