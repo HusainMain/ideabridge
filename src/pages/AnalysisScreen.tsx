@@ -109,6 +109,7 @@ export function AnalysisScreen() {
           throw new Error("Server returned invalid data.");
         }
 
+        console.log("Backend response =", data);
         setResults(data);
         navigate('/results');
       } catch (err: any) {

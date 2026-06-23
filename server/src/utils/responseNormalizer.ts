@@ -10,12 +10,21 @@ export function truncateWords(text: string, maxWords = 25): string {
   return trimmed;
 }
 
-export function normalizeSection(items: string[]): string[] {
-  if (!Array.isArray(items)) {
+export function normalizeSection(items: any): string[] {
+  let arr: any[] = [];
+  if (Array.isArray(items)) {
+    arr = items;
+  } else if (typeof items === 'string') {
+    if (items.includes('\n')) {
+      arr = items.split('\n');
+    } else {
+      arr = [items];
+    }
+  } else {
     return ['Information unavailable.'];
   }
 
-  const cleaned = items
+  const cleaned = arr
     .map((item) => String(item).trim())
     .filter(Boolean)
     .map((item) => truncateWords(item, 25))
@@ -48,6 +57,20 @@ export function normalizeResponse(rawOutput: string): StartupAnalysisResponse {
     parsed = {};
   }
 
+  // Handle case where JSON is wrapped under a single root key (e.g., { "analysis": { "summary": ... } })
+  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+    const firstKey = Object.keys(parsed)[0];
+    if (
+      Object.keys(parsed).length === 1 &&
+      parsed[firstKey] &&
+      typeof parsed[firstKey] === 'object' &&
+      !Array.isArray(parsed[firstKey]) &&
+      ('summary' in parsed[firstKey] || 'validation' in parsed[firstKey])
+    ) {
+      parsed = parsed[firstKey];
+    }
+  }
+
   const keys: (keyof StartupAnalysisResponse)[] = [
     'summary',
     'validation',
@@ -63,7 +86,7 @@ export function normalizeResponse(rawOutput: string): StartupAnalysisResponse {
   const normalized: Partial<StartupAnalysisResponse> = {};
 
   keys.forEach((key) => {
-    normalized[key] = normalizeSection(parsed[key]);
+    normalized[key] = normalizeSection(parsed ? parsed[key] : undefined);
   });
 
   return normalized as StartupAnalysisResponse;

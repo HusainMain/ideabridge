@@ -27,7 +27,7 @@ Team Size: ${data.teamSize}`;
       config: {
         systemInstruction: SYSTEM_PROMPT,
         temperature: 0.2,
-        maxOutputTokens: 350,
+        maxOutputTokens: 1000,
         responseMimeType: 'application/json',
       },
     });

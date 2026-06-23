@@ -107,6 +107,8 @@ export function ResultsWorkspace() {
   const navigate = useNavigate();
   const { results, inputs } = useJourneyStore();
 
+  console.log("Loaded result =", results);
+
   if (!results) {
     return (
       <div className="act-results-empty">
