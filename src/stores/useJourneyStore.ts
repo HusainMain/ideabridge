@@ -52,7 +52,10 @@ export const useJourneyStore = create<JourneyState>((set) => ({
   results: null,
   errorMessage: null,
   setInputs: (inputs) => set((state) => ({ inputs: { ...state.inputs, ...inputs } })),
-  setAnalysisStatus: (status) => set({ analysisStatus: status }),
+  setAnalysisStatus: (status) => { 
+    console.log('[setAnalysisStatus] called with:', status); 
+    return set({ analysisStatus: status }); 
+  },
   setResults: (results) => set({ results, analysisStatus: 'success', errorMessage: null }),
   setErrorMessage: (msg) => set(() => ({ 
     errorMessage: msg, 

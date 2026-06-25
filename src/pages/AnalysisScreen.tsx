@@ -44,21 +44,33 @@ export function AnalysisScreen() {
     }
   }, [inputs.idea, navigate]);
 
+  // Log every analysisStatus change
+  useEffect(() => {
+    console.log('[AnalysisScreen] analysisStatus changed to:', analysisStatus);
+  }, [analysisStatus]);
+
 
 
   // Cooldown countdown logic
   useEffect(() => {
     if (analysisStatus !== 'cooldown') return;
+    console.log('[AnalysisScreen] entering cooldown');
 
     const updateCooldown = () => {
+      if (!cooldownTimerRef.current) return; // Guard against interval that's been cleared but still running
       const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
       if (cooldownEnd) {
         const remaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
+        console.log('[AnalysisScreen] cooldown remaining:', remaining);
         if (remaining > 0) {
           setCooldownRemaining(remaining);
         } else {
           // Cooldown is over, start analysis
-          if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
+          console.log('[AnalysisScreen] cooldown over, calling performAnalysis');
+          if (cooldownTimerRef.current) {
+            clearInterval(cooldownTimerRef.current);
+            cooldownTimerRef.current = null;
+          }
           performAnalysis();
         }
       }
@@ -68,13 +80,16 @@ export function AnalysisScreen() {
     cooldownTimerRef.current = setInterval(updateCooldown, 1000);
 
     return () => {
+      console.log('[AnalysisScreen] cleaning up cooldown interval');
       if (cooldownTimerRef.current) {
         clearInterval(cooldownTimerRef.current);
+        cooldownTimerRef.current = null;
       }
     };
   }, [analysisStatus]);
 
   const performAnalysis = async () => {
+    console.log('[performAnalysis] called!');
     requestTriggered.current = true;
     setAnalysisStatus('analyzing');
     setErrorMessage(null);
@@ -204,7 +219,8 @@ export function AnalysisScreen() {
           key="loading" 
           cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined} 
         />
-      ) : analysisStatus === 'error' ? (
+      ) : analysisStatus === 'error' && errorMessage ? (
+        console.log('[AnalysisScreen] RENDERING ERROR UI, errorMessage:', errorMessage) || (
         <motion.div
           key="error"
           initial={{ opacity: 0, scale: 0.95 }}
@@ -248,7 +264,7 @@ export function AnalysisScreen() {
             </div>
           </div>
         </motion.div>
-      ) : (
+        )) : (
         // Show minimal state while waiting for 500ms delay
         <div className="min-h-screen bg-slate-950" />
       )}
