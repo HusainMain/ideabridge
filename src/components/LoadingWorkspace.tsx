@@ -13,7 +13,7 @@ const STAGES = [
   { icon: ClipboardList, label: 'Final Recommendations' },
 ];
 
-const MESSAGES = [
+const DEFAULT_MESSAGES = [
   "Analyzing startup concept...",
   "Identifying customer pain points...",
   "Researching competitors...",
@@ -23,12 +23,21 @@ const MESSAGES = [
   "Preparing recommendations...",
 ];
 
-export function LoadingWorkspace() {
+interface LoadingWorkspaceProps {
+  cooldownRemaining?: number;
+}
+
+export function LoadingWorkspace({ cooldownRemaining }: LoadingWorkspaceProps) {
   const [currentStage, setCurrentStage] = useState(0);
   const [currentMessage, setCurrentMessage] = useState(0);
   const [progress, setProgress] = useState(0);
+  const messages = cooldownRemaining !== undefined 
+    ? ["Preparing your AI advisor..."] 
+    : DEFAULT_MESSAGES;
 
   useEffect(() => {
+    if (cooldownRemaining !== undefined) return; // Don't animate stages if in cooldown
+    
     // Animate through stages
     const stageInterval = setInterval(() => {
       setCurrentStage(prev => Math.min(prev + 1, STAGES.length - 1));
@@ -36,7 +45,7 @@ export function LoadingWorkspace() {
 
     // Animate through messages
     const messageInterval = setInterval(() => {
-      setCurrentMessage(prev => (prev + 1) % MESSAGES.length);
+      setCurrentMessage(prev => (prev + 1) % messages.length);
     }, 2000);
 
     // Animate progress bar
@@ -49,7 +58,7 @@ export function LoadingWorkspace() {
       clearInterval(messageInterval);
       clearInterval(progressInterval);
     };
-  }, []);
+  }, [messages.length, cooldownRemaining]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans flex flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -100,14 +109,14 @@ export function LoadingWorkspace() {
             <motion.div
               className="h-full bg-gradient-to-r from-cyan-400 via-cyan-300 to-blue-400 rounded-full shadow-lg shadow-cyan-400/40"
               initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
+              animate={{ width: cooldownRemaining !== undefined ? '0%' : `${progress}%` }}
               transition={{ type: "spring", stiffness: 50, damping: 15 }}
             />
           </div>
         </div>
 
         {/* Animated Message */}
-        <div className="h-12 flex items-center justify-center mb-12">
+        <div className="h-12 flex items-center justify-center mb-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentMessage}
@@ -117,51 +126,71 @@ export function LoadingWorkspace() {
               transition={{ duration: 0.3 }}
               className="text-lg text-cyan-300 font-light tracking-wide"
             >
-              {MESSAGES[currentMessage]}
+              {messages[currentMessage % messages.length]}
             </motion.div>
           </AnimatePresence>
         </div>
+        
+        {/* Cooldown Timer */}
+        {cooldownRemaining !== undefined && (
+          <div className="h-10 flex items-center justify-center mb-6">
+            <AnimatePresence>
+              <motion.div
+                key={cooldownRemaining}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-xl font-semibold text-purple-400"
+              >
+                Next analysis available in {cooldownRemaining} second{cooldownRemaining !== 1 ? 's' : ''}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        )}
 
-        {/* Stages indicator */}
-        <div className="flex items-center justify-center gap-4 flex-wrap">
-          {STAGES.map((stage, index) => {
-            const Icon = stage.icon;
-            const isCompleted = index < currentStage;
-            const isActive = index === currentStage;
+        {/* Stages indicator (only show if not in cooldown) */}
+        {cooldownRemaining === undefined && (
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            {STAGES.map((stage, index) => {
+              const Icon = stage.icon;
+              const isCompleted = index < currentStage;
+              const isActive = index === currentStage;
 
-            return (
-              <div key={index} className="flex items-center gap-2">
-                <div
-                  className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-500 ${
-                    isCompleted
-                      ? 'bg-cyan-500/20 border-2 border-cyan-400 text-cyan-300'
-                      : isActive
-                      ? 'bg-purple-500/20 border-2 border-purple-400 text-purple-300 scale-110 shadow-lg shadow-purple-500/30'
-                      : 'bg-slate-800/50 border-2 border-slate-700/30 text-slate-500'
-                  }`}
-                >
-                  {isCompleted ? (
-                    <Check size={20} />
-                  ) : (
-                    <Icon size={20} />
+              return (
+                <div key={index} className="flex items-center gap-2">
+                  <div
+                    className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-500 ${
+                      isCompleted
+                        ? 'bg-cyan-500/20 border-2 border-cyan-400 text-cyan-300'
+                        : isActive
+                        ? 'bg-purple-500/20 border-2 border-purple-400 text-purple-300 scale-110 shadow-lg shadow-purple-500/30'
+                        : 'bg-slate-800/50 border-2 border-slate-700/30 text-slate-500'
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <Check size={20} />
+                    ) : (
+                      <Icon size={20} />
+                    )}
+                  </div>
+                  {index < STAGES.length - 1 && (
+                    <div className={`w-6 h-0.5 ${
+                      isCompleted ? 'bg-cyan-500/40' : 'bg-slate-700/30'
+                    }`} />
                   )}
                 </div>
-                {index < STAGES.length - 1 && (
-                  <div className={`w-6 h-0.5 ${
-                    isCompleted ? 'bg-cyan-500/40' : 'bg-slate-700/30'
-                  }`} />
-                )}
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
-        {/* Stage label */}
-        <div className="mt-6 text-center">
-          <span className="text-sm text-slate-400">
-            {STAGES[currentStage].label}
-          </span>
-        </div>
+        {/* Stage label (only show if not in cooldown) */}
+        {cooldownRemaining === undefined && (
+          <div className="mt-6 text-center">
+            <span className="text-sm text-slate-400">
+              {STAGES[currentStage].label}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

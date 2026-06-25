@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type AnalysisStatus = 'idle' | 'analyzing' | 'success' | 'error';
+export type AnalysisStatus = 'idle' | 'analyzing' | 'success' | 'error' | 'cooldown';
 
 export interface IdeaInputs {
   idea: string;

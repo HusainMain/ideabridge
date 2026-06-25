@@ -7,32 +7,35 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export function AnalysisScreen() {
   const navigate = useNavigate();
-  const { inputs, setResults, setAnalysisStatus, setErrorMessage, errorMessage, analysisStatus } = useJourneyStore();
-  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
-  const [showLoading, setShowLoading] = useState(false);
+  const { 
+    inputs, 
+    setResults, 
+    setAnalysisStatus, 
+    setErrorMessage, 
+    errorMessage, 
+    analysisStatus 
+  } = useJourneyStore();
+  
+  const [cooldownRemaining, setCooldownRemaining] = useState<number | null>(null);
   const [initialized, setInitialized] = useState(false);
   const requestTriggered = useRef(false);
+  const cooldownTimerRef = useRef<number | null>(null);
 
-  // Cooldown countdown timer
+  // Clear all timers on unmount
   useEffect(() => {
-    const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
-    if (cooldownEnd) {
-      const remaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
-      if (remaining > 0) {
-        setCooldownRemaining(remaining);
-        const timer = setInterval(() => {
-          const currentRemaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
-          if (currentRemaining <= 0) {
-            setCooldownRemaining(0);
-            clearInterval(timer);
-          } else {
-            setCooldownRemaining(currentRemaining);
-          }
-        }, 1000);
-        return () => clearInterval(timer);
+    return () => {
+      if (cooldownTimerRef.current) {
+        clearInterval(cooldownTimerRef.current);
       }
-    }
+    };
   }, []);
+
+  // Initialize on mount: clear any stale state, immediately reset
+  useEffect(() => {
+    setAnalysisStatus('idle');
+    setErrorMessage(null);
+    setInitialized(true);
+  }, [setAnalysisStatus, setErrorMessage]);
 
   // Guard: redirect if no inputs are present
   useEffect(() => {
@@ -41,136 +44,150 @@ export function AnalysisScreen() {
     }
   }, [inputs.idea, navigate]);
 
-  // Initialize on mount: clear any stale state, immediately reset
-  useEffect(() => {
-    setAnalysisStatus('idle');
-    setErrorMessage(null);
-    setShowLoading(false);
-    setInitialized(true);
-  }, [setAnalysisStatus, setErrorMessage]);
 
-  // Show loading after 500ms delay
+
+  // Cooldown countdown logic
   useEffect(() => {
-    if (analysisStatus === 'analyzing') {
-      const timer = setTimeout(() => {
-        setShowLoading(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
+    if (analysisStatus !== 'cooldown') return;
+
+    const updateCooldown = () => {
+      const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
+      if (cooldownEnd) {
+        const remaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
+        if (remaining > 0) {
+          setCooldownRemaining(remaining);
+        } else {
+          // Cooldown is over, start analysis
+          if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
+          performAnalysis();
+        }
+      }
+    };
+
+    updateCooldown();
+    cooldownTimerRef.current = setInterval(updateCooldown, 1000);
+
+    return () => {
+      if (cooldownTimerRef.current) {
+        clearInterval(cooldownTimerRef.current);
+      }
+    };
   }, [analysisStatus]);
 
+  const performAnalysis = async () => {
+    requestTriggered.current = true;
+    setAnalysisStatus('analyzing');
+    setErrorMessage(null);
+    setCooldownRemaining(null);
+    
+    // Set new 30 second cooldown for next request
+    localStorage.setItem('ideabridge_cooldown_end', (Date.now() + 30000).toString());
+    
+    try {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+      console.log("API_BASE =", API_BASE);
+      const cleanBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+      const response = await fetch(`${cleanBase}/api/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputs),
+      });
+
+      const text = await response.text();
+
+      console.log("HTTP Method:", "POST");
+      console.log("Final URL =", `${cleanBase}/api/analyze`);
+      console.log("Response Status:", response.status);
+      console.log("Response Body:", text);
+
+      if (!response.ok) {
+        let errorMsg = "";
+        try {
+          const errorData = JSON.parse(text);
+          errorMsg = errorData.error;
+        } catch (e) {
+          // Ignore parse error, fall back to status code
+        }
+
+        if (!errorMsg) {
+          if (response.status === 429) {
+            errorMsg = "Too many requests. Please try again later.";
+          } else if (response.status === 408 || response.status === 504) {
+            errorMsg = "AI is taking longer than expected.";
+          } else if (response.status === 503 || response.status === 500) {
+            errorMsg = "AI service is currently unavailable.";
+          } else {
+            errorMsg = "Server error. Please try again later.";
+          }
+        }
+        throw new Error(errorMsg);
+      }
+
+      if (!text || text.trim() === "") {
+        throw new Error("Empty response from server.");
+      }
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error("Server returned invalid data.");
+      }
+
+      console.log("Backend response =", data);
+      setResults(data);
+      navigate('/results');
+    } catch (err: any) {
+      console.error('Analysis API Call failed:', err);
+      setAnalysisStatus('error');
+      
+      let userMessage = "Something went wrong.";
+      const msg = err.message || "";
+      
+      if (msg.includes("Too many requests")) {
+        userMessage = "Too many requests. Please try again later.";
+      } else if (msg.includes("longer than expected")) {
+        userMessage = "AI is taking longer than expected.";
+      } else if (msg.includes("currently unavailable")) {
+        userMessage = "AI service is currently unavailable.";
+      } else if (msg.includes("invalid data") || msg.includes("invalid JSON") || msg.includes("JSON") || msg.includes("Unexpected end of JSON")) {
+        userMessage = "Server returned invalid data.";
+      } else if (msg.includes("Empty response")) {
+        userMessage = "Empty response from server.";
+      } else if (msg && msg !== "Something went wrong.") {
+        userMessage = msg;
+      }
+      
+      setErrorMessage(userMessage);
+    }
+  };
+
+  // Main logic: check on mount/initialized
   useEffect(() => {
     if (!initialized || !inputs.idea || requestTriggered.current) return;
 
     const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
     if (cooldownEnd && parseInt(cooldownEnd, 10) > Date.now()) {
-      // Cooldown active, show error message instead of calling API
-      setAnalysisStatus('error');
-      setErrorMessage(`Please wait ${Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000)}s before making another request.`);
-      return;
+      // Cooldown active, enter cooldown state
+      const remaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
+      setCooldownRemaining(remaining);
+      setAnalysisStatus('cooldown');
+    } else {
+      // No cooldown, start analysis immediately
+      performAnalysis();
     }
-
-    // Set 30-second cooldown in localStorage
-    localStorage.setItem('ideabridge_cooldown_end', (Date.now() + 30000).toString());
-    setCooldownRemaining(30);
-
-    const performAnalysis = async () => {
-      requestTriggered.current = true;
-      setAnalysisStatus('analyzing');
-      setErrorMessage(null);
-      try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
-        console.log("API_BASE =", API_BASE);
-        const cleanBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
-        const response = await fetch(`${cleanBase}/api/analyze`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(inputs),
-        });
-
-        const text = await response.text();
-
-        console.log("HTTP Method:", "POST");
-        console.log("Final URL =", `${cleanBase}/api/analyze`);
-        console.log("Response Status:", response.status);
-        console.log("Response Body:", text);
-
-        if (!response.ok) {
-          let errorMsg = "";
-          try {
-            const errorData = JSON.parse(text);
-            errorMsg = errorData.error;
-          } catch (e) {
-            // Ignore parse error, fall back to status code
-          }
-
-          if (!errorMsg) {
-            if (response.status === 429) {
-              errorMsg = "Too many requests. Please try again later.";
-            } else if (response.status === 408 || response.status === 504) {
-              errorMsg = "AI is taking longer than expected.";
-            } else if (response.status === 503 || response.status === 500) {
-              errorMsg = "AI service is currently unavailable.";
-            } else {
-              errorMsg = "Server error. Please try again later.";
-            }
-          }
-          throw new Error(errorMsg);
-        }
-
-        if (!text || text.trim() === "") {
-          throw new Error("Empty response from server.");
-        }
-
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          throw new Error("Server returned invalid data.");
-        }
-
-        console.log("Backend response =", data);
-        setResults(data);
-        navigate('/results');
-      } catch (err: any) {
-        console.error('Analysis API Call failed:', err);
-        setAnalysisStatus('error');
-        
-        let userMessage = "Something went wrong.";
-        const msg = err.message || "";
-        
-        if (msg.includes("Too many requests")) {
-          userMessage = "Too many requests. Please try again later.";
-        } else if (msg.includes("longer than expected")) {
-          userMessage = "AI is taking longer than expected.";
-        } else if (msg.includes("currently unavailable")) {
-          userMessage = "AI service is currently unavailable.";
-        } else if (msg.includes("invalid data") || msg.includes("invalid JSON") || msg.includes("JSON") || msg.includes("Unexpected end of JSON")) {
-          userMessage = "Server returned invalid data.";
-        } else if (msg.includes("Empty response")) {
-          userMessage = "Empty response from server.";
-        } else if (msg && msg !== "Something went wrong.") {
-          userMessage = msg;
-        }
-        
-        setErrorMessage(userMessage);
-      }
-    };
-
-    performAnalysis();
-  }, [inputs, navigate, setAnalysisStatus, setErrorMessage, setResults, initialized]);
+  }, [initialized, inputs, setAnalysisStatus]);
 
   const handleRetry = () => {
     // Check if cooldown is finished before allowing retry
     const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
     if (cooldownEnd && parseInt(cooldownEnd, 10) > Date.now()) {
-      alert(`Please wait for the 30-second cooldown to end (${cooldownRemaining}s remaining).`);
+      alert(`Please wait for the cooldown to end (${cooldownRemaining}s remaining).`);
       return;
     }
     requestTriggered.current = false;
-    setShowLoading(false);
     // Clear cooldown to start fresh
     localStorage.removeItem('ideabridge_cooldown_end');
     // Force re-execution by updating triggering flag
@@ -182,8 +199,11 @@ export function AnalysisScreen() {
       {!initialized ? (
         // Show minimal state while initializing (prevent stale state render)
         <div key="init" className="min-h-screen bg-slate-950" />
-      ) : analysisStatus === 'analyzing' && showLoading ? (
-        <LoadingWorkspace key="loading" />
+      ) : analysisStatus === 'analyzing' || analysisStatus === 'cooldown' ? (
+        <LoadingWorkspace 
+          key="loading" 
+          cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined} 
+        />
       ) : analysisStatus === 'error' ? (
         <motion.div
           key="error"
@@ -201,7 +221,7 @@ export function AnalysisScreen() {
               {errorMessage || 'Something went wrong.'}
             </p>
 
-            {cooldownRemaining > 0 && (
+            {cooldownRemaining !== null && cooldownRemaining > 0 && (
               <div className="text-xs text-slate-500 mb-6">
                 Request Cooldown: {cooldownRemaining}s remaining
               </div>
@@ -216,10 +236,10 @@ export function AnalysisScreen() {
               </button>
               <button 
                 onClick={handleRetry} 
-                disabled={cooldownRemaining > 0}
+                disabled={cooldownRemaining !== null && cooldownRemaining > 0}
                 className={`px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 text-sm ${
-                  cooldownRemaining > 0 
-                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
+                  cooldownRemaining !== null && cooldownRemaining > 0
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
                     : 'bg-cyan-400 text-slate-950 hover:opacity-90'
                 }`}
               >
