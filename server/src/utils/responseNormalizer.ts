@@ -99,3 +99,4 @@ export function normalizeResponse(rawOutput: string): StartupAnalysisResponse {
 
   return normalized as StartupAnalysisResponse;
 }
+

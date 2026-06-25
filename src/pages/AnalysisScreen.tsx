@@ -2,11 +2,14 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useJourneyStore } from '../stores/useJourneyStore';
 import { AlertCircle, ArrowLeft, RotateCcw } from 'lucide-react';
+import { LoadingWorkspace } from '../components/LoadingWorkspace';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export function AnalysisScreen() {
   const navigate = useNavigate();
   const { inputs, setResults, setAnalysisStatus, setErrorMessage, errorMessage, analysisStatus } = useJourneyStore();
   const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+  const [showLoading, setShowLoading] = useState(false);
   const requestTriggered = useRef(false);
 
   // Cooldown countdown timer
@@ -36,6 +39,16 @@ export function AnalysisScreen() {
       navigate('/input');
     }
   }, [inputs.idea, navigate]);
+
+  // Show loading after 500ms delay
+  useEffect(() => {
+    if (analysisStatus === 'analyzing') {
+      const timer = setTimeout(() => {
+        setShowLoading(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [analysisStatus]);
 
   useEffect(() => {
     if (!inputs.idea || requestTriggered.current) return;
@@ -148,6 +161,7 @@ export function AnalysisScreen() {
       return;
     }
     requestTriggered.current = false;
+    setShowLoading(false);
     // Clear cooldown to start fresh
     localStorage.removeItem('ideabridge_cooldown_end');
     // Force re-execution by updating triggering flag
@@ -155,68 +169,57 @@ export function AnalysisScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans flex flex-col items-center justify-center p-6">
-      
-      {/* ── Loading View ── */}
-      {analysisStatus === 'analyzing' && (
-        <div className="flex flex-col items-center justify-center">
-          <div className="relative w-32 h-32 mb-12">
-            <div className="absolute inset-0 border-4 border-white/10 rounded-full"></div>
-            <div 
-              className="absolute inset-0 border-4 border-[#00f0ff] rounded-full border-t-transparent animate-spin"
-              style={{ animationDuration: '2s' }}
-            ></div>
-            <div className="absolute inset-4 bg-[#00f0ff] rounded-full blur-xl opacity-20 animate-pulse"></div>
-          </div>
-          
-          <div className="h-16 flex items-center justify-center overflow-hidden">
-            <p className="text-2xl font-light text-center animate-pulse text-[#00f0ff]">
-              Analyzing your startup...
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* ── Error View (Elegantly Styled Card) ── */}
-      {analysisStatus === 'error' && (
-        <div className="glass-panel--elevated max-w-md w-full p-8 border border-red-500/20 rounded-xl bg-neutral-900/80 backdrop-blur-md flex flex-col items-center text-center">
-          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-500">
-            <AlertCircle size={32} />
-          </div>
-          
-          <h2 className="text-2xl font-semibold mb-3 text-white">Analysis Failed</h2>
-          <p className="text-neutral-400 mb-6 text-sm leading-relaxed">
-            {errorMessage || 'Something went wrong.'}
-          </p>
-
-          {cooldownRemaining > 0 && (
-            <div className="text-xs text-neutral-500 mb-6">
-              Request Cooldown: {cooldownRemaining}s remaining
+    <AnimatePresence>
+      {analysisStatus === 'analyzing' && showLoading ? (
+        <LoadingWorkspace key="loading" />
+      ) : analysisStatus === 'error' ? (
+        <motion.div
+          key="error"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="min-h-screen bg-slate-950 text-white font-sans flex flex-col items-center justify-center p-6"
+        >
+          <div className="max-w-md w-full p-8 border border-red-500/20 rounded-xl bg-slate-900/80 backdrop-blur-md flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-500">
+              <AlertCircle size={32} />
             </div>
-          )}
+            
+            <h2 className="text-2xl font-semibold mb-3 text-white">Analysis Failed</h2>
+            <p className="text-slate-400 mb-4 text-sm leading-relaxed">
+              {errorMessage || 'Something went wrong.'}
+            </p>
 
-          <div className="flex gap-4 w-full justify-center">
-            <button 
-              onClick={() => navigate('/input')} 
-              className="px-5 py-2.5 rounded-lg border border-white/10 text-neutral-300 hover:bg-white/5 transition flex items-center gap-2 text-sm"
-            >
-              <ArrowLeft size={16} /> Edit Inputs
-            </button>
-            <button 
-              onClick={handleRetry} 
-              disabled={cooldownRemaining > 0}
-              className={`px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 text-sm ${
-                cooldownRemaining > 0 
-                  ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' 
-                  : 'bg-[#00f0ff] text-black hover:opacity-90'
-              }`}
-            >
-              <RotateCcw size={16} /> Try Again
-            </button>
+            {cooldownRemaining > 0 && (
+              <div className="text-xs text-slate-500 mb-6">
+                Request Cooldown: {cooldownRemaining}s remaining
+              </div>
+            )}
+
+            <div className="flex gap-4 w-full justify-center">
+              <button 
+                onClick={() => navigate('/input')} 
+                className="px-5 py-2.5 rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 transition flex items-center gap-2 text-sm"
+              >
+                <ArrowLeft size={16} /> Edit Inputs
+              </button>
+              <button 
+                onClick={handleRetry} 
+                disabled={cooldownRemaining > 0}
+                className={`px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 text-sm ${
+                  cooldownRemaining > 0 
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
+                    : 'bg-cyan-400 text-slate-950 hover:opacity-90'
+                }`}
+              >
+                <RotateCcw size={16} /> Try Again
+              </button>
+            </div>
           </div>
-        </div>
+        </motion.div>
+      ) : (
+        // Show minimal state while waiting for 500ms delay
+        <div className="min-h-screen bg-slate-950" />
       )}
-    </div>
+    </AnimatePresence>
   );
 }
-
