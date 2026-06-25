@@ -9,6 +9,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust Render.com's proxy so express-rate-limit reads the real client IP
+// from X-Forwarded-For instead of the shared load-balancer IP.
+app.set('trust proxy', 1);
+
 app.use(cors({
   origin: [
     "https://ideabridge-six.vercel.app",

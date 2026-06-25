@@ -27,7 +27,7 @@ Team Size: ${data.teamSize}`;
       config: {
         systemInstruction: SYSTEM_PROMPT,
         temperature: 0.2,
-        maxOutputTokens: 2000,
+        maxOutputTokens: 4000, // raised from 2000 to support 5 bullets × 9 sections
         responseMimeType: 'application/json',
       },
     });

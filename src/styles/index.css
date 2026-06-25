@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Print styles for PDF export ───────────────────────── */
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  .print\:hidden { display: none !important; }
+  .fixed, [style*="position: fixed"] { position: static !important; }
+
+  /* Force white background on cards for print legibility */
+  [style*="background"] { background: transparent !important; }
+
+  /* Keep text readable */
+  [style*="color: rgba(255,255,255"] { color: #333 !important; }
+  .text-white { color: #111 !important; }
+}
+
+/* ── Mobile safe-area padding ───────────────────────────── */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+/* ── Scrollbar styling ───────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+
 * {
   box-sizing: border-box;
 }

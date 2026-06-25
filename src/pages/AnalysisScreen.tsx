@@ -7,15 +7,16 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export function AnalysisScreen() {
   const navigate = useNavigate();
-  const { 
-    inputs, 
-    setResults, 
-    setAnalysisStatus, 
-    setErrorMessage, 
-    errorMessage, 
-    analysisStatus 
+  const {
+    inputs,
+    setResults,
+    setAnalysisStatus,
+    setErrorMessage,
+    clearResults,
+    errorMessage,
+    analysisStatus,
   } = useJourneyStore();
-  
+
   const [cooldownRemaining, setCooldownRemaining] = useState<number | null>(null);
   const [initialized, setInitialized] = useState(false);
   const requestTriggered = useRef(false);
@@ -30,12 +31,16 @@ export function AnalysisScreen() {
     };
   }, []);
 
-  // Initialize on mount: clear any stale state, immediately reset
+  // Initialize on mount:
+  // FIX: also call clearResults() so stale data from a previous run is gone
+  // before the new fetch resolves (or fails). Without this, the old ResultsData
+  // object stays in the Zustand store and can leak to the results page.
   useEffect(() => {
-    setErrorMessage(null); // First clear errorMessage which could trigger status change if not fixed
-    setAnalysisStatus('idle'); // Then set status to idle explicitly
+    clearResults();
+    setErrorMessage(null);
+    setAnalysisStatus('idle');
     setInitialized(true);
-  }, [setAnalysisStatus, setErrorMessage]);
+  }, [setAnalysisStatus, setErrorMessage, clearResults]);
 
   // Guard: redirect if no inputs are present
   useEffect(() => {
@@ -48,8 +53,6 @@ export function AnalysisScreen() {
   useEffect(() => {
     console.log('[AnalysisScreen] analysisStatus changed to:', analysisStatus);
   }, [analysisStatus]);
-
-
 
   // Cooldown countdown logic
   useEffect(() => {
@@ -94,10 +97,12 @@ export function AnalysisScreen() {
     setAnalysisStatus('analyzing');
     setErrorMessage(null);
     setCooldownRemaining(null);
-    
-    // Set new 30 second cooldown for next request
-    localStorage.setItem('ideabridge_cooldown_end', (Date.now() + 30000).toString());
-    
+
+    // FIX: do NOT write the cooldown here. Writing it before the fetch means any
+    // failed request (429, timeout, network error) still leaves the cooldown flag
+    // in localStorage, forcing the user through a countdown before they can retry.
+    // The cooldown is now set only after we know the server accepted the request.
+
     try {
       const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
       console.log("API_BASE =", API_BASE);
@@ -119,9 +124,15 @@ export function AnalysisScreen() {
 
       if (!response.ok) {
         let errorMsg = "";
+        let retryAfterSeconds: number | null = null;
+
         try {
           const errorData = JSON.parse(text);
           errorMsg = errorData.error;
+          // FIX: read server-computed retryAfter so cooldown is accurate, not guessed.
+          if (typeof errorData.retryAfter === 'number') {
+            retryAfterSeconds = errorData.retryAfter;
+          }
         } catch (e) {
           // Ignore parse error, fall back to status code
         }
@@ -137,8 +148,22 @@ export function AnalysisScreen() {
             errorMsg = "Server error. Please try again later.";
           }
         }
+
+        // FIX: on 429 set a cooldown using the server's own retryAfter value.
+        // For all other errors, do NOT set a cooldown — the user should be able
+        // to retry immediately without being blocked by a phantom countdown.
+        if (response.status === 429) {
+          const waitMs = retryAfterSeconds != null ? retryAfterSeconds * 1000 : 60000;
+          localStorage.setItem('ideabridge_cooldown_end', (Date.now() + waitMs).toString());
+          setCooldownRemaining(Math.ceil(waitMs / 1000));
+        }
+
         throw new Error(errorMsg);
       }
+
+      // FIX: set the cooldown ONLY on a successful request so that failed
+      // attempts don't leave a blocking timer behind.
+      localStorage.setItem('ideabridge_cooldown_end', (Date.now() + 30000).toString());
 
       if (!text || text.trim() === "") {
         throw new Error("Empty response from server.");
@@ -156,11 +181,13 @@ export function AnalysisScreen() {
       navigate('/results');
     } catch (err: any) {
       console.error('Analysis API Call failed:', err);
+      // FIX: set status to 'error' explicitly here (no longer relying on
+      // setErrorMessage's hidden side-effect, which has been removed from the store).
       setAnalysisStatus('error');
-      
+
       let userMessage = "Something went wrong.";
       const msg = err.message || "";
-      
+
       if (msg.includes("Too many requests")) {
         userMessage = "Too many requests. Please try again later.";
       } else if (msg.includes("longer than expected")) {
@@ -174,7 +201,7 @@ export function AnalysisScreen() {
       } else if (msg && msg !== "Something went wrong.") {
         userMessage = msg;
       }
-      
+
       setErrorMessage(userMessage);
     }
   };
@@ -205,9 +232,16 @@ export function AnalysisScreen() {
     requestTriggered.current = false;
     // Clear cooldown to start fresh
     localStorage.removeItem('ideabridge_cooldown_end');
-    // Force re-execution by updating triggering flag
+    // Force re-execution by resetting triggering flag
     window.location.reload();
   };
+
+  // Log when we're about to render error UI
+  useEffect(() => {
+    if (analysisStatus === 'error' && errorMessage) {
+      console.log('[AnalysisScreen] ABOUT TO RENDER ERROR UI, errorMessage:', errorMessage);
+    }
+  }, [analysisStatus, errorMessage]);
 
   return (
     <AnimatePresence>
@@ -215,60 +249,56 @@ export function AnalysisScreen() {
         // Show minimal state while initializing (prevent stale state render)
         <div key="init" className="min-h-screen bg-slate-950" />
       ) : analysisStatus === 'analyzing' || analysisStatus === 'cooldown' ? (
-        <LoadingWorkspace 
-          key="loading" 
-          cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined} 
+        <LoadingWorkspace
+          key="loading"
+          cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined}
         />
       ) : analysisStatus === 'error' && errorMessage ? (
-        (() => {
-          console.log('[AnalysisScreen] RENDERING ERROR UI, errorMessage:', errorMessage);
-          return (
-            <motion.div
-              key="error"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="min-h-screen bg-slate-950 text-white font-sans flex flex-col items-center justify-center p-6"
-            >
-              <div className="max-w-md w-full p-8 border border-red-500/20 rounded-xl bg-slate-900/80 backdrop-blur-md flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-500">
-                  <AlertCircle size={32} />
-                </div>
-                
-                <h2 className="text-2xl font-semibold mb-3 text-white">Analysis Failed</h2>
-                <p className="text-slate-400 mb-4 text-sm leading-relaxed">
-                  {errorMessage || 'Something went wrong.'}
-                </p>
+        <motion.div
+          key="error"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="min-h-screen bg-slate-950 text-white font-sans flex flex-col items-center justify-center p-6"
+        >
+          <div className="max-w-md w-full p-8 border border-red-500/20 rounded-xl bg-slate-900/80 backdrop-blur-md flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-500">
+              <AlertCircle size={32} />
+            </div>
 
-                {cooldownRemaining !== null && cooldownRemaining > 0 && (
-                  <div className="text-xs text-slate-500 mb-6">
-                    Request Cooldown: {cooldownRemaining}s remaining
-                  </div>
-                )}
+            <h2 className="text-2xl font-semibold mb-3 text-white">Analysis Failed</h2>
+            <p className="text-slate-400 mb-4 text-sm leading-relaxed">
+              {errorMessage || 'Something went wrong.'}
+            </p>
 
-                <div className="flex gap-4 w-full justify-center">
-                  <button 
-                    onClick={() => navigate('/input')} 
-                    className="px-5 py-2.5 rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 transition flex items-center gap-2 text-sm"
-                  >
-                    <ArrowLeft size={16} /> Edit Inputs
-                  </button>
-                  <button 
-                    onClick={handleRetry} 
-                    disabled={cooldownRemaining !== null && cooldownRemaining > 0}
-                    className={`px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 text-sm ${
-                      cooldownRemaining !== null && cooldownRemaining > 0
-                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                        : 'bg-cyan-400 text-slate-950 hover:opacity-90'
-                    }`}
-                  >
-                    <RotateCcw size={16} /> Try Again
-                  </button>
-                </div>
+            {cooldownRemaining !== null && cooldownRemaining > 0 && (
+              <div className="text-xs text-slate-500 mb-6">
+                Request Cooldown: {cooldownRemaining}s remaining
               </div>
-            </motion.div>
-          );
-        })() : (
-        // Show minimal state while waiting for 500ms delay
+            )}
+
+            <div className="flex gap-4 w-full justify-center">
+              <button
+                onClick={() => navigate('/input')}
+                className="px-5 py-2.5 rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 transition flex items-center gap-2 text-sm"
+              >
+                <ArrowLeft size={16} /> Edit Inputs
+              </button>
+              <button
+                onClick={handleRetry}
+                disabled={cooldownRemaining !== null && cooldownRemaining > 0}
+                className={`px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 text-sm ${
+                  cooldownRemaining !== null && cooldownRemaining > 0
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                    : 'bg-cyan-400 text-slate-950 hover:opacity-90'
+                }`}
+              >
+                <RotateCcw size={16} /> Try Again
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      ) : (
+        // Show minimal state while waiting for analysis to begin
         <div className="min-h-screen bg-slate-950" />
       )}
     </AnimatePresence>

@@ -1,234 +1,346 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Download, 
-  Edit3, 
-  Share2, 
-  FileText, 
-  CheckSquare, 
-  Users, 
-  CreditCard, 
-  Target, 
-  Milestone, 
-  Coins, 
-  AlertTriangle, 
-  ArrowRight
+import {
+  CheckSquare,
+  Users,
+  CreditCard,
+  Target,
+  Milestone,
+  Coins,
+  AlertTriangle,
+  ArrowRight,
+  ShieldAlert,
+  CalendarDays,
 } from 'lucide-react';
-import { useJourneyStore, ResultsData } from '../stores/useJourneyStore';
 
-interface CardInfo {
-  title: string;
-  key: keyof ResultsData;
-  icon: any;
-  description: string;
+import { useJourneyStore } from '../stores/useJourneyStore';
+
+import { ReportHeader }        from '../components/results/ReportHeader';
+import { ScoreDashboard }      from '../components/results/ScoreDashboard';
+import { ExecutiveSummary }    from '../components/results/ExecutiveSummary';
+import { AnalysisSectionCard } from '../components/results/AnalysisSectionCard';
+import { PriorityActions }     from '../components/results/PriorityActions';
+import { RoadmapVisualizer }   from '../components/results/RoadmapVisualizer';
+import { FloatingActionBar }   from '../components/results/FloatingActionBar';
+import { RealityCheckCard }    from '../components/results/RealityCheckCard';
+import { CompetitorCards }     from '../components/results/CompetitorCards';
+import { SevenDayPlan }        from '../components/results/SevenDayPlan';
+
+/* ─── helpers ────────────────────────────────────────────── */
+
+function formatDate(d: Date): string {
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-const CARDS_CONFIG: CardInfo[] = [
-  { 
-    title: 'Startup Summary', 
-    key: 'summary', 
-    icon: FileText, 
-    description: 'High-level overview of the venture concept.' 
-  },
-  { 
-    title: 'Problem Validation', 
-    key: 'validation', 
-    icon: CheckSquare, 
-    description: 'Direct methods to verify customer pain points.' 
-  },
-  { 
-    title: 'Target Customers', 
-    key: 'customers', 
-    icon: Users, 
-    description: 'The specific customer segments experiencing the pain.' 
-  },
-  { 
-    title: 'Revenue Model', 
-    key: 'revenue', 
-    icon: CreditCard, 
-    description: 'Primary monetization and business strategies.' 
-  },
-  { 
-    title: 'Competitors', 
-    key: 'competitors', 
-    icon: Target, 
-    description: 'Market landscape and differentiation positioning.' 
-  },
-  { 
-    title: 'MVP Roadmap', 
-    key: 'roadmap', 
-    icon: Milestone, 
-    description: 'The tactical steps to build and launch.' 
-  },
-  { 
-    title: 'Funding Options', 
-    key: 'funding', 
-    icon: Coins, 
-    description: 'Funding avenues matched to the budget and stage.' 
-  },
-  { 
-    title: 'Risks', 
-    key: 'risks', 
-    icon: AlertTriangle, 
-    description: 'Critical market, technical, and operational hurdles.' 
-  },
-  { 
-    title: 'Next Actions', 
-    key: 'actions', 
-    icon: ArrowRight, 
-    description: 'Immediate, actionable next steps for execution.' 
-  }
-];
+/* ─── accent palette ─────────────────────────────────────── */
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08
-    }
-  }
-};
+const CYAN   = '#00f0ff';
+const PURPLE = '#a986ff';
+const AMBER  = '#ffae42';
+const GREEN  = '#4ade80';
+const RED    = '#f87171';
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { 
-      type: 'spring',
-      stiffness: 100,
-      damping: 15
-    } 
-  }
-};
+/* ─── page ───────────────────────────────────────────────── */
 
 export function ResultsWorkspace() {
   const navigate = useNavigate();
-  const { results, inputs } = useJourneyStore();
+  const { results, inputs, resetJourney } = useJourneyStore();
 
-  console.log("Loaded result =", results);
+  const generatedAt = useMemo(() => formatDate(new Date()), []);
 
+  /* ── empty guard ── */
   if (!results) {
     return (
       <div className="act-results-empty">
         <p>No analysis results found.</p>
-        <button onClick={() => navigate('/')}>Go to Home</button>
+        <button onClick={() => navigate('/')} className="act-cta-btn">Go to Home</button>
       </div>
     );
   }
 
-  const handleShare = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Workspace link copied to clipboard!');
-    }
-  };
+  const handleExport       = () => window.print();
+  const handleAnalyzeAgain = () => { resetJourney(); navigate('/input'); };
 
   return (
-    <div className="act-results-shell">
+    <>
+      {/* Print-only header */}
+      <div className="hidden print:block mb-6 text-white font-semibold text-sm">
+        IdeaBridge Analysis Report — {inputs.idea}
+      </div>
 
-      {/* Sticky Header */}
-      <header className="act-results-header">
-        <div className="act-results-header__left">
-          <span className="act-label" style={{ marginBottom: 0 }}>Execution Workspace</span>
-          <p className="act-results-header__idea">{inputs.idea}</p>
-        </div>
-        <div className="act-results-header__actions">
-          <button onClick={() => navigate('/input')} className="act-results-action-btn">
-            <Edit3 size={14} strokeWidth={1.5} /> Edit inputs
+      <div
+        className="min-h-screen"
+        style={{
+          background:
+            'radial-gradient(ellipse at 65% 0%, rgba(0,240,255,0.04) 0%, transparent 50%), var(--act-bg)',
+          paddingBottom: '7rem',
+        }}
+      >
+        {/* ══════════════════════════════════════
+            STICKY TOP NAV
+        ══════════════════════════════════════ */}
+        <header
+          className="sticky top-0 z-40 flex items-center justify-between gap-4 flex-wrap print:hidden"
+          style={{
+            padding: '0.85rem clamp(1.25rem, 5vw, 3rem)',
+            background: 'rgba(5,5,5,0.88)',
+            backdropFilter: 'blur(20px)',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="act-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>
+              Execution Workspace
+            </span>
+            <p
+              className="text-sm"
+              style={{
+                color: 'var(--act-muted)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '34ch',
+                margin: 0,
+              }}
+            >
+              {inputs.idea}
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/input')}
+            className="hidden md:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg"
+            style={{
+              color: 'var(--act-muted)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'transparent',
+              cursor: 'pointer',
+              transition: 'color 0.2s, border-color 0.2s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.color = '#fff';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.25)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.color = 'var(--act-muted)';
+              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)';
+            }}
+          >
+            Edit inputs
           </button>
-          <button onClick={handleShare} className="act-results-action-btn">
-            <Share2 size={14} strokeWidth={1.5} /> Share
-          </button>
-          <button onClick={() => window.print()} className="act-results-action-btn act-results-action-btn--accent">
-            <Download size={14} strokeWidth={1.5} /> Export PDF
-          </button>
-        </div>
-      </header>
+        </header>
 
-      <main className="act-results-main">
+        {/* ══════════════════════════════════════
+            MAIN CONTENT
+        ══════════════════════════════════════ */}
+        <main
+          style={{
+            maxWidth: '1100px',
+            margin: '0 auto',
+            padding: 'clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 3rem)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2rem',
+          }}
+        >
+          {/* ── A: Report Header ── */}
+          <ReportHeader inputs={inputs} generatedAt={generatedAt} />
 
-        {/* ── Welcome Banner ── */}
-        <section className="act-score-hero" style={{ marginBottom: '3rem' }}>
-          <div className="act-score-hero__inner">
-            <div className="act-reason-panel">
-              <span className="act-reason-panel__eyebrow">Advisor Insights</span>
-              <strong>Practical, execution-focused advice generated by IdeaBridge AI.</strong>
-              <p>
-                The workspace structures key strategic pillars for your startup based on your target market, budget level, and constraints.
-              </p>
-            </div>
-            <div className="act-score-hero__copy">
-              <span className="act-label">Launch Strategy</span>
-              <h1 className="act-score-hero__heading" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', lineHeight: 1.2 }}>
-                Custom Startup Execution Blueprint
-              </h1>
-              <p className="text-neutral-400 mt-2 text-sm">
-                Targeting <strong>{inputs.audience}</strong> within the <strong>{inputs.industry}</strong> sector in <strong>{inputs.country}</strong>, optimized for a <strong>{inputs.budget}</strong> budget and a team of <strong>{inputs.teamSize}</strong>.
-              </p>
+          {/* ── B: AI Score + Executive Summary (2-col on large screens) ── */}
+          <div
+            className="grid gap-6"
+            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))' }}
+          >
+            <ScoreDashboard scores={results.scores} />
+            <ExecutiveSummary results={results} />
+          </div>
+
+          {/* ══════ REALITY CHECK ══════ */}
+          <SectionDivider label="Reality Check" />
+
+          <AnalysisSectionCard
+            title="Hard Truths"
+            icon={ShieldAlert}
+            description="Unfiltered assessment of the riskiest assumptions and failure modes for this idea."
+            bullets={[
+              results.realityCheck.biggestAssumption,
+              results.realityCheck.biggestRisk,
+              results.realityCheck.whyItCouldFail,
+              results.realityCheck.hardestExecutionChallenge,
+            ]}
+            accentColor={RED}
+            delay={0}
+          >
+            <RealityCheckCard realityCheck={results.realityCheck} />
+          </AnalysisSectionCard>
+
+          {/* ══════ FULL ANALYSIS ══════ */}
+          <SectionDivider label="Full Analysis" />
+
+          {/* 2-col responsive grid for the six analysis sections */}
+          <div
+            className="grid gap-4"
+            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 480px), 1fr))' }}
+          >
+            <AnalysisSectionCard
+              title="Problem Validation"
+              icon={CheckSquare}
+              description="Specific experiments to validate the core problem in the next two weeks."
+              bullets={results.validation}
+              accentColor={CYAN}
+              delay={0}
+            />
+
+            <AnalysisSectionCard
+              title="Target Customers"
+              icon={Users}
+              description="Named customer segments with the most acute pain and highest willingness to pay."
+              bullets={results.customers}
+              accentColor={PURPLE}
+              delay={0.05}
+            />
+
+            <AnalysisSectionCard
+              title="Revenue Model"
+              icon={CreditCard}
+              description="Specific pricing mechanics, revenue streams, and unit economics."
+              bullets={results.revenue}
+              accentColor={GREEN}
+              delay={0.1}
+            />
+
+            <AnalysisSectionCard
+              title="Funding Options"
+              icon={Coins}
+              description="Funding sources matched to this budget level, stage, and sector."
+              bullets={results.funding}
+              accentColor={AMBER}
+              delay={0.15}
+            />
+
+            <AnalysisSectionCard
+              title="Risk Assessment"
+              icon={AlertTriangle}
+              description="Specific market, technical, and execution risks with mitigation approaches."
+              bullets={results.risks}
+              accentColor={RED}
+              delay={0.2}
+            />
+
+            {/* Competitor section spans full width — structured cards need room */}
+            <div style={{ gridColumn: '1 / -1' }}>
+              <AnalysisSectionCard
+                title="Competitive Landscape"
+                icon={Target}
+                description="Named competitors with their specific weaknesses and your concrete edge over each."
+                bullets={results.competitors.map(c => `${c.name}: ${c.weakness} — Your edge: ${c.yourEdge}`)}
+                accentColor="#f472b6"
+                delay={0.25}
+              >
+                <CompetitorCards competitors={results.competitors} />
+              </AnalysisSectionCard>
             </div>
           </div>
-        </section>
 
-        {/* ── 9-Card Animated Grid ── */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-        >
-          {CARDS_CONFIG.map((card) => {
-            const Icon = card.icon;
-            // Fallback to "Information unavailable." if missing
-            const bulletPoints = (results as any)[card.key] || ['Information unavailable.'];
+          {/* ══════ EXECUTION PLAN ══════ */}
+          <SectionDivider label="Execution Plan" />
 
-            return (
-              <motion.div
-                key={card.key}
-                variants={cardVariants}
-                className="glass-panel--elevated border border-white/5 bg-[#0d0d0d]/80 rounded-xl p-6 hover:border-[#00f0ff]/30 transition-all duration-300 flex flex-col group"
-                style={{ backdropFilter: 'blur(10px)' }}
+          {/* Roadmap */}
+          <AnalysisSectionCard
+            title="MVP Roadmap"
+            icon={Milestone}
+            description="Milestone-based phases with time estimates from validation to launch."
+            bullets={results.roadmap}
+            accentColor={CYAN}
+            delay={0}
+          >
+            <RoadmapVisualizer steps={results.roadmap} />
+          </AnalysisSectionCard>
+
+          {/* Next 7 Days */}
+          <AnalysisSectionCard
+            title="Next 7 Days"
+            icon={CalendarDays}
+            description="Specific daily actions you can execute immediately, without any budget."
+            bullets={results.nextSevenDays}
+            accentColor={GREEN}
+            delay={0.05}
+          >
+            <SevenDayPlan days={results.nextSevenDays} />
+          </AnalysisSectionCard>
+
+          {/* Priority Actions */}
+          <AnalysisSectionCard
+            title="Strategic Next Actions"
+            icon={ArrowRight}
+            description="Longer-horizon actions beyond this week, prioritised by urgency and impact."
+            bullets={results.actions}
+            accentColor={PURPLE}
+            delay={0.1}
+          >
+            <PriorityActions actions={results.actions} />
+          </AnalysisSectionCard>
+
+          {/* ══════ FOOTER ══════ */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col items-center gap-4 pt-6"
+            style={{ borderTop: '1px solid var(--act-border)', marginTop: '1rem' }}
+          >
+            <p style={{ color: 'var(--act-muted)', fontSize: '0.9rem', margin: 0 }}>
+              Ready to refine your analysis?
+            </p>
+            <div className="flex gap-3 flex-wrap justify-center">
+              <button
+                onClick={() => navigate('/input')}
+                className="act-cta-btn"
+                style={{ fontSize: '0.85rem', padding: '0.6rem 1.5rem' }}
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-[#00f0ff]/5 rounded-lg text-[#00f0ff] group-hover:bg-[#00f0ff]/10 transition-colors">
-                    <Icon size={20} strokeWidth={1.5} />
-                  </div>
-                  <h3 className="font-semibold text-lg text-white group-hover:text-[#00f0ff] transition-colors">
-                    {card.title}
-                  </h3>
-                </div>
-                
-                <p className="text-xs text-neutral-500 mb-4 leading-relaxed">
-                  {card.description}
-                </p>
+                Refine Inputs
+              </button>
+              <button
+                onClick={handleAnalyzeAgain}
+                className="act-cta-btn"
+                style={{ fontSize: '0.85rem', padding: '0.6rem 1.5rem' }}
+              >
+                New Analysis
+              </button>
+            </div>
+            <p style={{ color: 'rgba(255,255,255,0.18)', fontSize: '0.72rem', letterSpacing: '0.08em' }}>
+              IdeaBridge AI · Generated {generatedAt}
+            </p>
+          </motion.div>
+        </main>
+      </div>
 
-                <div className="flex-1 flex flex-col justify-start">
-                  <ul className="space-y-3">
-                    {bulletPoints.map((point: string, index: number) => (
-                      <li key={index} className="flex gap-2 text-sm text-neutral-300 leading-relaxed alignment-start">
-                        <span className="text-[#00f0ff] font-bold mt-0.5">•</span>
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-
-        {/* ── Footer CTA ── */}
-        <div className="act-results-divider" />
-        <div className="act-results-footer">
-          <p>Ready to refine your startup plan?</p>
-          <button onClick={() => navigate('/input')} className="act-cta-btn">
-            Refine Inputs →
-          </button>
-        </div>
-
-      </main>
-    </div>
+      {/* Floating action bar */}
+      <FloatingActionBar onExport={handleExport} onAnalyzeAgain={handleAnalyzeAgain} />
+    </>
   );
 }
 
+/* ── section divider ─────────────────────────────────── */
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className="flex items-center gap-4"
+      style={{ marginTop: '0.5rem' }}
+    >
+      <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />
+      <span
+        className="text-xs font-semibold uppercase tracking-widest flex-shrink-0"
+        style={{ color: 'rgba(255,255,255,0.28)' }}
+      >
+        {label}
+      </span>
+      <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />
+    </motion.div>
+  );
+}
