@@ -42,18 +42,26 @@ export function normalizeSection(items: any): string[] {
 export function normalizeResponse(rawOutput: string): StartupAnalysisResponse {
   let parsed: any = {};
   
-  // Strip code fences if the model output wrapped the JSON
-  let cleanOutput = rawOutput.trim();
-  if (cleanOutput.startsWith('```')) {
-    cleanOutput = cleanOutput.replace(/^```(json)?\s*/i, '');
-    cleanOutput = cleanOutput.replace(/```$/, '');
-    cleanOutput = cleanOutput.trim();
-  }
+  const cleaned = rawOutput
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
+
+  const firstBrace = cleaned.indexOf("{");
+  const lastBrace = cleaned.lastIndexOf("}");
+
+  const jsonOnly =
+    firstBrace !== -1 && lastBrace !== -1
+      ? cleaned.slice(firstBrace, lastBrace + 1)
+      : cleaned;
 
   try {
-    parsed = JSON.parse(cleanOutput);
-  } catch (err) {
-    console.error('Failed to parse Gemini response as JSON. Output was:', rawOutput, err);
+    parsed = JSON.parse(jsonOnly);
+  } catch (error) {
+    console.error("JSON PARSE FAILED");
+    console.error(error);
+    console.error("RAW RESPONSE:");
+    console.error(rawOutput);
     parsed = {};
   }
 

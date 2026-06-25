@@ -27,12 +27,17 @@ Team Size: ${data.teamSize}`;
       config: {
         systemInstruction: SYSTEM_PROMPT,
         temperature: 0.2,
-        maxOutputTokens: 1000,
+        maxOutputTokens: 2000,
         responseMimeType: 'application/json',
       },
     });
 
-    return response.text || '';
+    const responseText = response.text || '';
+    console.log("========== RAW GEMINI START ==========");
+    console.log(responseText);
+    console.log("========== RAW GEMINI END ==========");
+    
+    return responseText;
   };
 
   try {

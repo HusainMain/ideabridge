@@ -36,6 +36,11 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
     // 5. Save normalized data to cache (TTL = 3600 seconds)
     analysisCache.set(cacheKey, normalizedResult);
 
+    console.log(
+      "FINAL RESPONSE =",
+      JSON.stringify(normalizedResult, null, 2)
+    );
+    
     console.log("Response Sent");
     return res.json(normalizedResult);
   } catch (error: any) {
