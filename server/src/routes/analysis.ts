@@ -21,7 +21,7 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
   const cacheKey = JSON.stringify(req.body);
   const cachedData = analysisCache.get(cacheKey);
   if (cachedData) {
-    console.log('Cache HIT');
+    console.log('[CACHE_HIT]');
     console.log("Response Sent");
     return res.json(cachedData);
   }
@@ -47,17 +47,21 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
     console.error('API analyze route error:', error.message || error);
     
     console.log("Response Sent");
+
     if (error.message === 'AI is taking longer than expected.') {
       return res.status(408).json({ error: 'AI is taking longer than expected.' });
     }
     
-    if (error.message === 'AI service is currently unavailable.') {
-      return res.status(503).json({ error: 'AI service is currently unavailable.' });
+    if (error.message.includes('AI provider is experiencing temporary high demand')) {
+      return res.status(503).json({ error: error.message });
     }
 
-    return res.status(500).json({ error: 'Something went wrong.' });
+    if (error.message === 'AI service is currently unavailable.') {
+      return res.status(503).json({ error: error.message });
+    }
+
+    return res.status(500).json({ error: 'Analysis service is busy. A retry is recommended.' });
   }
 });
 
 export default router;
-
