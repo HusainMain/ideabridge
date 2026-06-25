@@ -18,55 +18,44 @@ export function ExecutiveSummary({ results }: ExecutiveSummaryProps) {
       label: 'Top Strength',
       text: topStrength,
       color: '#00f0ff',
-      bg: 'rgba(0,240,255,0.05)',
-      border: 'rgba(0,240,255,0.12)',
-      dividerColor: 'rgba(255,255,255,0.04)',
+      bg: 'rgba(0,240,255,0.08)',
     },
     {
       icon: AlertTriangle,
       label: 'Biggest Risk',
       text: biggestRisk,
       color: '#f87171',
-      bg: 'rgba(248,113,113,0.05)',
-      border: 'rgba(248,113,113,0.12)',
-      dividerColor: 'rgba(255,255,255,0.04)',
+      bg: 'rgba(248,113,113,0.08)',
     },
     {
       icon: Zap,
       label: 'First Action',
       text: nextAction,
       color: '#a986ff',
-      bg: 'rgba(169,134,255,0.05)',
-      border: 'rgba(169,134,255,0.12)',
-      dividerColor: 'rgba(255,255,255,0.04)',
+      bg: 'rgba(169,134,255,0.08)',
     },
   ];
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
-      className="rounded-2xl border overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, #0d0d0d 0%, #0a0f1a 100%)',
-        borderColor: 'rgba(255,255,255,0.07)',
-      }}
+      transition={{ duration: 0.5, delay: 0.08, ease: 'easeOut' }}
+      className="rounded-xl border border-white/10 bg-slate-900/80 overflow-hidden flex flex-col"
     >
       {/* Header */}
-      <div className="px-6 md:px-8 py-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <span className="act-label" style={{ margin: 0, display: 'inline-block' }}>Executive Summary</span>
-        <h2 className="text-white font-semibold text-lg mt-1 leading-snug">At a Glance</h2>
+      <div className="px-4 md:px-5 py-3 border-b border-white/5">
+        <span className="text-[0.7rem] font-mono text-cyan-400 tracking-widest uppercase">Executive Summary</span>
+        <h2 className="text-white font-semibold text-base mt-1 leading-snug">At a Glance</h2>
       </div>
 
       {/* Summary bullets */}
-      <div className="px-6 md:px-8 py-5 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <ul className="space-y-3">
+      <div className="px-4 md:px-5 py-3 border-b border-white/5">
+        <ul className="space-y-1.5">
           {results.summary.map((point, i) => (
-            <li key={i} className="flex gap-3 text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.72)' }}>
+            <li key={i} className="flex gap-2 text-xs leading-relaxed text-slate-300">
               <span
-                className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
-                style={{ background: 'var(--act-cyan)' }}
+                className="mt-1.5 w-1 h-1 rounded-full flex-shrink-0 bg-cyan-400"
               />
               {point}
             </li>
@@ -75,38 +64,29 @@ export function ExecutiveSummary({ results }: ExecutiveSummaryProps) {
       </div>
 
       {/* Three AI-sourced highlights */}
-      <div
-        className="grid grid-cols-1 md:grid-cols-3"
-        style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
-      >
-        {highlights.map(({ icon: Icon, label, text, color, bg, border }, idx) => (
+      <div className="px-4 md:px-5 py-3 space-y-2">
+        {highlights.map(({ icon: Icon, label, text, color, bg }) => (
           <div
             key={label}
-            className="px-6 py-5 flex flex-col gap-3 transition-colors duration-200"
-            style={{
-              borderRight: idx < highlights.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-              borderBottom: '0',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = bg)}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            className="flex gap-2 p-2 rounded-lg transition-colors duration-200"
+            style={{ background: bg }}
           >
-            <div className="flex items-center gap-2">
-              <div
-                className="p-1.5 rounded-lg"
-                style={{ background: bg, border: `1px solid ${border}` }}
-              >
-                <Icon size={13} style={{ color }} />
-              </div>
+            <div
+              className="mt-0.5 p-1.5 rounded-md"
+              style={{ background: 'rgba(0,0,0,0.2)' }}
+            >
+              <Icon size={11} style={{ color }} />
+            </div>
+            <div className="flex-1">
               <span
-                className="text-xs font-semibold uppercase tracking-widest"
-                style={{ color: 'var(--act-muted)' }}
+                className="text-[0.65rem] font-semibold uppercase tracking-widest text-slate-500"
               >
                 {label}
               </span>
+              <p className="text-xs leading-relaxed text-slate-300 mt-0.5">
+                {text}
+              </p>
             </div>
-            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
-              {text}
-            </p>
           </div>
         ))}
       </div>

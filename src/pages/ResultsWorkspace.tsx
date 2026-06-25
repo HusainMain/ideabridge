@@ -1,346 +1,234 @@
-import { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
-  CheckSquare,
-  Users,
-  CreditCard,
-  Target,
-  Milestone,
-  Coins,
-  AlertTriangle,
-  ArrowRight,
-  ShieldAlert,
-  CalendarDays,
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
 
 import { useJourneyStore } from '../stores/useJourneyStore';
+import { ReportHeader } from '../components/results/ReportHeader';
+import { ScoreDashboard } from '../components/results/ScoreDashboard';
+import { ExecutiveSummary } from '../components/results/ExecutiveSummary';
+import AnalysisSectionCard from '../components/results/AnalysisSectionCard';
+import { PriorityActions } from '../components/results/PriorityActions';
+import { RoadmapVisualizer } from '../components/results/RoadmapVisualizer';
+import { FloatingActionBar } from '../components/results/FloatingActionBar';
+import { RealityCheckCard } from '../components/results/RealityCheckCard';
+import { CompetitorCards } from '../components/results/CompetitorCards';
+import { SevenDayPlan } from '../components/results/SevenDayPlan';
 
-import { ReportHeader }        from '../components/results/ReportHeader';
-import { ScoreDashboard }      from '../components/results/ScoreDashboard';
-import { ExecutiveSummary }    from '../components/results/ExecutiveSummary';
-import { AnalysisSectionCard } from '../components/results/AnalysisSectionCard';
-import { PriorityActions }     from '../components/results/PriorityActions';
-import { RoadmapVisualizer }   from '../components/results/RoadmapVisualizer';
-import { FloatingActionBar }   from '../components/results/FloatingActionBar';
-import { RealityCheckCard }    from '../components/results/RealityCheckCard';
-import { CompetitorCards }     from '../components/results/CompetitorCards';
-import { SevenDayPlan }        from '../components/results/SevenDayPlan';
+// Constants for animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.15
+    }
+  }
+};
 
-/* ─── helpers ────────────────────────────────────────────── */
+// Main Results Page Component
+export default function ResultsWorkspace(): React.ReactElement {
+  // Hook init
+  const {
+    results,
+    setAnalysisStatus
+  } = useJourneyStore();
 
-function formatDate(d: Date): string {
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-}
-
-/* ─── accent palette ─────────────────────────────────────── */
-
-const CYAN   = '#00f0ff';
-const PURPLE = '#a986ff';
-const AMBER  = '#ffae42';
-const GREEN  = '#4ade80';
-const RED    = '#f87171';
-
-/* ─── page ───────────────────────────────────────────────── */
-
-export function ResultsWorkspace() {
   const navigate = useNavigate();
-  const { results, inputs, resetJourney } = useJourneyStore();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const generatedAt = useMemo(() => formatDate(new Date()), []);
+  // Handlers
+  const handleRestart = () => {
+    setAnalysisStatus('idle');
+    navigate('/');
+  };
+  
+  const handleExport = () => {
+    window.print();
+  };
 
-  /* ── empty guard ── */
-  if (!results) {
+  // Effect to handle navigation back if there are no results
+  useEffect(() => {
+    if (!results) {
+      navigate('/');
+    } else {
+      setIsLoading(false);
+    }
+  }, [results, navigate]);
+
+  // Loading state
+  if (isLoading || !results) {
     return (
-      <div className="act-results-empty">
-        <p>No analysis results found.</p>
-        <button onClick={() => navigate('/')} className="act-cta-btn">Go to Home</button>
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="text-center">
+          <div className="w-14 h-14 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-5"></div>
+          <p className="text-slate-400 text-sm">Loading report...</p>
+        </div>
       </div>
     );
   }
 
-  const handleExport       = () => window.print();
-  const handleAnalyzeAgain = () => { resetJourney(); navigate('/input'); };
-
   return (
-    <>
-      {/* Print-only header */}
-      <div className="hidden print:block mb-6 text-white font-semibold text-sm">
-        IdeaBridge Analysis Report — {inputs.idea}
+    <div
+      className="min-h-screen w-full bg-slate-950 text-slate-100 overflow-x-hidden relative"
+    >
+      {/* Ambient background elements - subtle only */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-80 h-80 bg-cyan-500/8 rounded-full blur-3xl -translate-y-1/2" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/8 rounded-full blur-3xl translate-y-1/2" />
       </div>
 
-      <div
-        className="min-h-screen"
-        style={{
-          background:
-            'radial-gradient(ellipse at 65% 0%, rgba(0,240,255,0.04) 0%, transparent 50%), var(--act-bg)',
-          paddingBottom: '7rem',
-        }}
-      >
-        {/* ══════════════════════════════════════
-            STICKY TOP NAV
-        ══════════════════════════════════════ */}
-        <header
-          className="sticky top-0 z-40 flex items-center justify-between gap-4 flex-wrap print:hidden"
-          style={{
-            padding: '0.85rem clamp(1.25rem, 5vw, 3rem)',
-            background: 'rgba(5,5,5,0.88)',
-            backdropFilter: 'blur(20px)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-          }}
+      <AnimatePresence>
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="relative z-10 pb-20"
         >
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="act-label" style={{ margin: 0, whiteSpace: 'nowrap' }}>
-              Execution Workspace
-            </span>
-            <p
-              className="text-sm"
+          {/* Sticky Header/Navigation */}
+          <header
+            className="sticky top-0 z-40 backdrop-blur-xl bg-slate-950/70 border-b border-white/5"
+          >
+            <div className="flex items-center justify-between max-w-7xl mx-auto px-4 py-3">
+               <button
+                onClick={handleRestart}
+                className="group flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 text-sm"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+                <span className="text-sm font-medium">Back</span>
+              </button>
+              <div className="flex items-center gap-1.5 text-[0.65rem] text-slate-500">
+                <Sparkles className="w-3 h-3 text-cyan-400" />
+                <span>IDEA BRIDGE AI REPORT</span>
+              </div>
+              <div className="w-16"></div>
+            </div>
+          </header>
+
+          {/* Main content wrapper */}
+          <main
+            className="max-w-7xl mx-auto w-full px-4 py-4"
+          >
+            {/* Section 1: Report Header */}
+            <ReportHeader />
+
+            {/* Section 2: Executive Summary + Score (Unified) */}
+            <motion.section
+              className="w-full grid grid-cols-1 lg:grid-cols-3 gap-3 mb-4"
+              variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
+            >
+              {/* Score Dashboard: 66% width on lg screens */}
+              <div className="lg:col-span-2">
+                <ScoreDashboard scores={results.scores} />
+              </div>
+              {/* Executive Summary: 33% width on lg screens */}
+              <div className="lg:col-span-1">
+                <ExecutiveSummary results={results} />
+              </div>
+            </motion.section>
+
+            {/* Section Divider & Title */}
+            <div className="flex items-center gap-3 mt-1 mb-3">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <span className="text-[0.6rem] font-mono tracking-[0.18em] text-slate-500 uppercase">REALITY CHECK</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </div>
+
+            {/* Section 3: Reality Check (Tighter padding) */}
+            <motion.section className="mb-4">
+               <RealityCheckCard realityCheck={results.realityCheck} />
+            </motion.section>
+
+            {/* Section Divider & Title */}
+            <div className="flex items-center gap-3 mt-1 mb-3">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <span className="text-[0.6rem] font-mono tracking-[0.18em] text-slate-500 uppercase">DEEP ANALYSIS</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </div>
+
+            {/* Section 4: Deep Analysis (Tighter, better grid) */}
+            <div
+              className="grid w-full mb-4"
               style={{
-                color: 'var(--act-muted)',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                maxWidth: '34ch',
-                margin: 0,
+                gap: '0.75rem',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))'
               }}
             >
-              {inputs.idea}
-            </p>
-          </div>
-          <button
-            onClick={() => navigate('/input')}
-            className="hidden md:inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg"
-            style={{
-              color: 'var(--act-muted)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              background: 'transparent',
-              cursor: 'pointer',
-              transition: 'color 0.2s, border-color 0.2s',
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.color = '#fff';
-              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.25)';
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.color = 'var(--act-muted)';
-              (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)';
-            }}
-          >
-            Edit inputs
-          </button>
-        </header>
-
-        {/* ══════════════════════════════════════
-            MAIN CONTENT
-        ══════════════════════════════════════ */}
-        <main
-          style={{
-            maxWidth: '1100px',
-            margin: '0 auto',
-            padding: 'clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 3rem)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '2rem',
-          }}
-        >
-          {/* ── A: Report Header ── */}
-          <ReportHeader inputs={inputs} generatedAt={generatedAt} />
-
-          {/* ── B: AI Score + Executive Summary (2-col on large screens) ── */}
-          <div
-            className="grid gap-6"
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))' }}
-          >
-            <ScoreDashboard scores={results.scores} />
-            <ExecutiveSummary results={results} />
-          </div>
-
-          {/* ══════ REALITY CHECK ══════ */}
-          <SectionDivider label="Reality Check" />
-
-          <AnalysisSectionCard
-            title="Hard Truths"
-            icon={ShieldAlert}
-            description="Unfiltered assessment of the riskiest assumptions and failure modes for this idea."
-            bullets={[
-              results.realityCheck.biggestAssumption,
-              results.realityCheck.biggestRisk,
-              results.realityCheck.whyItCouldFail,
-              results.realityCheck.hardestExecutionChallenge,
-            ]}
-            accentColor={RED}
-            delay={0}
-          >
-            <RealityCheckCard realityCheck={results.realityCheck} />
-          </AnalysisSectionCard>
-
-          {/* ══════ FULL ANALYSIS ══════ */}
-          <SectionDivider label="Full Analysis" />
-
-          {/* 2-col responsive grid for the six analysis sections */}
-          <div
-            className="grid gap-4"
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 480px), 1fr))' }}
-          >
-            <AnalysisSectionCard
-              title="Problem Validation"
-              icon={CheckSquare}
-              description="Specific experiments to validate the core problem in the next two weeks."
-              bullets={results.validation}
-              accentColor={CYAN}
-              delay={0}
-            />
-
-            <AnalysisSectionCard
-              title="Target Customers"
-              icon={Users}
-              description="Named customer segments with the most acute pain and highest willingness to pay."
-              bullets={results.customers}
-              accentColor={PURPLE}
-              delay={0.05}
-            />
-
-            <AnalysisSectionCard
-              title="Revenue Model"
-              icon={CreditCard}
-              description="Specific pricing mechanics, revenue streams, and unit economics."
-              bullets={results.revenue}
-              accentColor={GREEN}
-              delay={0.1}
-            />
-
-            <AnalysisSectionCard
-              title="Funding Options"
-              icon={Coins}
-              description="Funding sources matched to this budget level, stage, and sector."
-              bullets={results.funding}
-              accentColor={AMBER}
-              delay={0.15}
-            />
-
-            <AnalysisSectionCard
-              title="Risk Assessment"
-              icon={AlertTriangle}
-              description="Specific market, technical, and execution risks with mitigation approaches."
-              bullets={results.risks}
-              accentColor={RED}
-              delay={0.2}
-            />
-
-            {/* Competitor section spans full width — structured cards need room */}
-            <div style={{ gridColumn: '1 / -1' }}>
               <AnalysisSectionCard
-                title="Competitive Landscape"
-                icon={Target}
-                description="Named competitors with their specific weaknesses and your concrete edge over each."
-                bullets={results.competitors.map(c => `${c.name}: ${c.weakness} — Your edge: ${c.yourEdge}`)}
-                accentColor="#f472b6"
-                delay={0.25}
+                title="Market Validation"
+                icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
+                color="emerald"
+                points={results.validation}
+              />
+              <AnalysisSectionCard
+                title="Customer Discovery"
+                icon={<ArrowLeft className="w-4 h-4 text-blue-400" />}
+                color="blue"
+                points={results.customers}
+              />
+              <AnalysisSectionCard
+                title="Revenue Strategy"
+                icon={<Sparkles className="w-4 h-4 text-yellow-400" />}
+                color="yellow"
+                points={results.revenue}
+              />
+              <AnalysisSectionCard
+                title="Funding Path"
+                icon={<ArrowLeft className="w-4 h-4 text-cyan-400" />}
+                color="cyan"
+                points={results.funding}
+              />
+              <AnalysisSectionCard
+                title="Risk Mitigation"
+                icon={<Sparkles className="w-4 h-4 text-rose-400" />}
+                color="rose"
+                points={results.risks}
+              />
+            </div>
+
+            {/* Competitive Landscape */}
+            <motion.section className="mb-4">
+              <CompetitorCards />
+            </motion.section>
+
+            {/* Section Divider & Title */}
+            <div className="flex items-center gap-3 mt-1 mb-3">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <span className="text-[0.6rem] font-mono tracking-[0.18em] text-slate-500 uppercase">EXECUTION PLAN</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </div>
+
+            {/* Section 5: Execution Plan (Tighter spacing) */}
+            <motion.section className="space-y-3">
+              <RoadmapVisualizer />
+              <SevenDayPlan />
+              <AnalysisSectionCard
+                title="Priority Actions"
+                icon={<ArrowLeft className="w-4 h-4 text-purple-400" />}
+                color="purple"
+                points={[]}
               >
-                <CompetitorCards competitors={results.competitors} />
+                <PriorityActions actions={results.actions} />
               </AnalysisSectionCard>
-            </div>
-          </div>
+            </motion.section>
 
-          {/* ══════ EXECUTION PLAN ══════ */}
-          <SectionDivider label="Execution Plan" />
+            {/* Footer */}
+            <footer className="text-center text-slate-600 text-[0.65rem] py-8 mt-3 border-t border-white/5">
+              <p className="flex items-center justify-center gap-1.5">
+                <Sparkles className="w-3 h-3" />
+                Powered by IdeaBridge AI
+              </p>
+            </footer>
+          </main>
+        </motion.div>
+      </AnimatePresence>
 
-          {/* Roadmap */}
-          <AnalysisSectionCard
-            title="MVP Roadmap"
-            icon={Milestone}
-            description="Milestone-based phases with time estimates from validation to launch."
-            bullets={results.roadmap}
-            accentColor={CYAN}
-            delay={0}
-          >
-            <RoadmapVisualizer steps={results.roadmap} />
-          </AnalysisSectionCard>
-
-          {/* Next 7 Days */}
-          <AnalysisSectionCard
-            title="Next 7 Days"
-            icon={CalendarDays}
-            description="Specific daily actions you can execute immediately, without any budget."
-            bullets={results.nextSevenDays}
-            accentColor={GREEN}
-            delay={0.05}
-          >
-            <SevenDayPlan days={results.nextSevenDays} />
-          </AnalysisSectionCard>
-
-          {/* Priority Actions */}
-          <AnalysisSectionCard
-            title="Strategic Next Actions"
-            icon={ArrowRight}
-            description="Longer-horizon actions beyond this week, prioritised by urgency and impact."
-            bullets={results.actions}
-            accentColor={PURPLE}
-            delay={0.1}
-          >
-            <PriorityActions actions={results.actions} />
-          </AnalysisSectionCard>
-
-          {/* ══════ FOOTER ══════ */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col items-center gap-4 pt-6"
-            style={{ borderTop: '1px solid var(--act-border)', marginTop: '1rem' }}
-          >
-            <p style={{ color: 'var(--act-muted)', fontSize: '0.9rem', margin: 0 }}>
-              Ready to refine your analysis?
-            </p>
-            <div className="flex gap-3 flex-wrap justify-center">
-              <button
-                onClick={() => navigate('/input')}
-                className="act-cta-btn"
-                style={{ fontSize: '0.85rem', padding: '0.6rem 1.5rem' }}
-              >
-                Refine Inputs
-              </button>
-              <button
-                onClick={handleAnalyzeAgain}
-                className="act-cta-btn"
-                style={{ fontSize: '0.85rem', padding: '0.6rem 1.5rem' }}
-              >
-                New Analysis
-              </button>
-            </div>
-            <p style={{ color: 'rgba(255,255,255,0.18)', fontSize: '0.72rem', letterSpacing: '0.08em' }}>
-              IdeaBridge AI · Generated {generatedAt}
-            </p>
-          </motion.div>
-        </main>
-      </div>
-
-      {/* Floating action bar */}
-      <FloatingActionBar onExport={handleExport} onAnalyzeAgain={handleAnalyzeAgain} />
-    </>
-  );
-}
-
-/* ── section divider ─────────────────────────────────── */
-function SectionDivider({ label }: { label: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4 }}
-      className="flex items-center gap-4"
-      style={{ marginTop: '0.5rem' }}
-    >
-      <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />
-      <span
-        className="text-xs font-semibold uppercase tracking-widest flex-shrink-0"
-        style={{ color: 'rgba(255,255,255,0.28)' }}
-      >
-        {label}
-      </span>
-      <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.05)' }} />
-    </motion.div>
+      {/* Floating Actions */}
+      <FloatingActionBar onExport={handleExport} onAnalyzeAgain={handleRestart} />
+    </div>
   );
 }

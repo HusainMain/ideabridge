@@ -18,30 +18,18 @@ const PRIORITY_CONFIG = {
     label: 'High Priority',
     Icon: Flame,
     color: '#ff6b6b',
-    bg: 'rgba(255,107,107,0.06)',
-    border: 'rgba(255,107,107,0.2)',
-    badgeBg: 'rgba(255,107,107,0.12)',
-    badgeText: '#ff6b6b',
     order: 0,
   },
   medium: {
     label: 'Medium Priority',
     Icon: Zap,
     color: '#ffae42',
-    bg: 'rgba(255,174,66,0.06)',
-    border: 'rgba(255,174,66,0.2)',
-    badgeBg: 'rgba(255,174,66,0.12)',
-    badgeText: '#ffae42',
     order: 1,
   },
   future: {
     label: 'Future Opportunity',
     Icon: Lightbulb,
     color: '#a986ff',
-    bg: 'rgba(169,134,255,0.06)',
-    border: 'rgba(169,134,255,0.2)',
-    badgeBg: 'rgba(169,134,255,0.12)',
-    badgeText: '#a986ff',
     order: 2,
   },
 } as const;
@@ -60,10 +48,10 @@ function PriorityBadge({ priority }: { priority: Priority }) {
   const Icon = cfg.Icon;
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0"
-      style={{ background: cfg.badgeBg, color: cfg.badgeText, border: `1px solid ${cfg.border}` }}
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.6rem] font-semibold flex-shrink-0"
+      style={{ background: 'rgba(0,0,0,0.2)', color: cfg.color }}
     >
-      <Icon size={11} />
+      <Icon size={9} />
       {cfg.label}
     </span>
   );
@@ -71,7 +59,7 @@ function PriorityBadge({ priority }: { priority: Priority }) {
 
 export function PriorityActions({ actions }: PriorityActionsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(containerRef, { once: true, margin: '-60px' });
+  const inView = useInView(containerRef, { once: true, margin: '-40px' });
 
   const items: ActionItem[] = actions.map((text, i) => ({
     text,
@@ -83,7 +71,7 @@ export function PriorityActions({ actions }: PriorityActionsProps) {
   items.forEach(item => groups[item.priority].push(item));
 
   return (
-    <div ref={containerRef} className="flex flex-col gap-3">
+    <div ref={containerRef} className="flex flex-col gap-2.5">
       {(['high', 'medium', 'future'] as Priority[]).map(priority => {
         const group = groups[priority];
         if (group.length === 0) return null;
@@ -93,30 +81,29 @@ export function PriorityActions({ actions }: PriorityActionsProps) {
         return (
           <div key={priority}>
             {/* Group label */}
-            <div className="flex items-center gap-2 mb-2">
-              <Icon size={13} style={{ color: cfg.color }} />
-              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: cfg.color }}>
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <Icon size={12} style={{ color: cfg.color }} />
+              <span className="text-[0.65rem] font-semibold uppercase tracking-widest" style={{ color: cfg.color }}>
                 {cfg.label}
               </span>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               {group.map((item, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, x: -12 }}
+                  initial={{ opacity: 0, x: -10 }}
                   animate={inView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ delay: i * 0.06 + (PRIORITY_CONFIG[priority].order * 0.1), duration: 0.4 }}
-                  className="flex items-start gap-3 p-4 rounded-xl border"
-                  style={{ background: cfg.bg, borderColor: cfg.border }}
+                  transition={{ delay: i * 0.05 + (PRIORITY_CONFIG[priority].order * 0.1), duration: 0.4 }}
+                  className="flex items-start gap-2.5 p-3 rounded-lg border border-white/10 bg-slate-900/80"
                 >
                   <div
-                    className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 text-xs font-bold"
-                    style={{ background: cfg.badgeBg, color: cfg.color, border: `1px solid ${cfg.border}` }}
+                    className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center mt-0.5 text-[0.6rem] font-bold"
+                    style={{ background: 'rgba(0,0,0,0.2)', color: cfg.color }}
                   >
-                    <Icon size={10} />
+                    <Icon size={9} />
                   </div>
-                  <p className="text-sm leading-relaxed flex-1" style={{ color: 'rgba(255,255,255,0.78)' }}>
+                  <p className="text-xs leading-relaxed flex-1 text-slate-300">
                     {item.text}
                   </p>
                   <PriorityBadge priority={priority} />

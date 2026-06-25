@@ -20,7 +20,7 @@ function scoreLabel(score: number): string {
 
 // ─── sub-components ──────────────────────────────────────────────
 
-function AnimatedCounter({ target, duration = 1.4 }: { target: number; duration?: number }) {
+function AnimatedCounter({ target, duration = 1.2 }: { target: number; duration?: number }) {
   const [display, setDisplay] = useState(0);
   const started = useRef(false);
 
@@ -41,38 +41,31 @@ function AnimatedCounter({ target, duration = 1.4 }: { target: number; duration?
   return <>{display}</>;
 }
 
-function CircularScore({ score, size = 148 }: { score: number; size?: number }) {
+function CircularScore({ score, size = 120 }: { score: number; size?: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
-  const radius = 52;
+  const inView = useInView(ref, { once: true, margin: '-40px' });
+  const radius = 42;
   const circumference = 2 * Math.PI * radius;
   const color = scoreColor(score);
   const offset = circumference - (circumference * score) / 100;
 
   return (
     <div ref={ref} className="relative flex-shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox="0 0 120 120" className="-rotate-90">
-        <circle cx="60" cy="60" r={radius} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="8" />
-        {/* glow layer */}
-        <circle
-          cx="60" cy="60" r={radius} fill="none"
-          stroke={color} strokeWidth="10" strokeDasharray={circumference}
-          strokeDashoffset={inView ? offset : circumference} strokeLinecap="round"
-          style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.34,1.56,0.64,1)', filter: `drop-shadow(0 0 8px ${color})`, opacity: 0.25 }}
-        />
+      <svg width={size} height={size} viewBox="0 0 100 100" className="-rotate-90">
+        <circle cx="50" cy="50" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
         {/* main arc */}
         <circle
-          cx="60" cy="60" r={radius} fill="none"
-          stroke={color} strokeWidth="6" strokeDasharray={circumference}
+          cx="50" cy="50" r={radius} fill="none"
+          stroke={color} strokeWidth="5" strokeDasharray={circumference}
           strokeDashoffset={inView ? offset : circumference} strokeLinecap="round"
-          style={{ transition: 'stroke-dashoffset 1.5s cubic-bezier(0.34,1.56,0.64,1)' }}
+          style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-serif text-4xl font-bold text-white leading-none">
+        <span className="font-serif text-3xl font-bold text-white leading-none">
           {inView ? <AnimatedCounter target={score} /> : 0}
         </span>
-        <span className="text-[10px] uppercase tracking-widest mt-1" style={{ color: 'var(--act-muted)' }}>
+        <span className="text-[10px] uppercase tracking-widest mt-0.5 text-slate-500">
           / 100
         </span>
       </div>
@@ -82,22 +75,22 @@ function CircularScore({ score, size = 148 }: { score: number; size?: number }) 
 
 function SubScoreBar({ label, score, delay = 0 }: { label: string; score: number; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-40px' });
+  const inView = useInView(ref, { once: true, margin: '-30px' });
   const color = scoreColor(score);
 
   return (
-    <div ref={ref} className="flex flex-col gap-1.5">
+    <div ref={ref} className="flex flex-col gap-1">
       <div className="flex justify-between items-center">
-        <span className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</span>
+        <span className="text-xs font-medium text-slate-400">{label}</span>
         <span className="text-xs font-semibold tabular-nums" style={{ color }}>{score}</span>
       </div>
-      <div className="h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+      <div className="h-1.5 rounded-full bg-slate-800">
         <motion.div
           className="h-full rounded-full"
-          style={{ background: `linear-gradient(90deg, ${color}, ${color}88)`, boxShadow: `0 0 8px ${color}44` }}
+          style={{ background: color }}
           initial={{ width: 0 }}
           animate={inView ? { width: `${score}%` } : { width: 0 }}
-          transition={{ duration: 0.9, delay, ease: [0.34, 1.56, 0.64, 1] }}
+          transition={{ duration: 0.7, delay, ease: [0.4, 0, 0.2, 1] }}
         />
       </div>
     </div>
@@ -124,31 +117,29 @@ export function ScoreDashboard({ scores }: ScoreDashboardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
-      className="rounded-2xl border p-6 md:p-8 flex flex-col gap-6"
-      style={{
-        background: 'radial-gradient(circle at 20% 30%, rgba(0,240,255,0.06) 0%, transparent 55%), #0d0d0d',
-        borderColor: 'rgba(255,255,255,0.07)',
-      }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="rounded-xl border border-white/10 bg-slate-900/80 p-4 md:p-5 flex flex-col gap-4"
     >
-      <span className="act-label" style={{ margin: 0 }}>AI Viability Assessment</span>
+      <div className="flex items-center justify-between">
+        <span className="text-[0.7rem] font-mono text-cyan-400 tracking-widest uppercase">AI Viability Assessment</span>
+      </div>
 
-      <div className="flex flex-col sm:flex-row gap-8 items-center sm:items-start">
+      <div className="flex flex-col sm:flex-row gap-6 items-center">
         {/* Circular score */}
-        <div className="flex flex-col items-center gap-3 flex-shrink-0">
-          <CircularScore score={scores.overall} size={148} />
+        <div className="flex flex-col items-center gap-2 flex-shrink-0">
+          <CircularScore score={scores.overall} size={120} />
           <div className="text-center">
             <div className="text-sm font-semibold" style={{ color }}>{label}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--act-muted)' }}>Overall Viability</div>
+            <div className="text-[0.7rem] text-slate-500">Overall Viability</div>
           </div>
         </div>
 
         {/* Sub-score bars */}
-        <div className="flex-1 w-full flex flex-col gap-4 justify-center">
+        <div className="flex-1 w-full flex flex-col gap-3 justify-center">
           {subScores.map((s, i) => (
-            <SubScoreBar key={s.label} label={s.label} score={s.score} delay={0.1 + i * 0.08} />
+            <SubScoreBar key={s.label} label={s.label} score={s.score} delay={0.1 + i * 0.06} />
           ))}
         </div>
       </div>
@@ -156,13 +147,7 @@ export function ScoreDashboard({ scores }: ScoreDashboardProps) {
       {/* AI rationale */}
       {scores.rationale && (
         <div
-          className="text-xs leading-relaxed px-4 py-3 rounded-xl"
-          style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            color: 'rgba(255,255,255,0.5)',
-            fontStyle: 'italic',
-          }}
+          className="text-xs leading-relaxed px-3 py-2.5 rounded-lg bg-slate-950/50 border border-white/5 text-slate-400 italic"
         >
           "{scores.rationale}"
         </div>

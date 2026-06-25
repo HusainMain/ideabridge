@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LandingPage } from './pages/LandingPage';
 import { IdeaInputFlow } from './pages/IdeaInputFlow';
 import { AnalysisScreen } from './pages/AnalysisScreen';
-import { ResultsWorkspace } from './pages/ResultsWorkspace';
+import ResultsWorkspace from './pages/ResultsWorkspace';
 
 export default function App() {
   return (

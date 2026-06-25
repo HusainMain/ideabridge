@@ -1,93 +1,47 @@
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useJourneyStore } from '../../stores/useJourneyStore';
+import { Calendar, CheckCircle2 } from 'lucide-react';
 
-interface SevenDayPlanProps {
-  days: string[];
-}
-
-/** Parse "Day 1: text" or "Days 1-2: text" into label + body */
-function parseEntry(raw: string): { label: string; body: string } {
-  const match = raw.match(/^(Days?\s[\d\-–]+)\s*[:—]\s*/i);
-  if (match) {
-    return { label: match[1].trim(), body: raw.slice(match[0].length).trim() };
-  }
-  return { label: `Day ${1}`, body: raw };
-}
-
-const DOT_COLORS = [
-  '#00f0ff', '#a986ff', '#ffae42', '#4ade80',
-  '#f472b6', '#00f0ff', '#a986ff',
-];
-
-export function SevenDayPlan({ days }: SevenDayPlanProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
+export function SevenDayPlan(): React.ReactElement | null {
+  const { results } = useJourneyStore();
+  
+  if (!results) return null;
 
   return (
-    <div ref={ref} className="relative">
-      {/* Vertical connector line */}
-      <div
-        className="absolute left-5 top-5 bottom-5 w-px"
-        style={{ background: 'rgba(255,255,255,0.05)' }}
-      >
-        <motion.div
-          className="w-full origin-top"
-          style={{ background: 'linear-gradient(to bottom, #00f0ff88, #a986ff88, transparent)' }}
-          initial={{ scaleY: 0 }}
-          animate={inView ? { scaleY: 1 } : { scaleY: 0 }}
-          transition={{ duration: 1.0, ease: 'easeOut', delay: 0.2 }}
-        />
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="w-full"
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <Calendar className="w-4 h-4 text-yellow-400" />
+        <h2 className="text-[0.7rem] font-mono text-yellow-400 tracking-widest uppercase">Next 7 Days</h2>
       </div>
 
-      <div className="flex flex-col">
-        {days.map((raw, i) => {
-          const { label, body } = parseEntry(raw);
-          const color = DOT_COLORS[i % DOT_COLORS.length];
-          const isLast = i === days.length - 1;
-
-          return (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: -12 }}
-              animate={inView ? { opacity: 1, x: 0 } : {}}
-              transition={{ delay: 0.25 + i * 0.08, duration: 0.4, ease: 'easeOut' }}
-              className={`relative flex items-start gap-4 pl-12 ${isLast ? '' : 'pb-5'}`}
-            >
-              {/* Dot */}
-              <div
-                className="absolute left-0 top-0 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{
-                  background: `${color}10`,
-                  border: `1.5px solid ${color}40`,
-                  boxShadow: `0 0 10px ${color}20`,
-                }}
-              >
-                <CheckCircle2 size={16} style={{ color }} />
-              </div>
-
-              {/* Content */}
-              <div
-                className="flex-1 rounded-xl p-4 border"
-                style={{
-                  background: 'rgba(255,255,255,0.02)',
-                  borderColor: 'rgba(255,255,255,0.06)',
-                }}
-              >
-                <div
-                  className="text-xs font-semibold uppercase tracking-widest mb-1.5"
-                  style={{ color }}
-                >
-                  {label}
-                </div>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.78)' }}>
-                  {body}
-                </p>
-              </div>
-            </motion.div>
-          );
-        })}
+      <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-3">
+        {results.nextSevenDays.map((task, idx) => (
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: idx * 0.05 }}
+            className="relative overflow-hidden rounded-xl border border-white/10 bg-slate-900/80 p-4 flex items-start gap-2.5"
+          >
+            <div className="mt-0.5">
+              <CheckCircle2 className="w-4 h-4 text-yellow-400" />
+            </div>
+            <div>
+              <div className="text-[0.65rem] font-mono text-yellow-400 uppercase tracking-widest mb-1">
+              Day {idx + 1}
+            </div>
+              <p className="text-xs leading-relaxed text-slate-300">{task}</p>
+            </div>
+          </motion.div>
+        ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
