@@ -10,6 +10,7 @@ export function AnalysisScreen() {
   const { inputs, setResults, setAnalysisStatus, setErrorMessage, errorMessage, analysisStatus } = useJourneyStore();
   const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
   const [showLoading, setShowLoading] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const requestTriggered = useRef(false);
 
   // Cooldown countdown timer
@@ -40,6 +41,14 @@ export function AnalysisScreen() {
     }
   }, [inputs.idea, navigate]);
 
+  // Initialize on mount: clear any stale state, immediately reset
+  useEffect(() => {
+    setAnalysisStatus('idle');
+    setErrorMessage(null);
+    setShowLoading(false);
+    setInitialized(true);
+  }, [setAnalysisStatus, setErrorMessage]);
+
   // Show loading after 500ms delay
   useEffect(() => {
     if (analysisStatus === 'analyzing') {
@@ -51,7 +60,7 @@ export function AnalysisScreen() {
   }, [analysisStatus]);
 
   useEffect(() => {
-    if (!inputs.idea || requestTriggered.current) return;
+    if (!initialized || !inputs.idea || requestTriggered.current) return;
 
     const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
     if (cooldownEnd && parseInt(cooldownEnd, 10) > Date.now()) {
@@ -151,7 +160,7 @@ export function AnalysisScreen() {
     };
 
     performAnalysis();
-  }, [inputs, navigate, setAnalysisStatus, setErrorMessage, setResults]);
+  }, [inputs, navigate, setAnalysisStatus, setErrorMessage, setResults, initialized]);
 
   const handleRetry = () => {
     // Check if cooldown is finished before allowing retry
@@ -170,7 +179,10 @@ export function AnalysisScreen() {
 
   return (
     <AnimatePresence>
-      {analysisStatus === 'analyzing' && showLoading ? (
+      {!initialized ? (
+        // Show minimal state while initializing (prevent stale state render)
+        <div key="init" className="min-h-screen bg-slate-950" />
+      ) : analysisStatus === 'analyzing' && showLoading ? (
         <LoadingWorkspace key="loading" />
       ) : analysisStatus === 'error' ? (
         <motion.div
