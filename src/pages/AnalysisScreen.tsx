@@ -220,51 +220,54 @@ export function AnalysisScreen() {
           cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined} 
         />
       ) : analysisStatus === 'error' && errorMessage ? (
-        console.log('[AnalysisScreen] RENDERING ERROR UI, errorMessage:', errorMessage) || (
-        <motion.div
-          key="error"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="min-h-screen bg-slate-950 text-white font-sans flex flex-col items-center justify-center p-6"
-        >
-          <div className="max-w-md w-full p-8 border border-red-500/20 rounded-xl bg-slate-900/80 backdrop-blur-md flex flex-col items-center text-center">
-            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-500">
-              <AlertCircle size={32} />
-            </div>
-            
-            <h2 className="text-2xl font-semibold mb-3 text-white">Analysis Failed</h2>
-            <p className="text-slate-400 mb-4 text-sm leading-relaxed">
-              {errorMessage || 'Something went wrong.'}
-            </p>
+        (() => {
+          console.log('[AnalysisScreen] RENDERING ERROR UI, errorMessage:', errorMessage);
+          return (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="min-h-screen bg-slate-950 text-white font-sans flex flex-col items-center justify-center p-6"
+            >
+              <div className="max-w-md w-full p-8 border border-red-500/20 rounded-xl bg-slate-900/80 backdrop-blur-md flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-500">
+                  <AlertCircle size={32} />
+                </div>
+                
+                <h2 className="text-2xl font-semibold mb-3 text-white">Analysis Failed</h2>
+                <p className="text-slate-400 mb-4 text-sm leading-relaxed">
+                  {errorMessage || 'Something went wrong.'}
+                </p>
 
-            {cooldownRemaining !== null && cooldownRemaining > 0 && (
-              <div className="text-xs text-slate-500 mb-6">
-                Request Cooldown: {cooldownRemaining}s remaining
+                {cooldownRemaining !== null && cooldownRemaining > 0 && (
+                  <div className="text-xs text-slate-500 mb-6">
+                    Request Cooldown: {cooldownRemaining}s remaining
+                  </div>
+                )}
+
+                <div className="flex gap-4 w-full justify-center">
+                  <button 
+                    onClick={() => navigate('/input')} 
+                    className="px-5 py-2.5 rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 transition flex items-center gap-2 text-sm"
+                  >
+                    <ArrowLeft size={16} /> Edit Inputs
+                  </button>
+                  <button 
+                    onClick={handleRetry} 
+                    disabled={cooldownRemaining !== null && cooldownRemaining > 0}
+                    className={`px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 text-sm ${
+                      cooldownRemaining !== null && cooldownRemaining > 0
+                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                        : 'bg-cyan-400 text-slate-950 hover:opacity-90'
+                    }`}
+                  >
+                    <RotateCcw size={16} /> Try Again
+                  </button>
+                </div>
               </div>
-            )}
-
-            <div className="flex gap-4 w-full justify-center">
-              <button 
-                onClick={() => navigate('/input')} 
-                className="px-5 py-2.5 rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 transition flex items-center gap-2 text-sm"
-              >
-                <ArrowLeft size={16} /> Edit Inputs
-              </button>
-              <button 
-                onClick={handleRetry} 
-                disabled={cooldownRemaining !== null && cooldownRemaining > 0}
-                className={`px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 text-sm ${
-                  cooldownRemaining !== null && cooldownRemaining > 0
-                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                    : 'bg-cyan-400 text-slate-950 hover:opacity-90'
-                }`}
-              >
-                <RotateCcw size={16} /> Try Again
-              </button>
-            </div>
-          </div>
-        </motion.div>
-        )) : (
+            </motion.div>
+          );
+        })() : (
         // Show minimal state while waiting for 500ms delay
         <div className="min-h-screen bg-slate-950" />
       )}
