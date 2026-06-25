@@ -63,7 +63,7 @@ Team Size: ${data.teamSize}`;
             responseMimeType: 'application/json',
           },
         }),
-        15000,
+        30000,
         'AI is taking longer than expected.'
       );
 
