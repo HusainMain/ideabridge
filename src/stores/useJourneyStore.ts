@@ -54,7 +54,10 @@ export const useJourneyStore = create<JourneyState>((set) => ({
   setInputs: (inputs) => set((state) => ({ inputs: { ...state.inputs, ...inputs } })),
   setAnalysisStatus: (status) => set({ analysisStatus: status }),
   setResults: (results) => set({ results, analysisStatus: 'success', errorMessage: null }),
-  setErrorMessage: (msg) => set({ errorMessage: msg, analysisStatus: 'error' }),
+  setErrorMessage: (msg) => set(() => ({ 
+    errorMessage: msg, 
+    ...(msg ? { analysisStatus: 'error' } : {}) 
+  })),
   resetJourney: () => set({ inputs: initialInputs, analysisStatus: 'idle', results: null, errorMessage: null }),
 }));
 

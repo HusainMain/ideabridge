@@ -32,8 +32,8 @@ export function AnalysisScreen() {
 
   // Initialize on mount: clear any stale state, immediately reset
   useEffect(() => {
-    setAnalysisStatus('idle');
-    setErrorMessage(null);
+    setErrorMessage(null); // First clear errorMessage which could trigger status change if not fixed
+    setAnalysisStatus('idle'); // Then set status to idle explicitly
     setInitialized(true);
   }, [setAnalysisStatus, setErrorMessage]);
 
