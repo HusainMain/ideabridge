@@ -22,16 +22,16 @@ export function RoadmapVisualizer(): React.ReactElement | null {
       viewport={{ once: true }}
       className="w-full"
     >
-      <div className="flex items-center gap-2 mb-3">
-        <Map className="w-4 h-4 text-cyan-400" />
-        <h2 className="text-[0.7rem] font-mono text-cyan-400 tracking-widest uppercase">MVP Roadmap</h2>
+      <div className="flex items-center gap-2 mb-4">
+        <Map className="w-5 h-5 text-cyan-400" />
+        <h2 className="text-[0.75rem] font-mono text-cyan-400 tracking-widest uppercase">MVP Roadmap</h2>
       </div>
 
       <div className="relative">
         {/* Timeline connector line */}
-        <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-slate-800" />
+        <div className="absolute left-[19px] top-2 bottom-2 w-0.5 bg-slate-800" />
 
-        <div className="space-y-2">
+        <div className="space-y-4">
           {results.roadmap.map((step, idx) => {
             const phase = phases[idx % phases.length];
             return (
@@ -41,24 +41,24 @@ export function RoadmapVisualizer(): React.ReactElement | null {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.06 }}
-                className="relative flex items-start gap-3"
+                className="relative flex items-start gap-4"
               >
                 {/* Timeline dot */}
-                <div className="relative z-10 flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-slate-900 border-2" style={{ borderColor: phase.color }}>
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: phase.color }} />
+                <div className="relative z-10 flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-slate-900 border-2" style={{ borderColor: phase.color }}>
+                  <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: phase.color }} />
                 </div>
                 
                 {/* Timeline item content */}
-                <div className="flex-1 rounded-xl border border-white/10 bg-slate-900/80 p-3">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="text-[0.65rem] font-mono text-slate-500 uppercase tracking-widest">
+                <div className="flex-1 rounded-xl border border-white/10 bg-slate-900/80 p-4">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-[0.7rem] font-mono text-slate-500 uppercase tracking-widest">
                       {phase.title}
                     </span>
-                    <span className="text-[0.65rem] font-mono text-slate-400">
+                    <span className="text-[0.7rem] font-mono text-slate-400">
                       {phase.timeframe}
                     </span>
                   </div>
-                  <p className="text-xs leading-relaxed text-slate-300">{step}</p>
+                  <p className="text-sm leading-7 text-slate-300">{step}</p>
                 </div>
               </motion.div>
             );

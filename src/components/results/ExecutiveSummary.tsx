@@ -44,18 +44,18 @@ export function ExecutiveSummary({ results }: ExecutiveSummaryProps) {
       className="rounded-xl border border-white/10 bg-slate-900/80 overflow-hidden flex flex-col"
     >
       {/* Header */}
-      <div className="px-4 md:px-5 py-3 border-b border-white/5">
-        <span className="text-[0.7rem] font-mono text-cyan-400 tracking-widest uppercase">Executive Summary</span>
-        <h2 className="text-white font-semibold text-base mt-1 leading-snug">At a Glance</h2>
+      <div className="px-5 md:px-6 py-4 border-b border-white/5">
+        <span className="text-[0.75rem] font-mono text-cyan-400 tracking-widest uppercase">Executive Summary</span>
+        <h2 className="text-white font-semibold text-lg mt-1.5 leading-snug">At a Glance</h2>
       </div>
 
       {/* Summary bullets */}
-      <div className="px-4 md:px-5 py-3 border-b border-white/5">
-        <ul className="space-y-1.5">
+      <div className="px-5 md:px-6 py-4 border-b border-white/5">
+        <ul className="space-y-2.5">
           {results.summary.map((point, i) => (
-            <li key={i} className="flex gap-2 text-xs leading-relaxed text-slate-300">
+            <li key={i} className="flex gap-2.5 text-sm leading-7 text-slate-300">
               <span
-                className="mt-1.5 w-1 h-1 rounded-full flex-shrink-0 bg-cyan-400"
+                className="mt-2.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-cyan-400"
               />
               {point}
             </li>
@@ -64,26 +64,26 @@ export function ExecutiveSummary({ results }: ExecutiveSummaryProps) {
       </div>
 
       {/* Three AI-sourced highlights */}
-      <div className="px-4 md:px-5 py-3 space-y-2">
+      <div className="px-5 md:px-6 py-4 space-y-3">
         {highlights.map(({ icon: Icon, label, text, color, bg }) => (
           <div
             key={label}
-            className="flex gap-2 p-2 rounded-lg transition-colors duration-200"
+            className="flex gap-3 p-3 rounded-lg transition-colors duration-200"
             style={{ background: bg }}
           >
             <div
-              className="mt-0.5 p-1.5 rounded-md"
+              className="mt-0.5 p-2 rounded-md"
               style={{ background: 'rgba(0,0,0,0.2)' }}
             >
-              <Icon size={11} style={{ color }} />
+              <Icon size={14} style={{ color }} />
             </div>
             <div className="flex-1">
               <span
-                className="text-[0.65rem] font-semibold uppercase tracking-widest text-slate-500"
+                className="text-[0.7rem] font-semibold uppercase tracking-widest text-slate-500"
               >
                 {label}
               </span>
-              <p className="text-xs leading-relaxed text-slate-300 mt-0.5">
+              <p className="text-sm leading-relaxed text-slate-300 mt-1">
                 {text}
               </p>
             </div>

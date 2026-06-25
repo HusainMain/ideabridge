@@ -39,23 +39,23 @@ export default function AnalysisSectionCard({
       className="relative flex flex-col overflow-hidden rounded-xl border border-white/10 bg-slate-900/80"
     >
       {/* Card Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-white/5">
-        <div className={`p-1.5 rounded-md bg-white/5 border ${colorClass.split(' ')[1]}`}>
+      <div className="flex items-center gap-3 p-5 border-b border-white/5">
+        <div className={`p-2 rounded-md bg-white/5 border ${colorClass.split(' ')[1]}`}>
           {icon}
         </div>
-        <h3 className="text-base font-semibold text-white">{title}</h3>
+        <h3 className="text-lg font-semibold text-white">{title}</h3>
       </div>
 
       {/* Card Content */}
-      <div className="p-4">
+      <div className="p-5">
         {children ? (
           children
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {points.map((point, idx) => (
-              <li key={idx} className="flex items-start gap-2.5">
-                <CheckCircle2 className={`mt-0.5 w-3.5 h-3.5 flex-shrink-0 ${colorClass.split(' ')[0]}`} />
-                <span className="text-xs leading-relaxed text-slate-300">{point}</span>
+              <li key={idx} className="flex items-start gap-3">
+                <CheckCircle2 className={`mt-1 w-4.5 h-4.5 flex-shrink-0 ${colorClass.split(' ')[0]}`} />
+                <span className="text-sm leading-7 text-slate-300">{point}</span>
               </li>
             ))}
           </ul>
