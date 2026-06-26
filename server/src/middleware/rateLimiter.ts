@@ -16,7 +16,8 @@ export const analysisLimiter = rateLimit({
         : 3600;
 
     res.status(options.statusCode).json({
-      error: 'Too many requests. Please try again later.',
+      code: 'RATE_LIMIT',
+      message: 'Too many requests. Please wait before trying again.',
       retryAfter: retryAfterSeconds,
     });
   },

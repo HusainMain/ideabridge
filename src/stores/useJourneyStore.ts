@@ -1,7 +1,15 @@
 import { create } from 'zustand';
 import type { ValidationMeta } from '../../shared/validation/types';
+import type { ApiErrorCode, StructuredErrorResponse } from '../../shared/errors/types';
 
-export type AnalysisStatus = 'idle' | 'analyzing' | 'success' | 'error' | 'cooldown' | 'invalid_input';
+export type AnalysisStatus =
+  | 'idle'
+  | 'analyzing'
+  | 'success'
+  | 'error'
+  | 'cooldown'
+  | 'invalid_input'
+  | 'rate_limit_wait';
 
 export interface IdeaInputs {
   idea: string;
@@ -76,12 +84,15 @@ interface JourneyState {
   analysisStatus: AnalysisStatus;
   results: ResultsData | null;
   errorMessage: string | null;
+  errorCode: ApiErrorCode | null;
+  errorRetryAfter: number | null;
   validationResult: ValidationMeta | null;
   validationMeta: ValidationMeta | null;
   setInputs: (inputs: Partial<IdeaInputs>) => void;
   setAnalysisStatus: (status: AnalysisStatus) => void;
   setResults: (results: ResultsData, validationMeta?: ValidationMeta | null) => void;
   setErrorMessage: (msg: string | null) => void;
+  setApiError: (error: StructuredErrorResponse | null) => void;
   setValidationResult: (result: ValidationMeta | null) => void;
   setValidationMeta: (meta: ValidationMeta | null) => void;
   clearResults: () => void;
@@ -103,6 +114,8 @@ export const useJourneyStore = create<JourneyState>((set) => ({
   analysisStatus: 'idle',
   results: null,
   errorMessage: null,
+  errorCode: null,
+  errorRetryAfter: null,
   validationResult: null,
   validationMeta: null,
   setInputs: (inputs) => set((state) => ({ inputs: { ...state.inputs, ...inputs } })),
@@ -117,8 +130,17 @@ export const useJourneyStore = create<JourneyState>((set) => ({
       analysisStatus: 'success',
       errorMessage: null,
       validationResult: null,
+      errorCode: null,
+      errorRetryAfter: null,
     }),
   setErrorMessage: (msg) => set({ errorMessage: msg }),
+  setApiError: (error) =>
+    set({
+      errorCode: error?.code ?? null,
+      errorMessage: error?.message ?? null,
+      errorRetryAfter: error?.retryAfter ?? null,
+      analysisStatus: 'error',
+    }),
   setValidationResult: (result) => set({ validationResult: result }),
   setValidationMeta: (meta) => set({ validationMeta: meta }),
   clearResults: () => set({ results: null, validationMeta: null }),
@@ -128,6 +150,8 @@ export const useJourneyStore = create<JourneyState>((set) => ({
       analysisStatus: 'idle',
       results: null,
       errorMessage: null,
+      errorCode: null,
+      errorRetryAfter: null,
       validationResult: null,
       validationMeta: null,
     }),

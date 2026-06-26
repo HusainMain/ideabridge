@@ -7,13 +7,19 @@ import { analysisSchema } from '../validators/analysisSchema';
 import { validateDeterministic } from '../validators/deterministicValidator';
 import { analysisCache } from '../utils/cache';
 import { normalizeResponse } from '../utils/responseNormalizer';
+import { mapUnknownError, sendStructuredError } from '../utils/geminiErrorMapper';
 import type { ValidationMeta } from '../../../shared/validation/types';
 import type { StartupAnalysisRequest, StartupAnalysisResponse } from '../types/types';
 
 const router = Router();
 
 function validationFailureResponse(validation: ValidationMeta) {
-  return { validation };
+  return {
+    code: 'VALIDATION_FAILED' as const,
+    message: 'Input validation failed.',
+    retryAfter: null,
+    validation,
+  };
 }
 
 function attachIncubatorRecommendations(
@@ -83,23 +89,10 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
       validation: geminiValidation,
     });
   } catch (error: unknown) {
-    const message = (error as Error).message || String(error);
-    console.error('API analyze route error:', message);
+    const structured = mapUnknownError(error);
+    console.error('API analyze route error:', structured.code, structured.message);
     console.log('Response Sent');
-
-    if (message === 'AI is taking longer than expected.') {
-      return res.status(408).json({ error: 'AI is taking longer than expected.' });
-    }
-
-    if (message.includes('AI provider is experiencing temporary high demand')) {
-      return res.status(503).json({ error: message });
-    }
-
-    if (message === 'AI service is currently unavailable.') {
-      return res.status(503).json({ error: message });
-    }
-
-    return res.status(500).json({ error: 'Analysis service is busy. A retry is recommended.' });
+    return sendStructuredError(res, structured);
   }
 });
 

@@ -205,9 +205,5 @@ export async function validateIdeaWithGemini(data: StartupAnalysisRequest): Prom
     }
   }
 
-  const message = (lastError as Error)?.message?.includes('longer than expected')
-    ? (lastError as Error).message
-    : 'AI provider is experiencing temporary high demand. Please retry in 30 seconds.';
-
-  throw new Error(message);
+  throw lastError ?? new Error('All validation models failed.');
 }

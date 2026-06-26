@@ -118,12 +118,7 @@ Team Size: ${data.teamSize}`;
     }
   }
 
-  // All models failed
+  // All models failed — rethrow the last SDK error for accurate classification upstream
   console.error('[ALL_MODELS_FAILED]');
-  
-  const errorMessage = lastError?.message?.includes('AI is taking longer than expected.')
-    ? lastError.message
-    : 'AI provider is experiencing temporary high demand. Please retry in 30 seconds.';
-  
-  throw new Error(errorMessage);
+  throw lastError ?? new Error('All Gemini models failed.');
 }

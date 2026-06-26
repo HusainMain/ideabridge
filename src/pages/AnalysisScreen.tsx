@@ -1,15 +1,20 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useJourneyStore } from '../stores/useJourneyStore';
-import { AlertCircle, ArrowLeft, RotateCcw } from 'lucide-react';
 import { LoadingWorkspace } from '../components/LoadingWorkspace';
 import { ImproveYourIdeaScreen } from '../components/ImproveYourIdeaScreen';
+import { AnalysisErrorScreen } from '../components/AnalysisErrorScreen';
 import { validateInputsDeterministic } from '../utils/deterministicValidation';
 import type { ValidationMeta } from '../../shared/validation/types';
+import type { StructuredErrorResponse, ApiErrorCode } from '../../shared/errors/types';
+import { isStructuredError } from '../../shared/errors/types';
 import type { ResultsData } from '../stores/useJourneyStore';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Clock } from 'lucide-react';
 
-function isValidationPayload(data: unknown): data is { validation: ValidationMeta } {
+function isValidationPayload(
+  data: unknown
+): data is { validation: ValidationMeta; code?: string } {
   return (
     typeof data === 'object' &&
     data !== null &&
@@ -28,24 +33,48 @@ function isAnalysisPayload(
   );
 }
 
+function parseErrorResponse(text: string, status: number): StructuredErrorResponse | null {
+  try {
+    const data = JSON.parse(text);
+    if (isStructuredError(data)) return data;
+    if (typeof data?.error === 'string') {
+      const code: ApiErrorCode =
+        status === 429 ? 'RATE_LIMIT' : status >= 500 ? 'SERVER_ERROR' : 'UNKNOWN_ERROR';
+      return {
+        code,
+        message: data.error,
+        retryAfter: typeof data.retryAfter === 'number' ? data.retryAfter : null,
+      };
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 export function AnalysisScreen() {
   const navigate = useNavigate();
   const {
     inputs,
     setResults,
     setAnalysisStatus,
-    setErrorMessage,
+    setApiError,
     clearResults,
     setValidationResult,
     validationResult,
+    errorCode,
     errorMessage,
     analysisStatus,
   } = useJourneyStore();
 
   const [cooldownRemaining, setCooldownRemaining] = useState<number | null>(null);
+  const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
   const [initialized, setInitialized] = useState(false);
   const requestTriggered = useRef(false);
   const cooldownTimerRef = useRef<number | null>(null);
+  const rateLimitTimerRef = useRef<number | null>(null);
+  const hasAutoRetriedRateLimit = useRef(false);
+  const rateLimitRetryStarted = useRef(false);
 
   const handleInvalidValidation = useCallback(
     (validation: ValidationMeta) => {
@@ -55,179 +84,189 @@ export function AnalysisScreen() {
     [setAnalysisStatus, setValidationResult]
   );
 
-  useEffect(() => {
-    return () => {
-      if (cooldownTimerRef.current) {
-        clearInterval(cooldownTimerRef.current);
+  const handleStructuredError = useCallback(
+    (error: StructuredErrorResponse) => {
+      if (
+        error.code === 'RATE_LIMIT' &&
+        !hasAutoRetriedRateLimit.current &&
+        (error.retryAfter ?? 0) > 0
+      ) {
+        hasAutoRetriedRateLimit.current = true;
+        rateLimitRetryStarted.current = false;
+        setRateLimitCountdown(error.retryAfter ?? 10);
+        setAnalysisStatus('rate_limit_wait');
+        return;
       }
-    };
-  }, []);
 
-  useEffect(() => {
-    clearResults();
-    setErrorMessage(null);
-    setValidationResult(null);
-    setAnalysisStatus('idle');
-    setInitialized(true);
-  }, [setAnalysisStatus, setErrorMessage, clearResults, setValidationResult]);
+      setApiError(error);
+    },
+    [setAnalysisStatus, setApiError]
+  );
 
-  useEffect(() => {
-    if (!inputs.idea) {
-      navigate('/input');
+  const runAnalysisRequest = useCallback(async () => {
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+    const cleanBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+
+    const response = await fetch(`${cleanBase}/api/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(inputs),
+    });
+
+    const text = await response.text();
+
+    if (response.status === 422) {
+      let payload: unknown;
+      try {
+        payload = JSON.parse(text);
+      } catch {
+        throw Object.assign(new Error('Server returned invalid data.'), {
+          structured: {
+            code: 'SERVER_ERROR' as const,
+            message: 'Server returned invalid data.',
+            retryAfter: null,
+          },
+        });
+      }
+      if (isValidationPayload(payload)) {
+        handleInvalidValidation(payload.validation);
+        return;
+      }
+      throw Object.assign(new Error('Validation failed unexpectedly.'), {
+        structured: {
+          code: 'SERVER_ERROR' as const,
+          message: 'Validation failed unexpectedly.',
+          retryAfter: null,
+        },
+      });
     }
-  }, [inputs.idea, navigate]);
 
-  useEffect(() => {
-    console.log('[AnalysisScreen] analysisStatus changed to:', analysisStatus);
-  }, [analysisStatus]);
+    if (!response.ok) {
+      const structured = parseErrorResponse(text, response.status);
+      if (structured) {
+        throw Object.assign(new Error(structured.message), { structured });
+      }
+      throw Object.assign(new Error('Request failed.'), {
+        structured: {
+          code: 'UNKNOWN_ERROR' as const,
+          message: 'Something unexpected went wrong. Please try again.',
+          retryAfter: null,
+        },
+      });
+    }
+
+    localStorage.setItem('ideabridge_cooldown_end', (Date.now() + 30000).toString());
+
+    if (!text || text.trim() === '') {
+      throw Object.assign(new Error('Empty response from server.'), {
+        structured: {
+          code: 'SERVER_ERROR' as const,
+          message: 'Empty response from server.',
+          retryAfter: null,
+        },
+      });
+    }
+
+    let data: unknown;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw Object.assign(new Error('Server returned invalid data.'), {
+        structured: {
+          code: 'SERVER_ERROR' as const,
+          message: 'Server returned invalid data.',
+          retryAfter: null,
+        },
+      });
+    }
+
+    if (!isAnalysisPayload(data)) {
+      throw Object.assign(new Error('Unexpected response shape.'), {
+        structured: {
+          code: 'SERVER_ERROR' as const,
+          message: 'Server returned an unexpected response.',
+          retryAfter: null,
+        },
+      });
+    }
+
+    setResults(data.analysis, data.validation);
+    navigate('/results');
+  }, [inputs, navigate, setResults, handleInvalidValidation]);
 
   const performAnalysis = useCallback(async () => {
-    console.log('[performAnalysis] called!');
     requestTriggered.current = true;
 
     const clientValidation = validateInputsDeterministic(inputs);
     if (clientValidation) {
-      console.log('[performAnalysis] client deterministic validation failed');
       handleInvalidValidation(clientValidation);
       return;
     }
 
     setAnalysisStatus('analyzing');
-    setErrorMessage(null);
+    setApiError(null);
     setCooldownRemaining(null);
+    setRateLimitCountdown(null);
 
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-      console.log('API_BASE =', API_BASE);
-      const cleanBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
-      const response = await fetch(`${cleanBase}/api/analyze`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(inputs),
-      });
-
-      const text = await response.text();
-
-      console.log('HTTP Method:', 'POST');
-      console.log('Final URL =', `${cleanBase}/api/analyze`);
-      console.log('Response Status:', response.status);
-      console.log('Response Body:', text);
-
-      if (response.status === 422) {
-        let payload: unknown;
-        try {
-          payload = JSON.parse(text);
-        } catch {
-          throw new Error('Server returned invalid data.');
-        }
-        if (isValidationPayload(payload)) {
-          handleInvalidValidation(payload.validation);
-          return;
-        }
-        throw new Error('Validation failed but the server response was unexpected.');
-      }
-
-      if (!response.ok) {
-        let errorMsg = '';
-        let retryAfterSeconds: number | null = null;
-
-        try {
-          const errorData = JSON.parse(text);
-          errorMsg = errorData.error;
-          if (typeof errorData.retryAfter === 'number') {
-            retryAfterSeconds = errorData.retryAfter;
-          }
-        } catch {
-          // fall back to status code
-        }
-
-        if (!errorMsg) {
-          if (response.status === 429) {
-            errorMsg = 'Too many requests. Please try again later.';
-          } else if (response.status === 408 || response.status === 504) {
-            errorMsg = 'AI is taking longer than expected.';
-          } else if (response.status === 503 || response.status === 500) {
-            errorMsg = 'AI service is currently unavailable.';
-          } else {
-            errorMsg = 'Server error. Please try again later.';
-          }
-        }
-
-        if (response.status === 429) {
-          const waitMs = retryAfterSeconds != null ? retryAfterSeconds * 1000 : 60000;
-          localStorage.setItem('ideabridge_cooldown_end', (Date.now() + waitMs).toString());
-          setCooldownRemaining(Math.ceil(waitMs / 1000));
-        }
-
-        throw new Error(errorMsg);
-      }
-
-      localStorage.setItem('ideabridge_cooldown_end', (Date.now() + 30000).toString());
-
-      if (!text || text.trim() === '') {
-        throw new Error('Empty response from server.');
-      }
-
-      let data: unknown;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error('Server returned invalid data.');
-      }
-
-      if (!isAnalysisPayload(data)) {
-        throw new Error('Server returned an unexpected response shape.');
-      }
-
-      console.log('Backend response =', data);
-      setResults(data.analysis, data.validation);
-      navigate('/results');
+      await runAnalysisRequest();
     } catch (err: unknown) {
-      console.error('Analysis API Call failed:', err);
-      setAnalysisStatus('error');
+      const structured = (err as { structured?: StructuredErrorResponse }).structured;
 
-      let userMessage = 'Something went wrong.';
-      const msg = (err as Error).message || '';
-
-      if (msg.includes('Too many requests')) {
-        userMessage = 'Too many requests. Please try again later.';
-      } else if (msg.includes('longer than expected')) {
-        userMessage = 'AI is taking longer than expected.';
-      } else if (msg.includes('currently unavailable')) {
-        userMessage = 'AI service is currently unavailable.';
-      } else if (
-        msg.includes('invalid data') ||
-        msg.includes('invalid JSON') ||
-        msg.includes('JSON') ||
-        msg.includes('Unexpected end of JSON')
-      ) {
-        userMessage = 'Server returned invalid data.';
-      } else if (msg.includes('Empty response')) {
-        userMessage = 'Empty response from server.';
-      } else if (msg && msg !== 'Something went wrong.') {
-        userMessage = msg;
+      if (structured) {
+        handleStructuredError(structured);
+        return;
       }
 
-      setErrorMessage(userMessage);
+      if (err instanceof TypeError || (err as Error).message?.includes('Failed to fetch')) {
+        setApiError({
+          code: 'NETWORK_ERROR',
+          message: 'Check your internet connection and try again.',
+          retryAfter: null,
+        });
+        return;
+      }
+
+      setApiError({
+        code: 'UNKNOWN_ERROR',
+        message: (err as Error).message || 'Something unexpected went wrong.',
+        retryAfter: null,
+      });
     }
-  }, [inputs, navigate, setAnalysisStatus, setErrorMessage, setResults, handleInvalidValidation]);
+  }, [inputs, runAnalysisRequest, handleInvalidValidation, handleStructuredError, setAnalysisStatus, setApiError]);
+
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
+      if (rateLimitTimerRef.current) clearInterval(rateLimitTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    clearResults();
+    setApiError(null);
+    setValidationResult(null);
+    setAnalysisStatus('idle');
+    hasAutoRetriedRateLimit.current = false;
+    rateLimitRetryStarted.current = false;
+    setInitialized(true);
+  }, [setAnalysisStatus, setApiError, clearResults, setValidationResult]);
+
+  useEffect(() => {
+    if (!inputs.idea) navigate('/input');
+  }, [inputs.idea, navigate]);
 
   useEffect(() => {
     if (analysisStatus !== 'cooldown') return;
-    console.log('[AnalysisScreen] entering cooldown');
 
     const updateCooldown = () => {
       if (!cooldownTimerRef.current) return;
       const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
       if (cooldownEnd) {
         const remaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
-        console.log('[AnalysisScreen] cooldown remaining:', remaining);
         if (remaining > 0) {
           setCooldownRemaining(remaining);
         } else {
-          console.log('[AnalysisScreen] cooldown over, calling performAnalysis');
           if (cooldownTimerRef.current) {
             clearInterval(cooldownTimerRef.current);
             cooldownTimerRef.current = null;
@@ -241,13 +280,52 @@ export function AnalysisScreen() {
     cooldownTimerRef.current = setInterval(updateCooldown, 1000);
 
     return () => {
-      console.log('[AnalysisScreen] cleaning up cooldown interval');
       if (cooldownTimerRef.current) {
         clearInterval(cooldownTimerRef.current);
         cooldownTimerRef.current = null;
       }
     };
   }, [analysisStatus, performAnalysis]);
+
+  useEffect(() => {
+    if (analysisStatus !== 'rate_limit_wait' || rateLimitCountdown === null) return;
+
+    if (rateLimitCountdown <= 0) {
+      if (rateLimitRetryStarted.current) return;
+      rateLimitRetryStarted.current = true;
+      setAnalysisStatus('analyzing');
+      runAnalysisRequest().catch((err: unknown) => {
+        const structured = (err as { structured?: StructuredErrorResponse }).structured;
+        if (structured) {
+          setApiError(structured);
+        } else if (err instanceof TypeError || (err as Error).message?.includes('Failed to fetch')) {
+          setApiError({
+            code: 'NETWORK_ERROR',
+            message: 'Check your internet connection and try again.',
+            retryAfter: null,
+          });
+        } else {
+          setApiError({
+            code: 'UNKNOWN_ERROR',
+            message: 'Retry failed. Please try again.',
+            retryAfter: null,
+          });
+        }
+      });
+      return;
+    }
+
+    rateLimitTimerRef.current = setInterval(() => {
+      setRateLimitCountdown((prev) => (prev !== null && prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => {
+      if (rateLimitTimerRef.current) {
+        clearInterval(rateLimitTimerRef.current);
+        rateLimitTimerRef.current = null;
+      }
+    };
+  }, [analysisStatus, rateLimitCountdown, runAnalysisRequest, setAnalysisStatus, setApiError]);
 
   useEffect(() => {
     if (!initialized || !inputs.idea || requestTriggered.current) return;
@@ -263,27 +341,22 @@ export function AnalysisScreen() {
   }, [initialized, inputs, setAnalysisStatus, performAnalysis]);
 
   const handleRetry = () => {
-    const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
-    if (cooldownEnd && parseInt(cooldownEnd, 10) > Date.now()) {
-      return;
-    }
     requestTriggered.current = false;
+    hasAutoRetriedRateLimit.current = false;
+    rateLimitRetryStarted.current = false;
     localStorage.removeItem('ideabridge_cooldown_end');
     window.location.reload();
   };
 
   const handleBackToEdit = () => {
     setValidationResult(null);
+    setApiError(null);
     setAnalysisStatus('idle');
     requestTriggered.current = false;
+    hasAutoRetriedRateLimit.current = false;
+    rateLimitRetryStarted.current = false;
     navigate('/input');
   };
-
-  useEffect(() => {
-    if (analysisStatus === 'error' && errorMessage) {
-      console.log('[AnalysisScreen] ABOUT TO RENDER ERROR UI, errorMessage:', errorMessage);
-    }
-  }, [analysisStatus, errorMessage]);
 
   return (
     <AnimatePresence>
@@ -295,55 +368,37 @@ export function AnalysisScreen() {
           validation={validationResult}
           onBackToEdit={handleBackToEdit}
         />
+      ) : analysisStatus === 'rate_limit_wait' ? (
+        <motion.div
+          key="rate-limit"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6"
+        >
+          <div className="max-w-md w-full p-8 border border-yellow-500/20 rounded-xl bg-slate-900/80 backdrop-blur-md text-center">
+            <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Clock className="w-8 h-8 text-yellow-400" />
+            </div>
+            <h2 className="text-2xl font-semibold mb-3">Too many requests</h2>
+            <p className="text-slate-400 mb-2 text-sm">Retrying automatically...</p>
+            <p className="text-yellow-400 text-lg font-mono">
+              Retrying in {rateLimitCountdown ?? 0}...
+            </p>
+          </div>
+        </motion.div>
       ) : analysisStatus === 'analyzing' || analysisStatus === 'cooldown' ? (
         <LoadingWorkspace
           key="loading"
           cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined}
         />
-      ) : analysisStatus === 'error' && errorMessage ? (
-        <motion.div
+      ) : analysisStatus === 'error' && errorCode && errorMessage ? (
+        <AnalysisErrorScreen
           key="error"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="min-h-screen bg-slate-950 text-white font-sans flex flex-col items-center justify-center p-6"
-        >
-          <div className="max-w-md w-full p-8 border border-red-500/20 rounded-xl bg-slate-900/80 backdrop-blur-md flex flex-col items-center text-center">
-            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6 text-red-500">
-              <AlertCircle size={32} />
-            </div>
-
-            <h2 className="text-2xl font-semibold mb-3 text-white">Analysis Failed</h2>
-            <p className="text-slate-400 mb-4 text-sm leading-relaxed">
-              {errorMessage || 'Something went wrong.'}
-            </p>
-
-            {cooldownRemaining !== null && cooldownRemaining > 0 && (
-              <div className="text-xs text-slate-500 mb-6">
-                Request Cooldown: {cooldownRemaining}s remaining
-              </div>
-            )}
-
-            <div className="flex gap-4 w-full justify-center">
-              <button
-                onClick={() => navigate('/input')}
-                className="px-5 py-2.5 rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 transition flex items-center gap-2 text-sm"
-              >
-                <ArrowLeft size={16} /> Edit Inputs
-              </button>
-              <button
-                onClick={handleRetry}
-                disabled={cooldownRemaining !== null && cooldownRemaining > 0}
-                className={`px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 text-sm ${
-                  cooldownRemaining !== null && cooldownRemaining > 0
-                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                    : 'bg-cyan-400 text-slate-950 hover:opacity-90'
-                }`}
-              >
-                <RotateCcw size={16} /> Try Again
-              </button>
-            </div>
-          </div>
-        </motion.div>
+          code={errorCode}
+          message={errorMessage}
+          onRetry={errorCode !== 'QUOTA_EXCEEDED' ? handleRetry : undefined}
+          onEditIdea={handleBackToEdit}
+        />
       ) : (
         <div key="waiting" className="min-h-screen bg-slate-950" />
       )}
