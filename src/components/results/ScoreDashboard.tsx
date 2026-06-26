@@ -41,10 +41,10 @@ function AnimatedCounter({ target, duration = 1.2 }: { target: number; duration?
   return <>{display}</>;
 }
 
-function CircularScore({ score, size = 150 }: { score: number; size?: number }) {
+function CircularScore({ score, size = 180 }: { score: number; size?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
-  const radius = 44; // Fits properly in 100x100 viewBox (50 - 44 = 6, 50 + 44 = 94)
+  const radius = 48; // Perfect fit with room for glow in 120x120 viewBox
   const circumference = 2 * Math.PI * radius;
   const color = scoreColor(score);
   const offset = circumference - (circumference * score) / 100;
@@ -60,13 +60,13 @@ function CircularScore({ score, size = 150 }: { score: number; size?: number }) 
           pointerEvents: 'none',
         }}
       />
-      <svg width={size} height={size} viewBox="0 0 100 100" className="-rotate-90">
-        <circle cx="50" cy="50" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+      <svg width={size} height={size} viewBox="0 0 120 120" className="-rotate-90">
+        <circle cx="60" cy="60" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
         {/* Subtle bg track glow */}
-        <circle cx="50" cy="50" r={radius} fill="none" stroke={`${color}18`} strokeWidth="9" />
+        <circle cx="60" cy="60" r={radius} fill="none" stroke={`${color}18`} strokeWidth="9" />
         {/* Main arc */}
         <circle
-          cx="50" cy="50" r={radius} fill="none"
+          cx="60" cy="60" r={radius} fill="none"
           stroke={color} strokeWidth="5.5" strokeDasharray={circumference}
           strokeDashoffset={inView ? offset : circumference} strokeLinecap="round"
           style={{ transition: 'stroke-dashoffset 1.3s cubic-bezier(0.4, 0, 0.2, 1)', filter: `drop-shadow(0 0 4px ${color}88)` }}
@@ -151,7 +151,7 @@ export function ScoreDashboard({ scores }: ScoreDashboardProps) {
       <div className="flex flex-col sm:flex-row gap-6 items-center">
         {/* Circular score */}
         <div className="flex flex-col items-center gap-2 flex-shrink-0">
-          <CircularScore score={scores.overall} size={148} />
+          <CircularScore score={scores.overall} size={180} />
           <div className="text-center">
             <div className="text-[0.72rem] text-slate-500">Overall Viability</div>
           </div>
