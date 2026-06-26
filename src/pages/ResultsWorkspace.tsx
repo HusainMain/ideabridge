@@ -24,6 +24,7 @@ import { FloatingActionBar } from '../components/results/FloatingActionBar';
 import { RealityCheckCard } from '../components/results/RealityCheckCard';
 import { CompetitorCards } from '../components/results/CompetitorCards';
 import { SevenDayPlan } from '../components/results/SevenDayPlan';
+import { IncubatorRecommendations } from '../components/results/IncubatorRecommendations';
 
 // Constants for animation variants
 const containerVariants = {
@@ -265,6 +266,23 @@ export default function ResultsWorkspace(): React.ReactElement {
                 <PriorityActions actions={results.actions} />
               </AnalysisSectionCard>
             </motion.section>
+
+            {/* Section 7: Incubator Recommendations */}
+            {results.incubatorRecommendations && results.incubatorRecommendations.length > 0 && (
+              <>
+                <div className="flex items-center gap-3 mt-6 mb-3">
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  <span className="text-[0.68rem] font-mono tracking-[0.18em] text-slate-500 uppercase flex items-center gap-1.5">
+                    <span className="w-1 h-1 rounded-full bg-cyan-400/70 inline-block" />
+                    FUNDING &amp; ECOSYSTEM
+                  </span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                </div>
+                <motion.section className="mb-4">
+                  <IncubatorRecommendations recommendations={results.incubatorRecommendations} />
+                </motion.section>
+              </>
+            )}
 
             {/* Footer */}
             <footer className="text-center text-slate-600 text-[0.68rem] py-6 mt-4 border-t border-white/5">

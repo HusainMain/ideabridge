@@ -1,0 +1,2823 @@
+[
+  {
+    "id": "y-combinator",
+    "name": "Y Combinator",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "saas",
+      "deeptech",
+      "fintech",
+      "consumer"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$500K investment ($125K for 7% plus $375K on uncapped SAFE)",
+    "equity": "7% on standard deal",
+    "website": "https://www.ycombinator.com",
+    "description": "Y Combinator is one of the world's most prominent startup accelerators, running two batches per year in San Francisco. It provides seed funding, intensive mentorship, and access to a vast alumni network.",
+    "tags": [
+      "ai",
+      "saas",
+      "b2b",
+      "consumer",
+      "deeptech"
+    ]
+  },
+  {
+    "id": "techstars",
+    "name": "Techstars",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "saas",
+      "fintech",
+      "healthcare",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "$120K investment ($20K for 6% equity plus $100K convertible note)",
+    "equity": "6% common stock",
+    "website": "https://www.techstars.com",
+    "description": "Techstars operates accelerator programs worldwide, partnering with corporations, cities, and universities. Each program runs 13 weeks with mentorship-driven growth and Demo Day exposure.",
+    "tags": [
+      "saas",
+      "fintech",
+      "healthtech",
+      "enterprise"
+    ]
+  },
+  {
+    "id": "500-global",
+    "name": "500 Global",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "saas",
+      "fintech",
+      "consumer",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "$150K seed investment for accelerator cohorts",
+    "equity": "6% equity typical",
+    "website": "https://500.co",
+    "description": "500 Global (formerly 500 Startups) is a venture capital firm and accelerator investing in early-stage startups globally. It runs flagship programs in San Francisco and regional programs across continents.",
+    "tags": [
+      "saas",
+      "marketplace",
+      "fintech",
+      "emerging-markets"
+    ]
+  },
+  {
+    "id": "antler",
+    "name": "Antler",
+    "country": "Singapore",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "saas",
+      "fintech",
+      "deeptech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed"
+    ],
+    "remote": false,
+    "funding": "Pre-seed investment from $100K–$250K depending on location",
+    "equity": "8–11% equity typical",
+    "website": "https://www.antler.co",
+    "description": "Antler is a global early-stage VC and startup generator that helps founders form teams and build companies from scratch. Programs run in 30+ cities across six continents.",
+    "tags": [
+      "founder-matching",
+      "pre-seed",
+      "global-network"
+    ]
+  },
+  {
+    "id": "plug-and-play",
+    "name": "Plug and Play Tech Center",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech",
+      "healthcare",
+      "saas",
+      "cleantech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": true,
+    "funding": "Corporate pilot opportunities; selective direct investment",
+    "equity": null,
+    "website": "https://www.plugandplaytechcenter.com",
+    "description": "Plug and Play is a global innovation platform connecting startups with corporations for pilots and partnerships. It runs vertical-specific accelerator programs in Silicon Valley and worldwide.",
+    "tags": [
+      "corporate-innovation",
+      "fintech",
+      "insurtech",
+      "mobility"
+    ]
+  },
+  {
+    "id": "entrepreneur-first",
+    "name": "Entrepreneur First",
+    "country": "United Kingdom",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "deeptech",
+      "saas",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed"
+    ],
+    "remote": false,
+    "funding": "Pre-seed investment up to £80K plus follow-on access",
+    "equity": "8–10% equity",
+    "website": "https://www.joinef.com",
+    "description": "Entrepreneur First (EF) is a talent investor that backs individuals before they have a team or idea. It operates in London, Paris, Berlin, Bangalore, Singapore, and Toronto.",
+    "tags": [
+      "deeptech",
+      "founder-first",
+      "technical-talent"
+    ]
+  },
+  {
+    "id": "masschallenge",
+    "name": "MassChallenge",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "healthcare",
+      "cleantech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": true,
+    "funding": "Non-dilutive prizes up to $100K; no equity taken",
+    "equity": null,
+    "website": "https://masschallenge.org",
+    "description": "MassChallenge is a global network of zero-equity startup accelerators supporting high-impact entrepreneurs. Programs run in Boston, Switzerland, Mexico, Israel, and other locations.",
+    "tags": [
+      "zero-equity",
+      "impact",
+      "healthtech",
+      "cleantech"
+    ]
+  },
+  {
+    "id": "google-for-startups",
+    "name": "Google for Startups",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "ai",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": true,
+    "funding": "Cloud credits, mentorship, and partner grants (varies by program)",
+    "equity": null,
+    "website": "https://startup.google.com",
+    "description": "Google for Startups provides programs, products, and connections to help startups build and scale. Offerings include Accelerator programs, Cloud credits, and regional hubs worldwide.",
+    "tags": [
+      "ai",
+      "cloud",
+      "google-cloud",
+      "mentorship"
+    ]
+  },
+  {
+    "id": "microsoft-for-startups",
+    "name": "Microsoft for Startups Founders Hub",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "ai",
+      "deeptech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "Up to $150K Azure credits plus access to GitHub Enterprise and OpenAI",
+    "equity": null,
+    "website": "https://www.microsoft.com/en-us/startups",
+    "description": "Microsoft for Startups Founders Hub offers free Azure cloud credits, development tools, and go-to-market support for eligible startups. No equity is required to participate.",
+    "tags": [
+      "azure",
+      "ai",
+      "cloud",
+      "enterprise"
+    ]
+  },
+  {
+    "id": "nvidia-inception",
+    "name": "NVIDIA Inception",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "deeptech",
+      "saas",
+      "healthcare",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": true,
+    "funding": "GPU credits, co-marketing, and technical support (no direct cash)",
+    "equity": null,
+    "website": "https://www.nvidia.com/en-us/deep-learning-ai/startups/",
+    "description": "NVIDIA Inception is a free virtual accelerator program for AI and data-science startups. Members receive GPU credits, technical resources, and access to NVIDIA's investor network.",
+    "tags": [
+      "ai",
+      "gpu",
+      "machine-learning",
+      "deeptech"
+    ]
+  },
+  {
+    "id": "creative-destruction-lab",
+    "name": "Creative Destruction Lab",
+    "country": "Canada",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "deeptech",
+      "saas",
+      "healthcare",
+      "cleantech"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "No direct funding; access to mentors and investor network",
+    "equity": null,
+    "website": "https://creativedestructionlab.com",
+    "description": "Creative Destruction Lab (CDL) is a nonprofit objectives-based program for massively scalable science and technology ventures. Streams include AI, Health, Climate, and Quantum at universities globally.",
+    "tags": [
+      "deeptech",
+      "quantum",
+      "ai",
+      "science-based"
+    ]
+  },
+  {
+    "id": "level39",
+    "name": "Level39",
+    "country": "United Kingdom",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech",
+      "cybersecurity",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": false,
+    "funding": "Workspace and corporate connections; no standard equity investment",
+    "equity": null,
+    "website": "https://level39.co",
+    "description": "Level39 is Europe's largest fintech accelerator located in Canary Wharf, London. It provides workspace, events, and connections to financial institutions and investors.",
+    "tags": [
+      "fintech",
+      "cybersecurity",
+      "regtech",
+      "london"
+    ]
+  },
+  {
+    "id": "seedcamp",
+    "name": "Seedcamp",
+    "country": "United Kingdom",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "fintech",
+      "deeptech",
+      "general"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": true,
+    "funding": "€100K–€200K initial seed investment",
+    "equity": "Variable on seed round",
+    "website": "https://seedcamp.com",
+    "description": "Seedcamp is Europe's seed fund identifying and investing in world-class founders at the earliest stages. It provides capital, mentorship, and a global network of operators.",
+    "tags": [
+      "european-startups",
+      "seed",
+      "b2b",
+      "saas"
+    ]
+  },
+  {
+    "id": "startupbootcamp",
+    "name": "Startupbootcamp",
+    "country": "Netherlands",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech",
+      "insurtech",
+      "healthcare",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "€15K living stipend plus potential follow-on investment",
+    "equity": "6–8% equity",
+    "website": "https://www.startupbootcamp.org",
+    "description": "Startupbootcamp runs industry-focused accelerator programs across Europe, Asia-Pacific, and the Americas. Each program lasts three months with corporate partner access.",
+    "tags": [
+      "fintech",
+      "insurtech",
+      "healthtech",
+      "corporate-partners"
+    ]
+  },
+  {
+    "id": "gener8tor",
+    "name": "gener8tor",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "saas",
+      "healthcare",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$100K investment for 7.5% equity",
+    "equity": "7.5% equity",
+    "website": "https://www.gener8tor.com",
+    "description": "gener8tor is a nationally ranked accelerator and venture capital firm operating gBETA free accelerators and equity investment programs across the United States.",
+    "tags": [
+      "midwest",
+      "gbeta",
+      "seed",
+      "mentorship"
+    ]
+  },
+  {
+    "id": "angelpad",
+    "name": "AngelPad",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "b2b",
+      "general"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$120K for 7% equity",
+    "equity": "7% equity",
+    "website": "https://angelpad.org",
+    "description": "AngelPad is a seed-stage accelerator program in San Francisco and New York City focused on B2B and SaaS startups. It runs intensive 10-week programs twice per year.",
+    "tags": [
+      "saas",
+      "b2b",
+      "seed",
+      "silicon-valley"
+    ]
+  },
+  {
+    "id": "hub71",
+    "name": "Hub71",
+    "country": "United Arab Emirates",
+    "region": "Middle East",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech",
+      "saas",
+      "healthcare",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": false,
+    "funding": "Incentive packages up to AED 750K in subsidies and benefits",
+    "equity": null,
+    "website": "https://www.hub71.com",
+    "description": "Hub71 is Abu Dhabi's global tech ecosystem enabling startups to scale through access to capital, corporate partners, and a vibrant community in the UAE capital.",
+    "tags": [
+      "mena",
+      "abudhabi",
+      "fintech",
+      "government-backed"
+    ]
+  },
+  {
+    "id": "startup-chile",
+    "name": "Start-Up Chile",
+    "country": "Chile",
+    "region": "South America",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "saas",
+      "cleantech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "CLP 15M–25M equity-free grants depending on program track",
+    "equity": null,
+    "website": "https://startupchile.org",
+    "description": "Start-Up Chile is a government-backed accelerator that attracts early-stage startups worldwide to incorporate and grow in Chile. It offers equity-free funding and a vibrant founder community.",
+    "tags": [
+      "equity-free",
+      "latam",
+      "government",
+      "international"
+    ]
+  },
+  {
+    "id": "station-f",
+    "name": "Station F",
+    "country": "France",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "saas",
+      "fintech",
+      "consumer",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Program-dependent; F/ L.A.B and partner programs offer various support",
+    "equity": null,
+    "website": "https://stationf.co",
+    "description": "Station F is the world's largest startup campus in Paris, housing hundreds of startups and multiple accelerator programs including Founders Program and corporate labs.",
+    "tags": [
+      "paris",
+      "campus",
+      "founders",
+      "europe"
+    ]
+  },
+  {
+    "id": "wayra",
+    "name": "Wayra",
+    "country": "Spain",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "telecom",
+      "fintech",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "Up to €150K investment plus Telefónica partnership opportunities",
+    "equity": "Variable",
+    "website": "https://wayra.com",
+    "description": "Wayra is Telefónica's open innovation hub investing in and accelerating startups across Europe and Latin America. It connects startups with Telefónica business units for pilots.",
+    "tags": [
+      "telecom",
+      "corporate",
+      "latam",
+      "europe"
+    ]
+  },
+  {
+    "id": "accelerator-centre",
+    "name": "Accelerator Centre",
+    "country": "Canada",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "deeptech",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "AC:Inc program offers seed investment; other tracks provide mentorship",
+    "equity": "Varies by program",
+    "website": "https://acceleratorcentre.com",
+    "description": "The Accelerator Centre in Waterloo, Canada supports tech startups through structured programs from idea validation to scaling. It is one of Canada's top-ranked incubators.",
+    "tags": [
+      "waterloo",
+      "canada",
+      "deeptech",
+      "mentorship"
+    ]
+  },
+  {
+    "id": "dmz-toronto",
+    "name": "DMZ at Toronto Metropolitan University",
+    "country": "Canada",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "fintech",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": false,
+    "funding": "Non-dilutive support, workspace, and investor introductions",
+    "equity": null,
+    "website": "https://dmz.torontomu.ca",
+    "description": "DMZ is a leading startup incubator at Toronto Metropolitan University helping tech founders build and scale companies. It has incubated over 500 startups since 2010.",
+    "tags": [
+      "canada",
+      "toronto",
+      "university",
+      "incubator"
+    ]
+  },
+  {
+    "id": "brinc",
+    "name": "Brinc",
+    "country": "Hong Kong",
+    "region": "Asia",
+    "acceptsInternational": true,
+    "industries": [
+      "hardware",
+      "deeptech",
+      "food",
+      "cleantech"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Up to $150K investment plus hardware prototyping support",
+    "equity": "Variable",
+    "website": "https://www.brinc.io",
+    "description": "Brinc is a global venture accelerator focused on IoT, robotics, food technology, and connected hardware startups. It operates programs in Hong Kong, Bahrain, Poland, and other locations.",
+    "tags": [
+      "hardware",
+      "iot",
+      "robotics",
+      "prototyping"
+    ]
+  },
+  {
+    "id": "flat6labs",
+    "name": "Flat6Labs",
+    "country": "Egypt",
+    "region": "Middle East",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "fintech",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Seed investment up to $500K through follow-on funds",
+    "equity": "10–15% on initial accelerator",
+    "website": "https://flat6labs.com",
+    "description": "Flat6Labs is the MENA region's leading seed and early-stage investor, running accelerator programs in Cairo, Riyadh, Abu Dhabi, Tunis, and other cities.",
+    "tags": [
+      "mena",
+      "seed",
+      "arab-startups",
+      "regional"
+    ]
+  },
+  {
+    "id": "village-capital",
+    "name": "Village Capital",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech",
+      "healthcare",
+      "cleantech",
+      "agtech"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "Peer-selected investment up to $100K–$200K",
+    "equity": "Variable",
+    "website": "https://vilcap.com",
+    "description": "Village Capital supports early-stage entrepreneurs solving global problems in finance, health, education, and energy. Its peer-selection model lets founders choose investments.",
+    "tags": [
+      "impact",
+      "fintech",
+      "healthtech",
+      "peer-selection"
+    ]
+  },
+  {
+    "id": "aws-activate",
+    "name": "AWS Activate",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "deeptech",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": true,
+    "funding": "Up to $100K AWS credits through Activate Portfolio tier",
+    "equity": null,
+    "website": "https://aws.amazon.com/activate/",
+    "description": "AWS Activate provides startups with free tools, resources, and AWS credits to quickly get started on Amazon Web Services. Tiers range from Self-Starter to Portfolio based on affiliation.",
+    "tags": [
+      "cloud",
+      "aws",
+      "infrastructure",
+      "credits"
+    ]
+  },
+  {
+    "id": "betaworks",
+    "name": "Betaworks",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "ai",
+      "consumer",
+      "media"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Camp and accelerator investments from $250K–$500K",
+    "equity": "Variable",
+    "website": "https://betaworks.com",
+    "description": "Betaworks is a New York-based startup studio and early-stage investor building and investing in companies at the intersection of media, AI, and consumer technology.",
+    "tags": [
+      "ai",
+      "media",
+      "consumer",
+      "startup-studio"
+    ]
+  },
+  {
+    "id": "springboard-enterprises",
+    "name": "Springboard Enterprises",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": false,
+    "industries": [
+      "healthcare",
+      "saas",
+      "consumer",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": true,
+    "funding": "Access to investor network; alumni have raised $12B+ collectively",
+    "equity": null,
+    "website": "https://sb.co",
+    "description": "Springboard Enterprises is a global accelerator for women-led companies seeking equity capital. Its programs connect founders with investors, mentors, and industry experts.",
+    "tags": [
+      "women-led",
+      "diversity",
+      "healthtech",
+      "investor-access"
+    ]
+  },
+  {
+    "id": "launch-academy",
+    "name": "Launch Academy",
+    "country": "Canada",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Mentorship-driven program with investor demo day access",
+    "equity": null,
+    "website": "https://www.launchacademy.ca",
+    "description": "Launch Academy is a Vancouver-based tech incubator providing education, mentorship, and community for early-stage startups. It has supported 6,000+ entrepreneurs.",
+    "tags": [
+      "vancouver",
+      "canada",
+      "education",
+      "community"
+    ]
+  },
+  {
+    "id": "skydeck-berkeley",
+    "name": "Berkeley SkyDeck",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "deeptech",
+      "saas",
+      "healthcare",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "$200K investment via SkyDeck Fund for accelerator cohort",
+    "equity": "5–7% equity",
+    "website": "https://skydeck.berkeley.edu",
+    "description": "Berkeley SkyDeck is the official startup accelerator of UC Berkeley combining a accelerator program with a dedicated venture fund. It leverages university research and Silicon Valley networks.",
+    "tags": [
+      "university",
+      "uc-berkeley",
+      "deeptech",
+      "fund"
+    ]
+  },
+  {
+    "id": "mit-delta-v",
+    "name": "MIT delta v",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "deeptech",
+      "saas",
+      "healthcare",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$20K stipend plus $2K per team member; no equity taken",
+    "equity": null,
+    "website": "https://entrepreneurship.mit.edu/accelerator/",
+    "description": "MIT delta v (formerly Global Founders' Skills Accelerator) is MIT's capstone educational accelerator for student-founded startups. It provides intensive summer programming and MIT resources.",
+    "tags": [
+      "university",
+      "mit",
+      "student-founders",
+      "education"
+    ]
+  },
+  {
+    "id": "stanford-startx",
+    "name": "StartX",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": false,
+    "industries": [
+      "deeptech",
+      "saas",
+      "healthcare",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Non-profit accelerator; no equity or fees required",
+    "equity": null,
+    "website": "https://startx.com",
+    "description": "StartX is a non-profit startup accelerator for Stanford-affiliated founders. It provides office space, mentorship, and community without taking equity or charging fees.",
+    "tags": [
+      "stanford",
+      "university",
+      "non-profit",
+      "silicon-valley"
+    ]
+  },
+  {
+    "id": "harvard-i-lab",
+    "name": "Harvard Innovation Labs",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "healthcare",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Venture Incubation Program offers workspace and mentorship",
+    "equity": null,
+    "website": "https://innovationlabs.harvard.edu",
+    "description": "Harvard Innovation Labs (i-lab) supports Harvard students and alumni in building ventures across all industries. The Venture Incubation Program is its flagship accelerator track.",
+    "tags": [
+      "harvard",
+      "university",
+      "student-founders",
+      "vip"
+    ]
+  },
+  {
+    "id": "alchemist-accelerator",
+    "name": "Alchemist Accelerator",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "b2b",
+      "enterprise"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": true,
+    "funding": "$25K seed investment plus Demo Day investor access",
+    "equity": "3–5% equity",
+    "website": "https://alchemistaccelerator.com",
+    "description": "Alchemist Accelerator is the leading accelerator for enterprise startups that monetize from day one. It focuses exclusively on B2B companies with a structured six-month program.",
+    "tags": [
+      "b2b",
+      "enterprise",
+      "saas",
+      "monetization"
+    ]
+  },
+  {
+    "id": "founders-factory",
+    "name": "Founders Factory",
+    "country": "United Kingdom",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech",
+      "healthcare",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "£30K–£50K initial investment plus studio and corporate support",
+    "equity": "Variable",
+    "website": "https://foundersfactory.com",
+    "description": "Founders Factory is a global venture studio and accelerator partnering with corporates to build and scale startups. Verticals include fintech, health, and beauty.",
+    "tags": [
+      "venture-studio",
+      "corporate",
+      "fintech",
+      "healthtech"
+    ]
+  },
+  {
+    "id": "capital-factory",
+    "name": "Capital Factory",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": false,
+    "industries": [
+      "saas",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": false,
+    "funding": "Center of gravity for Texas startups; selective angel investments",
+    "equity": "Variable on investment",
+    "website": "https://www.capitalfactory.com",
+    "description": "Capital Factory is the center of gravity for entrepreneurs in Texas, providing co-working, events, mentorship, and access to investors. It is one of the most active angel groups in the US.",
+    "tags": [
+      "texas",
+      "austin",
+      "angel",
+      "community"
+    ]
+  },
+  {
+    "id": "era-nyc",
+    "name": "Entrepreneurs Roundtable Accelerator",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "fintech",
+      "consumer",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$100K for 8% equity",
+    "equity": "8% equity",
+    "website": "https://www.eranyc.com",
+    "description": "Entrepreneurs Roundtable Accelerator (ERA) is New York City's leading technology accelerator providing capital, mentorship, and office space. It runs two four-month programs annually.",
+    "tags": [
+      "nyc",
+      "seed",
+      "mentorship",
+      "demo-day"
+    ]
+  },
+  {
+    "id": "mlab-east-africa",
+    "name": "m:lab East Africa",
+    "country": "Kenya",
+    "region": "Africa",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "fintech",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Incubation support and mobile-focused innovation grants",
+    "equity": null,
+    "website": "https://mlab.co.ke",
+    "description": "m:lab East Africa is a consortium that identifies and supports mobile innovation startups across Kenya and the region. It provides incubation, testing, and investor linkages.",
+    "tags": [
+      "mobile",
+      "africa",
+      "kenya",
+      "innovation"
+    ]
+  },
+  {
+    "id": "cc-hub-nigeria",
+    "name": "Co-Creation Hub (CcHUB)",
+    "country": "Nigeria",
+    "region": "Africa",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "edtech",
+      "healthcare",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Design-led incubation with access to CcHUB Design Lab and investors",
+    "equity": null,
+    "website": "https://cchub.africa",
+    "description": "Co-Creation Hub (CcHUB) is Nigeria's first open living lab and pre-incubation space focused on social innovation. It has expanded to Nairobi and Kigali.",
+    "tags": [
+      "africa",
+      "nigeria",
+      "social-impact",
+      "design"
+    ]
+  },
+  {
+    "id": "endeaver-catalyst",
+    "name": "Endeavor",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "fintech",
+      "consumer",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "early",
+      "growth",
+      "scale"
+    ],
+    "remote": true,
+    "funding": "Mentorship and network access; portfolio companies raise follow-on capital",
+    "equity": null,
+    "website": "https://endeavor.org",
+    "description": "Endeavor selects, mentors, and accelerates high-impact entrepreneurs worldwide. It focuses on scale-stage founders in emerging and growth markets across 40+ countries.",
+    "tags": [
+      "scale-up",
+      "emerging-markets",
+      "mentorship",
+      "global"
+    ]
+  },
+  {
+    "id": "sosv",
+    "name": "SOSV",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "deeptech",
+      "hardware",
+      "biotech",
+      "food"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$500K total investment ($200K program fee plus $300K SAFE)",
+    "equity": "Variable via program",
+    "website": "https://sosv.com",
+    "description": "SOSV is a multi-stage venture fund running vertical accelerators including HAX (hardware), IndieBio (biotech), and Food-X (food tech). It invests in 150+ startups annually.",
+    "tags": [
+      "hardware",
+      "biotech",
+      "deeptech",
+      "vertical-accelerators"
+    ]
+  },
+  {
+    "id": "neo-accelerator",
+    "name": "Neo Accelerator",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "ai",
+      "deeptech",
+      "general"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": true,
+    "funding": "Investment from associated Neo fund for selected founders",
+    "equity": "Variable",
+    "website": "https://neo.com",
+    "description": "Neo is a mentorship community and accelerator for exceptional engineers and founders. It combines a competitive accelerator program with a venture fund backing technical founders.",
+    "tags": [
+      "technical-founders",
+      "ai",
+      "engineers",
+      "community"
+    ]
+  },
+  {
+    "id": "founder-institute",
+    "name": "Founder Institute",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "saas",
+      "consumer",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed"
+    ],
+    "remote": true,
+    "funding": "Equity collective model; graduates join shared equity pool",
+    "equity": "3.5% warrant to equity collective",
+    "website": "https://fi.co",
+    "description": "Founder Institute is the world's largest pre-seed accelerator, operating in 100+ cities globally. Its part-time four-month program helps founders launch meaningful and enduring companies.",
+    "tags": [
+      "pre-seed",
+      "global",
+      "part-time",
+      "equity-collective"
+    ]
+  },
+  {
+    "id": "techstars-london",
+    "name": "Techstars London",
+    "country": "United Kingdom",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech",
+      "saas",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$120K investment standard Techstars deal",
+    "equity": "6% common stock",
+    "website": "https://www.techstars.com/accelerators/london",
+    "description": "Techstars London is a flagship Techstars accelerator based in the UK capital. It connects startups with London's fintech ecosystem, mentors, and European investor networks.",
+    "tags": [
+      "london",
+      "fintech",
+      "europe",
+      "techstars"
+    ]
+  },
+  {
+    "id": "chinaccelerator",
+    "name": "Chinaccelerator",
+    "country": "China",
+    "region": "Asia",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "consumer",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Part of MOX accelerator; access to Asia mobile markets",
+    "equity": "Variable",
+    "website": "https://chinaccelerator.com",
+    "description": "Chinaccelerator is a mentorship-driven accelerator helping startups access Asian markets, particularly mobile-first economies. It is operated by SOSV as part of the MOX program.",
+    "tags": [
+      "china",
+      "asia",
+      "mobile",
+      "cross-border"
+    ]
+  },
+  {
+    "id": "yozma-korea",
+    "name": "D.CAMP",
+    "country": "South Korea",
+    "region": "Asia",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "deeptech",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Banks Foundation-backed support and investor matching",
+    "equity": null,
+    "website": "https://dcamp.kr",
+    "description": "D.CAMP is Korea's leading startup hub operated by Banks Foundation for Young Entrepreneurs, providing workspace, programs, and community for Korean and international startups.",
+    "tags": [
+      "korea",
+      "seoul",
+      "startup-hub",
+      "banks-foundation"
+    ]
+  },
+  {
+    "id": "launchpad-sydney",
+    "name": "Launch Pad Technology Business Incubator",
+    "country": "Australia",
+    "region": "Oceania",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "deeptech",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Western Sydney University incubator with grants and mentorship",
+    "equity": null,
+    "website": "https://www.westernsydney.edu.au/launchpad",
+    "description": "Launch Pad is Western Sydney University's innovation hub supporting startups with co-working, mentoring, and connections to research. It serves the Greater Western Sydney ecosystem.",
+    "tags": [
+      "australia",
+      "university",
+      "western-sydney",
+      "incubator"
+    ]
+  },
+  {
+    "id": "startmate",
+    "name": "Startmate",
+    "country": "Australia",
+    "region": "Oceania",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "deeptech",
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": true,
+    "funding": "$120K AUD investment for 7.5% equity",
+    "equity": "7.5% equity",
+    "website": "https://www.startmate.com",
+    "description": "Startmate is Australia and New Zealand's leading accelerator backing ambitious founders building global companies. It runs two cohorts per year with intensive mentorship.",
+    "tags": [
+      "australia",
+      "anz",
+      "seed",
+      "mentorship"
+    ]
+  },
+  {
+    "id": "buildit-latvia",
+    "name": "Buildit Accelerator",
+    "country": "Latvia",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "hardware",
+      "saas",
+      "deeptech"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Up to €50K investment for hardware and IoT startups",
+    "equity": "Variable",
+    "website": "https://buildit.lv",
+    "description": "Buildit is the Baltic region's first accelerator focused on hardware, IoT, and physical product startups. It provides prototyping labs and manufacturing connections.",
+    "tags": [
+      "hardware",
+      "iot",
+      "baltics",
+      "prototyping"
+    ]
+  },
+  {
+    "id": "parallel18",
+    "name": "Parallel18",
+    "country": "Puerto Rico",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "saas",
+      "biotech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "$40K equity-free grant for accelerator cohort",
+    "equity": null,
+    "website": "https://parallel18.com",
+    "description": "Parallel18 is a top-level accelerator in Puerto Rico supporting global startups with equity-free grants and access to the US and Latin American markets.",
+    "tags": [
+      "puerto-rico",
+      "equity-free",
+      "latam",
+      "global"
+    ]
+  },
+  {
+    "id": "t-hub",
+    "name": "T-Hub",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "saas",
+      "deeptech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": false,
+    "funding": "Lab32 accelerator offers seed funding; various corporate programs",
+    "equity": "Varies by program",
+    "website": "https://t-hub.co",
+    "description": "T-Hub is India's largest innovation hub based in Hyderabad, supporting startups through incubation, acceleration, and corporate innovation programs. It has supported 2,000+ startups.",
+    "tags": [
+      "hyderabad",
+      "telangana",
+      "innovation-hub",
+      "corporate-innovation"
+    ]
+  },
+  {
+    "id": "ciie-co",
+    "name": "CIIE.CO",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "saas",
+      "deeptech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Seed fund and accelerator investments up to ₹1 Cr",
+    "equity": "Variable",
+    "website": "https://ciie.co",
+    "description": "CIIE.CO (IIM Ahmedabad's Centre for Innovation Incubation and Entrepreneurship) is one of India's pioneering incubators. It runs accelerators, seed funds, and Bharat Inclusion initiatives.",
+    "tags": [
+      "iim-ahmedabad",
+      "gujarat",
+      "seed-fund",
+      "inclusion"
+    ]
+  },
+  {
+    "id": "nsrce-iim-bangalore",
+    "name": "NSRCEL",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "saas",
+      "fintech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Launchpad and incubation programs with IIMB seed support",
+    "equity": null,
+    "website": "https://nsrcel.org",
+    "description": "NSRCEL at IIM Bangalore is a leading startup hub offering incubation, acceleration, and entrepreneurship education. It supports startups from idea stage through early growth.",
+    "tags": [
+      "iim-bangalore",
+      "karnataka",
+      "incubation",
+      "launchpad"
+    ]
+  },
+  {
+    "id": "sine-iit-bombay",
+    "name": "Society for Innovation and Entrepreneurship (SINE)",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "deeptech",
+      "saas",
+      "hardware",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Seed support and government grant facilitation",
+    "equity": null,
+    "website": "https://www.sineiitb.org",
+    "description": "SINE IIT Bombay is one of India's first university incubators, supporting technology startups spun out of IIT Bombay research. It provides incubation space, mentoring, and funding access.",
+    "tags": [
+      "iit-bombay",
+      "mumbai",
+      "deeptech",
+      "university"
+    ]
+  },
+  {
+    "id": "aic-banasthali",
+    "name": "AIC Banasthali Vidyapith Foundation",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "consumer",
+      "edtech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Atal Innovation Mission grant-backed incubation support",
+    "equity": null,
+    "website": "https://aicbanasthali.org",
+    "description": "AIC Banasthali is an Atal Incubation Centre at Banasthali Vidyapith supporting women entrepreneurs and startups from Rajasthan and beyond with incubation facilities and mentorship.",
+    "tags": [
+      "atal-incubation",
+      "rajasthan",
+      "women-entrepreneurs",
+      "aim"
+    ]
+  },
+  {
+    "id": "kerala-startup-mission",
+    "name": "Kerala Startup Mission",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "saas",
+      "hardware",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Seed fund, innovation grants, and soft loan schemes",
+    "equity": "Variable on seed fund",
+    "website": "https://startupmission.kerala.gov.in",
+    "description": "Kerala Startup Mission (KSUM) is the nodal agency for entrepreneurship development in Kerala. It operates multiple incubators, a seed fund, and the Huddle Global conference.",
+    "tags": [
+      "kerala",
+      "government",
+      "seed-fund",
+      "hardware-park"
+    ]
+  },
+  {
+    "id": "icreate-gujarat",
+    "name": "iCreate (International Centre for Entrepreneurship and Technology)",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": true,
+    "industries": [
+      "deeptech",
+      "hardware",
+      "cleantech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Equity and grant funding up to ₹25 lakh through various programs",
+    "equity": "Variable on investment programs",
+    "website": "https://www.icreate.org.in",
+    "description": "iCreate is an autonomous technology business incubator in Gujarat focused on deep tech, hardware, and IP-led startups. It is supported by the Government of Gujarat and Government of India.",
+    "tags": [
+      "gujarat",
+      "deeptech",
+      "hardware",
+      "government"
+    ]
+  },
+  {
+    "id": "iit-madras-incubation-cell",
+    "name": "IIT Madras Incubation Cell",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "deeptech",
+      "saas",
+      "hardware",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Seed grants and access to IIT Madras research infrastructure",
+    "equity": null,
+    "website": "https://incubation.iitm.ac.in",
+    "description": "IIT Madras Incubation Cell (RTBI and IITMIC) supports startups leveraging IIT Madras research and talent. It is among India's most prolific academic incubators by startup count.",
+    "tags": [
+      "iit-madras",
+      "chennai",
+      "research",
+      "deeptech"
+    ]
+  },
+  {
+    "id": "i-hub-hyderabad",
+    "name": "iHub Hyderabad",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "deeptech",
+      "ai",
+      "hardware",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Telangana government-backed incubation and prototyping grants",
+    "equity": null,
+    "website": "https://ihub.co.in",
+    "description": "iHub Hyderabad is a deeptech-focused incubator supported by the Telangana government and DST. It provides prototyping labs, mentorship, and connections to research institutions.",
+    "tags": [
+      "hyderabad",
+      "deeptech",
+      "prototyping",
+      "telangana"
+    ]
+  },
+  {
+    "id": "forge-accelerator",
+    "name": "Forge Innovation & Ventures",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "hardware",
+      "manufacturing",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Accelerator investments and manufacturing support programs",
+    "equity": "Variable",
+    "website": "https://forgeforward.in",
+    "description": "Forge is a Coimbatore-based accelerator and incubator focused on hardware, manufacturing, and industrial startups. It bridges the gap between prototype and production.",
+    "tags": [
+      "coimbatore",
+      "hardware",
+      "manufacturing",
+      "tamil-nadu"
+    ]
+  },
+  {
+    "id": "zone-startups-india",
+    "name": "Zone Startups India",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Corporate accelerator programs with pilot and investment opportunities",
+    "equity": null,
+    "website": "https://zonestartups.com/india",
+    "description": "Zone Startups India is a Toronto-based accelerator's Mumbai outpost running corporate-linked accelerator programs. It connects startups with enterprise partners for validation and pilots.",
+    "tags": [
+      "mumbai",
+      "corporate-accelerator",
+      "b2b",
+      "pilots"
+    ]
+  },
+  {
+    "id": "iim-calcutta-innovation-park",
+    "name": "IIM Calcutta Innovation Park",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "saas",
+      "fintech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Incubation support and access to IIM Calcutta network",
+    "equity": null,
+    "website": "https://iimcip.org",
+    "description": "IIM Calcutta Innovation Park (IIMCIP) promotes entrepreneurship in Eastern India through incubation, acceleration, and innovation programs linked to IIM Calcutta.",
+    "tags": [
+      "kolkata",
+      "iim-calcutta",
+      "east-india",
+      "incubation"
+    ]
+  },
+  {
+    "id": "nasscom-coe",
+    "name": "NASSCOM Center of Excellence",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "ai",
+      "iot",
+      "deeptech",
+      "saas"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": false,
+    "funding": "CoE programs with MeitY support; access to corporate labs",
+    "equity": null,
+    "website": "https://coe-iot.com",
+    "description": "NASSCOM Center of Excellence for IoT and AI supports startups through labs, corporate co-creation, and market access. Centers operate in Bangalore, Gurugram, Ahmedabad, and Vizag.",
+    "tags": [
+      "nasscom",
+      "iot",
+      "ai",
+      "corporate-co-creation"
+    ]
+  },
+  {
+    "id": "aic-iiit-hyderabad",
+    "name": "AIC IIIT Hyderabad Foundation",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "ai",
+      "deeptech",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "AIM grant-backed incubation and prototyping support",
+    "equity": null,
+    "website": "https://aic.iiit.ac.in",
+    "description": "AIC at IIIT Hyderabad is an Atal Incubation Centre leveraging the institute's AI and computer science expertise. It incubates startups in deep tech and software products.",
+    "tags": [
+      "iiit-hyderabad",
+      "ai",
+      "atal-incubation",
+      "deeptech"
+    ]
+  },
+  {
+    "id": "aic-pimpri-chinchwad",
+    "name": "AIC Pimpri Chinchwad College of Engineering",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "hardware",
+      "manufacturing",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Atal Innovation Mission supported incubation grants",
+    "equity": null,
+    "website": "https://aicpcmc.com",
+    "description": "AIC PCMC is an Atal Incubation Centre in Pune's industrial hub supporting hardware, manufacturing, and engineering startups with lab facilities and industry mentorship.",
+    "tags": [
+      "pune",
+      "manufacturing",
+      "atal-incubation",
+      "engineering"
+    ]
+  },
+  {
+    "id": "aic-bimtech",
+    "name": "AIC BIMTECH",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "saas",
+      "consumer",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "AIM-backed incubation with seed grant access",
+    "equity": null,
+    "website": "https://aicbimtech.com",
+    "description": "AIC BIMTECH is an Atal Incubation Centre at BIMTECH Greater Noida supporting early-stage startups with workspace, mentoring, and investor connect programs.",
+    "tags": [
+      "greater-noida",
+      "atal-incubation",
+      "bimtech",
+      "incubation"
+    ]
+  },
+  {
+    "id": "aic-jk-lakshmipat",
+    "name": "AIC JK Lakshmipat University",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "edtech",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Incubation support under Atal Innovation Mission",
+    "equity": null,
+    "website": "https://aicjklu.in",
+    "description": "AIC JK Lakshmipat University in Jaipur provides incubation facilities and entrepreneurship programs for Rajasthan-based startups through the Atal Innovation Mission framework.",
+    "tags": [
+      "jaipur",
+      "rajasthan",
+      "atal-incubation",
+      "university"
+    ]
+  },
+  {
+    "id": "aic-anna-university",
+    "name": "AIC Anna University Incubation Foundation",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "deeptech",
+      "hardware",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "AIM grants and Tamil Nadu startup policy benefits",
+    "equity": null,
+    "website": "https://aicannauniv.org",
+    "description": "AIC Anna University supports technology startups in Tamil Nadu with incubation space, prototyping labs, and connections to one of India's largest engineering universities.",
+    "tags": [
+      "chennai",
+      "anna-university",
+      "tamil-nadu",
+      "atal-incubation"
+    ]
+  },
+  {
+    "id": "rtbi-iit-madras",
+    "name": "Rural Technology Business Incubator (RTBI)",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "agtech",
+      "cleantech",
+      "healthcare",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "DST and IIT Madras supported seed grants for social ventures",
+    "equity": null,
+    "website": "https://www.rtbi.in",
+    "description": "RTBI at IIT Madras incubates startups addressing rural and social challenges in agriculture, healthcare, and livelihoods. It is one of India's pioneering social incubators.",
+    "tags": [
+      "rural",
+      "social-impact",
+      "agtech",
+      "iit-madras"
+    ]
+  },
+  {
+    "id": "aic-gitam",
+    "name": "AIC GITAM University",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "saas",
+      "edtech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Atal Innovation Mission incubation funding",
+    "equity": null,
+    "website": "https://aicgitam.ac.in",
+    "description": "AIC GITAM is an Atal Incubation Centre at GITAM University supporting startups from Andhra Pradesh and Telangana with incubation, mentoring, and funding facilitation.",
+    "tags": [
+      "visakhapatnam",
+      "atal-incubation",
+      "gitam",
+      "andhra-pradesh"
+    ]
+  },
+  {
+    "id": "startup-india-hub",
+    "name": "Startup India Hub",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": true,
+    "industries": [
+      "general",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": true,
+    "funding": "Fund of Funds, seed fund scheme, and tax benefit facilitation",
+    "equity": null,
+    "website": "https://www.startupindia.gov.in",
+    "description": "Startup India Hub is the Government of India's flagship platform connecting startups with funding, mentorship, and compliance support. It administers the Startup India Seed Fund Scheme.",
+    "tags": [
+      "government",
+      "startup-india",
+      "seed-fund",
+      "policy"
+    ]
+  },
+  {
+    "id": "aic-raipur",
+    "name": "AIC Chhattisgarh (NIT Raipur)",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "cleantech",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "AIM-supported incubation with state startup incentives",
+    "equity": null,
+    "website": "https://aicnitraipur.com",
+    "description": "AIC Chhattisgarh at NIT Raipur supports startups from central India with incubation facilities, mentorship, and access to Atal Innovation Mission resources.",
+    "tags": [
+      "raipur",
+      "chhattisgarh",
+      "atal-incubation",
+      "nit"
+    ]
+  },
+  {
+    "id": "electropreneur-park",
+    "name": "Electropreneur Park",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "hardware",
+      "deeptech",
+      "electronics"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "MeitY and STPI supported ESDM incubation grants",
+    "equity": null,
+    "website": "https://electropreneurpark.com",
+    "description": "Electropreneur Park is an ESDM-focused incubator in Delhi supported by MeitY and STPI. It provides electronics prototyping labs and mentorship for hardware startups.",
+    "tags": [
+      "electronics",
+      "esdm",
+      "hardware",
+      "delhi"
+    ]
+  },
+  {
+    "id": "aic-sscbs",
+    "name": "AIC Shaheed Sukhdev College of Business Studies",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "consumer",
+      "fintech",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "AIM incubation grants and Delhi startup ecosystem access",
+    "equity": null,
+    "website": "https://aic-sscbs.in",
+    "description": "AIC SSCBS is a Delhi University-affiliated Atal Incubation Centre supporting student and alumni startups with workspace, mentoring, and early-stage funding connections.",
+    "tags": [
+      "delhi",
+      "atal-incubation",
+      "student-startups",
+      "sscbs"
+    ]
+  },
+  {
+    "id": "society-innovation-du",
+    "name": "Society for Innovation and Entrepreneurship (SINE) DU",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "saas",
+      "consumer",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "University of Delhi incubation support and grant facilitation",
+    "equity": null,
+    "website": "https://sine.du.ac.in",
+    "description": "SINE at Delhi University incubates startups founded by DU students, faculty, and alumni. It provides co-working space and entrepreneurship training on campus.",
+    "tags": [
+      "delhi-university",
+      "student-startups",
+      "incubation",
+      "delhi"
+    ]
+  },
+  {
+    "id": "aic-nalanda",
+    "name": "AIC Nalanda Institute of Technology Foundation",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "edtech",
+      "saas",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "Atal Innovation Mission incubation support",
+    "equity": null,
+    "website": "https://aicnalanda.com",
+    "description": "AIC Nalanda in Bhubaneswar supports Odisha-based startups through the Atal Incubation Centre program with workspace, mentoring, and investor networking.",
+    "tags": [
+      "odisha",
+      "bhubaneswar",
+      "atal-incubation",
+      "east-india"
+    ]
+  },
+  {
+    "id": "ahmedabad-university-incubator",
+    "name": "Ahmedabad University Incubator",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "general",
+      "saas",
+      "social-impact",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "University-backed incubation and Gujarat startup scheme access",
+    "equity": null,
+    "website": "https://ahduni.edu.in/incubator",
+    "description": "Ahmedabad University Incubator supports interdisciplinary ventures from students and faculty with mentorship, workspace, and connections to Gujarat's startup ecosystem.",
+    "tags": [
+      "ahmedabad",
+      "gujarat",
+      "university",
+      "interdisciplinary"
+    ]
+  },
+  {
+    "id": "aic-hyderabad-bhansali",
+    "name": "AIC Bhansali & Co",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "fintech",
+      "saas",
+      "consumer",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "AIM grants plus angel network access via Bhansali & Co",
+    "equity": null,
+    "website": "https://aicbhansali.com",
+    "description": "AIC Bhansali & Co in Hyderabad combines Atal Incubation Centre infrastructure with active angel investor networks, supporting early-stage startups in Telangana.",
+    "tags": [
+      "hyderabad",
+      "angel-network",
+      "atal-incubation",
+      "fintech"
+    ]
+  },
+  {
+    "id": "agri-business-incubation-iit-kharagpur",
+    "name": "Agri Business Incubation Centre IIT Kharagpur",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "food",
+      "agtech",
+      "cleantech"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "ICAR and DST supported agtech incubation grants",
+    "equity": null,
+    "website": "https://abiciitkgp.org",
+    "description": "The Agri Business Incubation Centre at IIT Kharagpur supports agritech and food-processing startups with labs, field testing, and connections to agricultural research.",
+    "tags": [
+      "agtech",
+      "iit-kharagpur",
+      "food-processing",
+      "agriculture"
+    ]
+  },
+  {
+    "id": "meity-startup-hub",
+    "name": "MeitY Startup Hub",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "saas",
+      "deeptech",
+      "hardware",
+      "multi-sector"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": true,
+    "funding": "TIDE 2.0, SAMRIDH, and other MeitY scheme funding",
+    "equity": null,
+    "website": "https://meitystartuphub.in",
+    "description": "MeitY Startup Hub is the Ministry of Electronics and IT's platform coordinating startup schemes including TIDE centers, EIR programs, and the SAMRIDH accelerator.",
+    "tags": [
+      "government",
+      "meity",
+      "deeptech",
+      "electronics"
+    ]
+  },
+  {
+    "id": "indiebio",
+    "name": "IndieBio",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "healthcare",
+      "deeptech"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$525K total ($250K program fee plus $275K SAFE)",
+    "equity": "Program fee structure",
+    "website": "https://indiebio.co",
+    "description": "IndieBio is the world's largest biotech startup accelerator, run by SOSV. It helps scientists build biotech companies with lab space, mentorship, and seed capital in San Francisco.",
+    "tags": [
+      "biotech",
+      "life-sciences",
+      "sosv",
+      "lab-space"
+    ]
+  },
+  {
+    "id": "hax",
+    "name": "HAX",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "hardware",
+      "deeptech",
+      "consumer"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$500K total investment package via SOSV",
+    "equity": "Variable via SOSV program",
+    "website": "https://hax.co",
+    "description": "HAX is SOSV's hard tech accelerator providing hardware startups with prototyping labs, supply chain expertise, and seed funding. Programs run in Newark and Shenzhen.",
+    "tags": [
+      "hardware",
+      "iot",
+      "robotics",
+      "prototyping"
+    ]
+  },
+  {
+    "id": "fintech-sandbox",
+    "name": "FinTech Sandbox",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "Free access to data feeds and APIs from 40+ partners",
+    "equity": null,
+    "website": "https://fintechsandbox.org",
+    "description": "FinTech Sandbox provides startups with free access to financial data and infrastructure for building and testing products. It operates in Boston and San Francisco.",
+    "tags": [
+      "fintech",
+      "data-apis",
+      "sandbox",
+      "financial-data"
+    ]
+  },
+  {
+    "id": "bionest-birac",
+    "name": "BioNEST (BIRAC)",
+    "country": "India",
+    "region": "South Asia",
+    "acceptsInternational": false,
+    "industries": [
+      "healthcare",
+      "deeptech"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "BIRAC seed fund, BIG grants up to ₹50 lakh, and lab access",
+    "equity": "Variable on BIRAC investments",
+    "website": "https://birac.nic.in/bionest.php",
+    "description": "BioNEST is BIRAC's bio-incubation program supporting life-sciences startups across 50+ centers in India. It provides shared labs, equipment, and biotech-specific mentoring.",
+    "tags": [
+      "biotech",
+      "birac",
+      "life-sciences",
+      "lab-incubation"
+    ]
+  },
+  {
+    "id": "rock-health",
+    "name": "Rock Health",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "healthcare"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "Digital health advisory and capital advisory services",
+    "equity": null,
+    "website": "https://rockhealth.com",
+    "description": "Rock Health is a seed fund and advisory firm dedicated exclusively to digital health startups. It provides market insights, advisory services, and investor connections.",
+    "tags": [
+      "digital-health",
+      "healthtech",
+      "seed-fund",
+      "advisory"
+    ]
+  },
+  {
+    "id": "matter-chicago",
+    "name": "MATTER",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "healthcare"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": false,
+    "funding": "Corporate partnership programs and investor showcase events",
+    "equity": null,
+    "website": "https://matter.health",
+    "description": "MATTER is a healthcare startup incubator and innovation center in Chicago connecting startups with hospitals, pharma companies, and payers for pilots and partnerships.",
+    "tags": [
+      "healthtech",
+      "medtech",
+      "corporate-partnerships",
+      "chicago"
+    ]
+  },
+  {
+    "id": "imagine-h2o",
+    "name": "Imagine H2O",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "cleantech"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "Non-dilutive prizes and access to water industry partners",
+    "equity": null,
+    "website": "https://imagineh2o.org",
+    "description": "Imagine H2O is a nonprofit water innovation accelerator supporting startups addressing global water challenges. Its annual competition provides funding and industry visibility.",
+    "tags": [
+      "water",
+      "cleantech",
+      "sustainability",
+      "nonprofit"
+    ]
+  },
+  {
+    "id": "food-x",
+    "name": "Food-X",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "food"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": false,
+    "funding": "$500K SOSV investment package for food tech cohorts",
+    "equity": "Variable via SOSV",
+    "website": "https://sosv.com/program/food-x/",
+    "description": "Food-X is SOSV's accelerator for food technology and alternative protein startups. It provides kitchen labs, industry mentors, and seed funding in New York City.",
+    "tags": [
+      "foodtech",
+      "alternative-protein",
+      "sosv",
+      "agrifood"
+    ]
+  },
+  {
+    "id": "zeroth-ai",
+    "name": "Zeroth.AI",
+    "country": "Hong Kong",
+    "region": "Asia",
+    "acceptsInternational": true,
+    "industries": [
+      "deeptech",
+      "saas"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": true,
+    "funding": "$120K investment for AI accelerator cohorts",
+    "equity": "6–8% equity",
+    "website": "https://zeroth.ai",
+    "description": "Zeroth.AI is Asia's first accelerator dedicated to artificial intelligence startups. It provides funding, technical mentorship, and access to corporate AI partners.",
+    "tags": [
+      "ai",
+      "machine-learning",
+      "asia",
+      "technical"
+    ]
+  },
+  {
+    "id": "dreamit-health",
+    "name": "Dreamit Health",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "healthcare"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "Up to $500K investment for health tech startups",
+    "equity": "Variable",
+    "website": "https://www.dreamit.com/health",
+    "description": "Dreamit Health is a growth-focused accelerator for health tech startups with traction. It connects companies with health systems for pilots and commercial partnerships.",
+    "tags": [
+      "healthtech",
+      "health-systems",
+      "pilots",
+      "growth"
+    ]
+  },
+  {
+    "id": "cleantech-open",
+    "name": "Cleantech Open",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "cleantech"
+    ],
+    "startupStages": [
+      "idea",
+      "pre-seed",
+      "seed"
+    ],
+    "remote": true,
+    "funding": "Global Ideas competition prizes and accelerator mentorship",
+    "equity": null,
+    "website": "https://www.cleantechopen.org",
+    "description": "Cleantech Open runs the world's largest cleantech accelerator, helping startups develop business models for energy, water, agriculture, and transportation solutions.",
+    "tags": [
+      "cleantech",
+      "energy",
+      "sustainability",
+      "climate"
+    ]
+  },
+  {
+    "id": "greentown-labs",
+    "name": "Greentown Labs",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "cleantech"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": false,
+    "funding": "Lab space and accelerator programs; access to climatetech investors",
+    "equity": null,
+    "website": "https://greentownlabs.com",
+    "description": "Greentown Labs is the largest climatetech startup incubator in North America with locations in Somerville and Houston. It provides lab space and a 200+ company community.",
+    "tags": [
+      "climatetech",
+      "lab-space",
+      "sustainability",
+      "community"
+    ]
+  },
+  {
+    "id": "fintech-lab-london",
+    "name": "FinTech Innovation Lab",
+    "country": "United Kingdom",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "fintech"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "12-week program with bank and insurer pilot opportunities",
+    "equity": null,
+    "website": "https://www.fintechinnovationlab.com",
+    "description": "FinTech Innovation Lab London is an accelerator run by Accenture connecting fintech startups with leading banks and insurers for product validation and partnerships.",
+    "tags": [
+      "fintech",
+      "banking",
+      "insurtech",
+      "accenture"
+    ]
+  },
+  {
+    "id": "healthbox",
+    "name": "Healthbox",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": false,
+    "industries": [
+      "healthcare"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": true,
+    "funding": "Advisory and corporate innovation programs for health startups",
+    "equity": null,
+    "website": "https://www.healthbox.com",
+    "description": "Healthbox, part of HIMSS, helps healthcare organizations and startups accelerate innovation through advisory services, accelerator programs, and industry connections.",
+    "tags": [
+      "healthtech",
+      "himss",
+      "innovation",
+      "advisory"
+    ]
+  },
+  {
+    "id": "katapult-ocean",
+    "name": "Katapult Ocean",
+    "country": "Norway",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "cleantech"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "€150K investment for ocean impact accelerator cohorts",
+    "equity": "Variable",
+    "website": "https://katapult.vc/ocean",
+    "description": "Katapult Ocean invests in and accelerates startups tackling ocean sustainability challenges including plastic pollution, overfishing, and marine ecosystem health.",
+    "tags": [
+      "ocean-tech",
+      "impact",
+      "sustainability",
+      "norway"
+    ]
+  },
+  {
+    "id": "cyberlaunch",
+    "name": "CyberLaunch",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "deeptech"
+    ],
+    "startupStages": [
+      "pre-seed",
+      "seed"
+    ],
+    "remote": true,
+    "funding": "$50K investment plus cybersecurity mentor network access",
+    "equity": "Variable",
+    "website": "https://cyberlaunch.com",
+    "description": "CyberLaunch is a cybersecurity-focused accelerator in Atlanta providing seed funding, mentorship, and connections to enterprise security buyers and investors.",
+    "tags": [
+      "cybersecurity",
+      "infosec",
+      "enterprise",
+      "atlanta"
+    ]
+  },
+  {
+    "id": "metaprop",
+    "name": "MetaProp",
+    "country": "United States",
+    "region": "North America",
+    "acceptsInternational": true,
+    "industries": [
+      "saas",
+      "fintech"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "PropTech accelerator with $250K investment opportunities",
+    "equity": "Variable",
+    "website": "https://metaprop.com",
+    "description": "MetaProp is the leading PropTech venture capital firm and accelerator investing in startups transforming real estate and the built environment.",
+    "tags": [
+      "proptech",
+      "real-estate",
+      "construction",
+      "built-environment"
+    ]
+  },
+  {
+    "id": "the-mix-bayer",
+    "name": "Leaps by Bayer - Co.Lab",
+    "country": "Germany",
+    "region": "Europe",
+    "acceptsInternational": true,
+    "industries": [
+      "healthcare",
+      "deeptech"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Lab space and venture support through Leaps by Bayer",
+    "equity": null,
+    "website": "https://leaps.bayer.com",
+    "description": "Leaps by Bayer invests in breakthrough innovations in health and agriculture. Its Co.Lab programs provide lab infrastructure and venture support for biotech startups.",
+    "tags": [
+      "biotech",
+      "agtech",
+      "pharma",
+      "corporate-vc"
+    ]
+  },
+  {
+    "id": "aerospace-xcelerator",
+    "name": "Starburst Aerospace Accelerator",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "deeptech",
+      "hardware"
+    ],
+    "startupStages": [
+      "seed",
+      "early"
+    ],
+    "remote": false,
+    "funding": "Corporate partnership programs with aerospace and defense primes",
+    "equity": null,
+    "website": "https://starburst.aero",
+    "description": "Starburst is the first and only global aerospace accelerator connecting startups with Boeing, Airbus, and defense contractors. It runs programs in Los Angeles, Munich, and other hubs.",
+    "tags": [
+      "aerospace",
+      "defense",
+      "aviation",
+      "space"
+    ]
+  },
+  {
+    "id": "edtech-sandbox",
+    "name": "AWS EdStart",
+    "country": "United States",
+    "region": "Global",
+    "acceptsInternational": true,
+    "industries": [
+      "edtech"
+    ],
+    "startupStages": [
+      "seed",
+      "early",
+      "growth"
+    ],
+    "remote": true,
+    "funding": "Up to $100K AWS credits for qualifying edtech startups",
+    "equity": null,
+    "website": "https://aws.amazon.com/education/edstart/",
+    "description": "AWS EdStart is Amazon Web Services' virtual incubation program for edtech startups. It provides cloud credits, technical training, and community support for education technology companies.",
+    "tags": [
+      "edtech",
+      "aws",
+      "cloud",
+      "education"
+    ]
+  }
+]

@@ -4,7 +4,7 @@
   "description": "IdeaBridge AI Advisor Backend",
   "main": "dist/server/src/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node -e \"require('fs').cpSync('src/data','dist/server/src/data',{recursive:true})\"",
     "start": "node dist/server/src/index.js",
     "dev": "ts-node src/index.ts"
   },

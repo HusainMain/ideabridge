@@ -1,17 +1,29 @@
 import { Router } from 'express';
 import { generateGeminiAnalysis } from '../services/geminiService';
 import { validateIdeaWithGemini } from '../services/validationService';
+import { matchIncubators } from '../services/incubatorMatchingService';
 import { analysisLimiter } from '../middleware/rateLimiter';
 import { analysisSchema } from '../validators/analysisSchema';
 import { validateDeterministic } from '../validators/deterministicValidator';
 import { analysisCache } from '../utils/cache';
 import { normalizeResponse } from '../utils/responseNormalizer';
 import type { ValidationMeta } from '../../../shared/validation/types';
+import type { StartupAnalysisRequest, StartupAnalysisResponse } from '../types/types';
 
 const router = Router();
 
 function validationFailureResponse(validation: ValidationMeta) {
   return { validation };
+}
+
+function attachIncubatorRecommendations(
+  requestData: StartupAnalysisRequest,
+  analysis: StartupAnalysisResponse
+) {
+  return {
+    ...analysis,
+    incubatorRecommendations: matchIncubators(requestData, analysis),
+  };
 }
 
 router.post('/analyze', analysisLimiter, async (req, res) => {
@@ -45,12 +57,13 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
     }
 
     const cacheKey = JSON.stringify(req.body);
-    const cachedData = analysisCache.get(cacheKey);
+    const cachedData = analysisCache.get(cacheKey) as StartupAnalysisResponse | undefined;
+
     if (cachedData) {
       console.log('[CACHE_HIT]');
       console.log('Response Sent');
       return res.json({
-        analysis: cachedData,
+        analysis: attachIncubatorRecommendations(requestData, cachedData),
         validation: geminiValidation,
       });
     }
@@ -60,11 +73,13 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
 
     analysisCache.set(cacheKey, normalizedResult);
 
-    console.log('FINAL RESPONSE =', JSON.stringify(normalizedResult, null, 2));
+    const analysisWithIncubators = attachIncubatorRecommendations(requestData, normalizedResult);
+
+    console.log('FINAL RESPONSE =', JSON.stringify(analysisWithIncubators, null, 2));
     console.log('Response Sent');
 
     return res.json({
-      analysis: normalizedResult,
+      analysis: analysisWithIncubators,
       validation: geminiValidation,
     });
   } catch (error: unknown) {
