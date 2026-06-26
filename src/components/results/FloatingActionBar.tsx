@@ -37,10 +37,10 @@ export function FloatingActionBar({ onExport, onAnalyzeAgain }: FloatingActionBa
             transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
             className="fixed bottom-6 right-6 z-50 hidden md:flex items-center gap-2 p-2 rounded-2xl"
             style={{
-              background: 'rgba(13,13,13,0.92)',
+              background: 'rgba(7,13,27,0.95)',
               border: '1px solid rgba(255,255,255,0.1)',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,240,255,0.06)',
+              backdropFilter: 'blur(24px)',
+              boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,240,255,0.06), 0 0 32px rgba(0,240,255,0.06)',
             }}
           >
             <ActionBtn
@@ -55,7 +55,7 @@ export function FloatingActionBar({ onExport, onAnalyzeAgain }: FloatingActionBa
               onClick={onAnalyzeAgain}
               variant="ghost"
             />
-            <div className="w-px h-6 mx-1" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            <div className="w-px h-6 mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
             <ActionBtn
               icon={Download}
               label="Export PDF"
@@ -124,17 +124,17 @@ export function FloatingActionBar({ onExport, onAnalyzeAgain }: FloatingActionBa
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.2 }}
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="fixed bottom-24 right-6 z-50 hidden md:flex w-10 h-10 items-center justify-center rounded-full"
+                className="fixed bottom-[4.5rem] right-6 z-50 hidden md:flex w-9 h-9 items-center justify-center rounded-full"
                 style={{
-                  background: 'rgba(13,13,13,0.92)',
+                  background: 'rgba(7,13,27,0.95)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   backdropFilter: 'blur(16px)',
-                  color: 'rgba(255,255,255,0.6)',
+                  color: 'rgba(255,255,255,0.55)',
                   boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
                 }}
                 aria-label="Scroll to top"
               >
-                <ChevronUp size={18} />
+                <ChevronUp size={16} />
               </motion.button>
             )}
           </AnimatePresence>
@@ -160,10 +160,14 @@ function ActionBtn({ icon: Icon, label, onClick, variant }: ActionBtnProps) {
       className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-colors"
       style={
         variant === 'accent'
-          ? { background: 'var(--act-cyan)', color: '#000' }
+          ? {
+              background: 'var(--act-cyan)',
+              color: '#000',
+              boxShadow: '0 0 18px rgba(0,240,255,0.3), 0 2px 8px rgba(0,0,0,0.3)',
+            }
           : {
               background: 'transparent',
-              color: 'rgba(255,255,255,0.65)',
+              color: 'rgba(255,255,255,0.6)',
               border: '1px solid transparent',
             }
       }
@@ -176,11 +180,11 @@ function ActionBtn({ icon: Icon, label, onClick, variant }: ActionBtnProps) {
       onMouseLeave={e => {
         if (variant === 'ghost') {
           (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-          (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.65)';
+          (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.6)';
         }
       }}
     >
-      <Icon size={15} />
+      <Icon size={14} />
       {label}
     </motion.button>
   );

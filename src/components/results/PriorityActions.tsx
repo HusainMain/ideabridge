@@ -66,12 +66,11 @@ export function PriorityActions({ actions }: PriorityActionsProps) {
     priority: assignPriority(text, i),
   }));
 
-  // Group by priority for visual separation
   const groups: Record<Priority, ActionItem[]> = { high: [], medium: [], future: [] };
   items.forEach(item => groups[item.priority].push(item));
 
   return (
-    <div ref={containerRef} className="flex flex-col gap-4">
+    <div ref={containerRef} className="flex flex-col gap-5">
       {(['high', 'medium', 'future'] as Priority[]).map(priority => {
         const group = groups[priority];
         if (group.length === 0) return null;
@@ -80,10 +79,16 @@ export function PriorityActions({ actions }: PriorityActionsProps) {
 
         return (
           <div key={priority}>
-            {/* Group label */}
-            <div className="flex items-center gap-1.5 mb-2">
-              <Icon size={14} style={{ color: cfg.color }} />
-              <span className="text-[0.7rem] font-semibold uppercase tracking-widest" style={{ color: cfg.color }}>
+            {/* Group header with pill background */}
+            <div
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full mb-2.5"
+              style={{ background: `${cfg.color}14`, border: `1px solid ${cfg.color}30` }}
+            >
+              <Icon size={11} style={{ color: cfg.color }} />
+              <span
+                className="text-[0.62rem] font-bold uppercase tracking-widest"
+                style={{ color: cfg.color }}
+              >
                 {cfg.label}
               </span>
             </div>
@@ -92,18 +97,21 @@ export function PriorityActions({ actions }: PriorityActionsProps) {
               {group.map((item, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, x: -10 }}
+                  initial={{ opacity: 0, x: -8 }}
                   animate={inView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ delay: i * 0.05 + (PRIORITY_CONFIG[priority].order * 0.1), duration: 0.4 }}
-                  className="flex items-start gap-3 p-4 rounded-lg border border-white/10 bg-slate-900/80"
+                  transition={{ delay: i * 0.05 + (PRIORITY_CONFIG[priority].order * 0.08), duration: 0.35 }}
+                  className="flex items-start gap-3 px-4 py-3 rounded-lg"
+                  style={{
+                    background: 'rgba(255,255,255,0.025)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                  }}
                 >
+                  {/* Colored dot indicator instead of icon + circle */}
                   <div
-                    className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 text-[0.7rem] font-bold"
-                    style={{ background: 'rgba(0,0,0,0.2)', color: cfg.color }}
-                  >
-                    <Icon size={11} />
-                  </div>
-                  <p className="text-sm leading-7 flex-1 text-slate-300">
+                    className="flex-shrink-0 w-1.5 h-1.5 rounded-full mt-[0.4rem]"
+                    style={{ background: cfg.color, boxShadow: `0 0 6px ${cfg.color}88` }}
+                  />
+                  <p className="text-[0.82rem] leading-6 flex-1 text-slate-300">
                     {item.text}
                   </p>
                   <PriorityBadge priority={priority} />

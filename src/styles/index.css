@@ -669,11 +669,38 @@ select {
 
 .act-input-shell {
   min-height: 100vh;
-  background: var(--act-bg);
+  /* Premium ambient background — matches landing page futuristic identity */
+  background:
+    radial-gradient(ellipse 55% 40% at 72% 10%, rgba(0, 240, 255, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 18% 88%, rgba(169, 134, 255, 0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 85% 75%, rgba(59, 130, 246, 0.04) 0%, transparent 65%),
+    var(--act-bg);
   color: var(--act-text);
   font-family: var(--act-sans);
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle grid overlay — same DNA as landing-grid-bg but calmer */
+.act-input-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 80%);
+}
+
+/* All direct children sit above the grid overlay */
+.act-input-shell > * {
+  position: relative;
+  z-index: 1;
 }
 .act-input-header {
   display: flex;

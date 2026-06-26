@@ -42,10 +42,14 @@ const milestones: Milestone[] = [
 ];
 
 // Pre-computed ranges for each of the 5 milestones — no hooks inside loops
+// Cards 1-4 fade in and gently fade out as user scrolls past.
+// Card 5 (index 4) fades in and HOLDS at full opacity until section ends.
 const SCALE_RANGES = milestones.map((_, i) => {
   const s = i * 0.2;
   const e = (i + 1) * 0.2;
   const mid = (s + e) / 2;
+  // Card 5: hold scale at peak until the end
+  if (i === 4) return { input: [Math.max(0, s - 0.1), mid, 1], output: [0.9, 1.05, 1.0] };
   return { input: [Math.max(0, s - 0.1), mid, Math.min(1, e + 0.1)], output: [0.9, 1.05, 0.9] };
 });
 
@@ -53,10 +57,13 @@ const OPACITY_RANGES = milestones.map((_, i) => {
   const s = i * 0.2;
   const e = (i + 1) * 0.2;
   const mid = (s + e) / 2;
+  // Card 5: fade in then HOLD at 1 — do not fade out before section exits
+  if (i === 4) return { input: [Math.max(0, s - 0.1), mid, 1], output: [0.05, 1, 1] };
   return { input: [Math.max(0, s - 0.1), mid, Math.min(1, e + 0.1)], output: [0.05, 1, 0.05] };
 });
 
-const VERTICAL_POSITIONS = milestones.map((_, i) => 15 + i * 17.5);
+// Spread cards more evenly to match the larger container height
+const VERTICAL_POSITIONS = milestones.map((_, i) => 12 + i * 18);
 
 function MilestoneCard({
   milestone,
@@ -96,9 +103,10 @@ function MilestoneCard({
         <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.4, marginBottom: '0.75rem' }}>
           {m.desc}
         </p>
-        <ul style={{ margin: 0, paddingLeft: '1rem', listStyleType: 'square' }}>
+        <ul style={{ margin: 0, paddingLeft: '0', listStyle: 'none' }}>
           {m.details.map((detail) => (
-            <li key={detail} style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.25rem' }}>
+            <li key={detail} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.78rem', color: 'rgba(255,255,255,0.58)', marginBottom: '0.3rem', lineHeight: 1.55 }}>
+              <span style={{ color: 'var(--neon-cyan)', flexShrink: 0, marginTop: '0.05em' }}>·</span>
               {detail}
             </li>
           ))}
@@ -141,7 +149,8 @@ export const RoadmapTimeline: React.FC = () => {
       ref={containerRef}
       id="section-roadmap"
       className="pinned-section-container"
-      style={{ height: '350vh', background: '#020711', position: 'relative' }} 
+      // Increased height gives card 5 enough dwell time before the section exits
+      style={{ height: '420vh', background: '#020711', position: 'relative' }} 
     >
       <div className="pinned-viewport">
         {/* Ambient background glow */}
@@ -165,7 +174,7 @@ export const RoadmapTimeline: React.FC = () => {
           }}
         >
           {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem', height: '10%' }}>
+          <div style={{ textAlign: 'center', marginBottom: '1.25rem', height: '10%' }}>
             <span
               style={{
                 color: 'var(--neon-purple)', fontSize: '0.75rem',

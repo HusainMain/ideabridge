@@ -24,23 +24,29 @@ export function ReportHeader(): React.ReactElement {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -16 }}
+      initial={{ opacity: 0, y: -14 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full mb-6"
+      className="w-full mb-4"
     >
-      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950 p-5 md:p-6">
+      <div
+        className="relative overflow-hidden rounded-xl border border-white/10 p-5 md:p-6"
+        style={{
+          background: 'linear-gradient(135deg, rgba(7,13,27,0.98) 0%, rgba(5,10,22,0.95) 100%)',
+          boxShadow: '0 0 0 1px rgba(255,255,255,0.04), 0 4px 32px rgba(0,0,0,0.5), 0 0 60px rgba(0,240,255,0.03)',
+        }}
+      >
         {/* Gradient accent bar */}
         <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
 
-        <div className="relative flex flex-col gap-4">
+        <div className="relative flex flex-col gap-3.5">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-cyan-400" />
-            <span className="text-[0.75rem] font-mono text-cyan-400 tracking-widest uppercase">
+            <Sparkles className="w-4 h-4 text-cyan-400" />
+            <span className="text-[0.7rem] font-mono text-cyan-400 tracking-widest uppercase">
               Idea Validation Report
             </span>
           </div>
           
-          <h1 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
+          <h1 className="text-2xl md:text-4xl font-semibold text-white tracking-tight leading-tight">
             {inputs.idea}
           </h1>
 

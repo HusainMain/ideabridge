@@ -443,7 +443,10 @@
 
 /* --- RESPONSIVE TYPOGRAPHY OVERLAY --- */
 .text-glow-header {
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.1), 0 0 40px rgba(0, 240, 255, 0.2);
+  /* Offset downward so the bloom doesn't spill into letter tops/dots */
+  text-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.6),
+    0 4px 28px rgba(0, 240, 255, 0.14);
 }
 
 .text-gradient-purple-cyan {
@@ -650,12 +653,20 @@
 
 .section-heading p,
 .split-story p,
-.launch-grid p,
-.landing-hero p {
+.launch-grid p {
   color: rgba(255,255,255,0.64);
   font-size: clamp(1rem, 1.8vw, 1.18rem);
-  line-height: 1.62; /* Deliberate readability */
+  line-height: 1.62;
   letter-spacing: -0.01em;
+}
+
+/* Hero paragraph gets higher contrast and tighter measure for readability */
+.landing-hero p {
+  color: rgba(255,255,255,0.78);
+  font-size: clamp(1rem, 1.6vw, 1.12rem);
+  line-height: 1.68;
+  letter-spacing: -0.01em;
+  max-width: 46ch;
 }
 
 .split-story {
@@ -703,7 +714,8 @@
   overflow: hidden;
   display: grid;
   place-items: center;
-  padding: clamp(5rem, 8vw, 7rem) 2rem;
+  /* Reduced top padding to tighten left-side empty space */
+  padding: clamp(4rem, 6vw, 6rem) 2rem;
 }
 
 .landing-hero__inner {
@@ -711,8 +723,9 @@
   z-index: 2;
   width: min(1180px, 100%);
   display: grid;
-  grid-template-columns: minmax(0, 1.06fr) minmax(280px, 0.94fr);
-  gap: clamp(2rem, 7vw, 5rem);
+  /* Balanced 1fr / 1fr as per design decision */
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2.5rem, 6vw, 4.5rem);
   align-items: center;
 }
 
@@ -763,13 +776,13 @@
 .hero-orb-panel {
   position: relative;
   display: grid;
-  min-height: 430px;
+  min-height: 400px;
   place-items: center;
 }
 
 .hero-orb-anchor {
   left: 50%;
-  top: 38%;
+  top: 36%;
   transform: translate(-50%, -50%);
   width: 220px;
   height: 220px;

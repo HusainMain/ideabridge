@@ -51,21 +51,32 @@ function CircularScore({ score, size = 150 }: { score: number; size?: number }) 
 
   return (
     <div ref={ref} className="relative flex-shrink-0" style={{ width: size, height: size }}>
+      {/* Outer glow ring matching score color */}
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{
+          boxShadow: `0 0 28px ${color}22, 0 0 8px ${color}18`,
+          borderRadius: '50%',
+          pointerEvents: 'none',
+        }}
+      />
       <svg width={size} height={size} viewBox="0 0 100 100" className="-rotate-90">
-        <circle cx="50" cy="50" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
-        {/* main arc */}
+        <circle cx="50" cy="50" r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+        {/* Subtle bg track glow */}
+        <circle cx="50" cy="50" r={radius} fill="none" stroke={`${color}18`} strokeWidth="9" />
+        {/* Main arc */}
         <circle
           cx="50" cy="50" r={radius} fill="none"
-          stroke={color} strokeWidth="5" strokeDasharray={circumference}
+          stroke={color} strokeWidth="5.5" strokeDasharray={circumference}
           strokeDashoffset={inView ? offset : circumference} strokeLinecap="round"
-          style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+          style={{ transition: 'stroke-dashoffset 1.3s cubic-bezier(0.4, 0, 0.2, 1)', filter: `drop-shadow(0 0 4px ${color}88)` }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-serif text-4xl font-bold text-white leading-none">
+        <span className="font-mono tabular-nums text-4xl font-bold text-white leading-none tracking-tight">
           {inView ? <AnimatedCounter target={score} /> : 0}
         </span>
-        <span className="text-xs uppercase tracking-widest mt-1 text-slate-500">
+        <span className="text-[0.6rem] uppercase tracking-widest mt-1" style={{ color: `${color}99` }}>
           / 100
         </span>
       </div>
@@ -79,18 +90,18 @@ function SubScoreBar({ label, score, delay = 0 }: { label: string; score: number
   const color = scoreColor(score);
 
   return (
-    <div ref={ref} className="flex flex-col gap-2">
+    <div ref={ref} className="flex flex-col gap-1.5">
       <div className="flex justify-between items-center">
-        <span className="text-sm font-medium text-slate-400">{label}</span>
-        <span className="text-sm font-semibold tabular-nums" style={{ color }}>{score}</span>
+        <span className="text-[0.78rem] font-medium text-slate-400">{label}</span>
+        <span className="text-[0.78rem] font-semibold tabular-nums font-mono" style={{ color }}>{score}</span>
       </div>
-      <div className="h-2 rounded-full bg-slate-800">
+      <div className="h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
         <motion.div
           className="h-full rounded-full"
-          style={{ background: color }}
+          style={{ background: `linear-gradient(90deg, ${color}cc, ${color})` }}
           initial={{ width: 0 }}
           animate={inView ? { width: `${score}%` } : { width: 0 }}
-          transition={{ duration: 0.7, delay, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 0.75, delay, ease: [0.4, 0, 0.2, 1] }}
         />
       </div>
     </div>
@@ -120,24 +131,34 @@ export function ScoreDashboard({ scores }: ScoreDashboardProps) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="rounded-xl border border-white/10 bg-slate-900/80 p-5 md:p-6 flex flex-col gap-5"
+      className="rounded-xl border border-white/10 p-5 md:p-6 flex flex-col gap-4"
+      style={{
+        background: 'rgba(7,13,27,0.9)',
+        borderLeft: `3px solid ${color}44`,
+        boxShadow: `0 4px 24px rgba(0,0,0,0.4), 0 0 40px ${color}08`,
+      }}
     >
       <div className="flex items-center justify-between">
-        <span className="text-[0.75rem] font-mono text-cyan-400 tracking-widest uppercase">AI Viability Assessment</span>
+        <span className="text-[0.7rem] font-mono text-cyan-400 tracking-widest uppercase">AI Viability Assessment</span>
+        <span
+          className="text-[0.68rem] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full"
+          style={{ background: `${color}15`, color }}
+        >
+          {label}
+        </span>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-7 items-center">
+      <div className="flex flex-col sm:flex-row gap-6 items-center">
         {/* Circular score */}
-        <div className="flex flex-col items-center gap-3 flex-shrink-0">
-          <CircularScore score={scores.overall} size={150} />
+        <div className="flex flex-col items-center gap-2 flex-shrink-0">
+          <CircularScore score={scores.overall} size={148} />
           <div className="text-center">
-            <div className="text-base font-semibold" style={{ color }}>{label}</div>
-            <div className="text-sm text-slate-500">Overall Viability</div>
+            <div className="text-[0.72rem] text-slate-500">Overall Viability</div>
           </div>
         </div>
 
         {/* Sub-score bars */}
-        <div className="flex-1 w-full flex flex-col gap-4 justify-center">
+        <div className="flex-1 w-full flex flex-col gap-3 justify-center">
           {subScores.map((s, i) => (
             <SubScoreBar key={s.label} label={s.label} score={s.score} delay={0.1 + i * 0.06} />
           ))}
@@ -147,9 +168,10 @@ export function ScoreDashboard({ scores }: ScoreDashboardProps) {
       {/* AI rationale */}
       {scores.rationale && (
         <div
-          className="text-sm leading-relaxed px-4 py-3 rounded-lg bg-slate-950/50 border border-white/5 text-slate-400 italic"
+          className="text-[0.8rem] leading-relaxed px-4 py-3 rounded-lg border border-white/5 text-slate-400 italic"
+          style={{ background: 'rgba(0,0,0,0.25)' }}
         >
-          "{scores.rationale}"
+          &ldquo;{scores.rationale}&rdquo;
         </div>
       )}
     </motion.div>

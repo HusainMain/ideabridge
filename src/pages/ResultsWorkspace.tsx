@@ -3,7 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  TrendingUp,
+  BarChart3,
+  Users,
+  DollarSign,
+  ShieldAlert
 } from 'lucide-react';
 
 import { useJourneyStore } from '../stores/useJourneyStore';
@@ -76,10 +81,20 @@ export default function ResultsWorkspace(): React.ReactElement {
     <div
       className="min-h-screen w-full bg-slate-950 text-slate-100 overflow-x-hidden relative"
     >
-      {/* Ambient background elements - subtle only */}
+      {/* Ambient background elements */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-80 h-80 bg-cyan-500/8 rounded-full blur-3xl -translate-y-1/2" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/8 rounded-full blur-3xl translate-y-1/2" />
+        {/* Subtle grid — same DNA as landing page */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(0,240,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,255,0.025) 1px, transparent 1px)',
+            backgroundSize: '48px 48px',
+            maskImage: 'radial-gradient(ellipse 70% 70% at 50% 30%, black 20%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 30%, black 20%, transparent 80%)',
+          }}
+        />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/6 rounded-full blur-3xl -translate-y-1/2" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/6 rounded-full blur-3xl translate-y-1/2" />
       </div>
 
       <AnimatePresence>
@@ -111,104 +126,111 @@ export default function ResultsWorkspace(): React.ReactElement {
 
           {/* Main content wrapper */}
           <main
-            className="max-w-7xl mx-auto w-full px-4 py-6"
+            className="max-w-7xl mx-auto w-full px-4 py-5 pb-28 md:pb-6"
           >
             {/* Section 1: Report Header */}
             <ReportHeader />
 
-            {/* Section 2: Executive Summary + Score (Unified) */}
+            {/* Section 2: Score Dashboard — viability at a glance, first thing users read */}
+            <motion.section className="w-full mb-4">
+              <ScoreDashboard scores={results.scores} />
+            </motion.section>
+
+            {/* Section 3: Executive Summary — narrative context below the score */}
             <motion.section
-              className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6"
+              className="w-full mb-4"
               variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
             >
-              {/* Score Dashboard: 66% width on lg screens */}
-              <div className="lg:col-span-2">
-                <ScoreDashboard scores={results.scores} />
-              </div>
-              {/* Executive Summary: 33% width on lg screens */}
-              <div className="lg:col-span-1">
-                <ExecutiveSummary results={results} />
-              </div>
+              <ExecutiveSummary results={results} />
             </motion.section>
 
             {/* Section Divider & Title */}
-            <div className="flex items-center gap-3 mt-2 mb-4">
+            <div className="flex items-center gap-3 mt-1 mb-3">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-              <span className="text-[0.7rem] font-mono tracking-[0.18em] text-slate-500 uppercase">REALITY CHECK</span>
+              <span className="text-[0.68rem] font-mono tracking-[0.18em] text-slate-500 uppercase flex items-center gap-1.5">
+                <span className="w-1 h-1 rounded-full bg-orange-400/70 inline-block" />
+                REALITY CHECK
+              </span>
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </div>
 
-            {/* Section 3: Reality Check (Tighter padding) */}
-            <motion.section className="mb-6">
+            {/* Section 4: Reality Check */}
+            <motion.section className="mb-4">
                <RealityCheckCard realityCheck={results.realityCheck} />
             </motion.section>
 
             {/* Section Divider & Title */}
-            <div className="flex items-center gap-3 mt-2 mb-4">
+            <div className="flex items-center gap-3 mt-1 mb-3">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-              <span className="text-[0.7rem] font-mono tracking-[0.18em] text-slate-500 uppercase">DEEP ANALYSIS</span>
+              <span className="text-[0.68rem] font-mono tracking-[0.18em] text-slate-500 uppercase flex items-center gap-1.5">
+                <span className="w-1 h-1 rounded-full bg-emerald-400/70 inline-block" />
+                DEEP ANALYSIS
+              </span>
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </div>
 
-            {/* Section 4: Deep Analysis (Tighter, better grid) */}
+            {/* Section 5: Deep Analysis */}
             <div
-              className="grid w-full mb-6"
+              className="grid w-full mb-4"
               style={{
-                gap: '1rem',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))'
+                gap: '0.875rem',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))'
               }}
             >
               <AnalysisSectionCard
                 title="Market Validation"
-                icon={<Sparkles className="w-5 h-5 text-emerald-400" />}
+                icon={<TrendingUp className="w-4 h-4 text-emerald-400" />}
                 color="emerald"
                 points={results.validation}
               />
               <AnalysisSectionCard
                 title="Customer Discovery"
-                icon={<ArrowLeft className="w-5 h-5 text-blue-400" />}
+                icon={<Users className="w-4 h-4 text-blue-400" />}
                 color="blue"
                 points={results.customers}
               />
               <AnalysisSectionCard
                 title="Revenue Strategy"
-                icon={<Sparkles className="w-5 h-5 text-yellow-400" />}
+                icon={<DollarSign className="w-4 h-4 text-yellow-400" />}
                 color="yellow"
                 points={results.revenue}
               />
               <AnalysisSectionCard
                 title="Funding Path"
-                icon={<ArrowLeft className="w-5 h-5 text-cyan-400" />}
+                icon={<BarChart3 className="w-4 h-4 text-cyan-400" />}
                 color="cyan"
                 points={results.funding}
               />
               <AnalysisSectionCard
                 title="Risk Mitigation"
-                icon={<Sparkles className="w-5 h-5 text-rose-400" />}
+                icon={<ShieldAlert className="w-4 h-4 text-rose-400" />}
                 color="rose"
                 points={results.risks}
               />
             </div>
 
             {/* Competitive Landscape */}
-            <motion.section className="mb-6">
+            <motion.section className="mb-4">
               <CompetitorCards />
             </motion.section>
 
             {/* Section Divider & Title */}
-            <div className="flex items-center gap-3 mt-2 mb-4">
+            <div className="flex items-center gap-3 mt-1 mb-3">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-              <span className="text-[0.7rem] font-mono tracking-[0.18em] text-slate-500 uppercase">EXECUTION PLAN</span>
+              <span className="text-[0.68rem] font-mono tracking-[0.18em] text-slate-500 uppercase flex items-center gap-1.5">
+                <span className="w-1 h-1 rounded-full bg-purple-400/70 inline-block" />
+                EXECUTION PLAN
+              </span>
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </div>
 
-            {/* Section 5: Execution Plan (Tighter spacing) */}
-            <motion.section className="space-y-4">
+            {/* Section 6: Execution Plan */}
+            <motion.section className="space-y-3">
               <RoadmapVisualizer />
               <SevenDayPlan />
               <AnalysisSectionCard
                 title="Priority Actions"
-                icon={<ArrowLeft className="w-5 h-5 text-purple-400" />}
+                icon={<Sparkles className="w-4 h-4 text-purple-400" />}
                 color="purple"
                 points={[]}
               >
@@ -217,9 +239,9 @@ export default function ResultsWorkspace(): React.ReactElement {
             </motion.section>
 
             {/* Footer */}
-            <footer className="text-center text-slate-600 text-[0.7rem] py-8 mt-4 border-t border-white/5">
+            <footer className="text-center text-slate-600 text-[0.68rem] py-6 mt-4 border-t border-white/5">
               <p className="flex items-center justify-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
+                <Sparkles className="w-3 h-3" />
                 Powered by IdeaBridge AI
               </p>
             </footer>

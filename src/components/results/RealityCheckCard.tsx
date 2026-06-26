@@ -43,35 +43,43 @@ export function RealityCheckCard({ realityCheck }: RealityCheckCardProps) {
   const inView = useInView(ref, { once: true, margin: '-40px' });
 
   return (
-    <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {ITEMS.map(({ key, label, sublabel, Icon, color }, i) => (
         <motion.div
           key={key}
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: i * 0.06, duration: 0.45, ease: 'easeOut' }}
-          className="flex flex-col gap-3 rounded-xl p-5 border border-white/10 bg-slate-900/80"
+          transition={{ delay: i * 0.06, duration: 0.4, ease: 'easeOut' }}
+          className="flex flex-col gap-3 rounded-xl p-4 border border-white/8"
+          style={{
+            background: 'rgba(7,13,27,0.88)',
+            borderLeft: `3px solid ${color}55`,
+            boxShadow: `inset 0 0 20px ${color}06`,
+          }}
         >
           {/* Header */}
           <div className="flex items-start gap-3">
             <div
-              className="p-2 rounded-md flex-shrink-0 mt-0.5"
-              style={{ background: 'rgba(0,0,0,0.2)' }}
+              className="p-1.5 rounded-md flex-shrink-0 mt-0.5"
+              style={{ background: `${color}15` }}
             >
-              <Icon size={16} style={{ color }} />
+              <Icon size={14} style={{ color }} />
             </div>
             <div>
-              <div className="text-[0.7rem] font-semibold uppercase tracking-widest" style={{ color }}>
+              <div
+                className="text-[0.68rem] font-semibold uppercase tracking-widest font-mono"
+                style={{ color }}
+              >
                 {label}
               </div>
-              <div className="text-[0.7rem] mt-0.5 leading-snug text-slate-500">
+              <div className="text-[0.68rem] mt-0.5 leading-snug text-slate-500">
                 {sublabel}
               </div>
             </div>
           </div>
 
           {/* Content */}
-          <p className="text-sm leading-7 text-slate-300">
+          <p className="text-[0.82rem] leading-6 text-slate-300">
             {realityCheck[key]}
           </p>
         </motion.div>
