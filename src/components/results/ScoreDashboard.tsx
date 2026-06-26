@@ -44,7 +44,7 @@ function AnimatedCounter({ target, duration = 1.2 }: { target: number; duration?
 function CircularScore({ score, size = 150 }: { score: number; size?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
-  const radius = 52;
+  const radius = 44; // Fits properly in 100x100 viewBox (50 - 44 = 6, 50 + 44 = 94)
   const circumference = 2 * Math.PI * radius;
   const color = scoreColor(score);
   const offset = circumference - (circumference * score) / 100;
