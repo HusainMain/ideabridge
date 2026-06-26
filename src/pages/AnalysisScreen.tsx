@@ -1,9 +1,32 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useJourneyStore } from '../stores/useJourneyStore';
 import { AlertCircle, ArrowLeft, RotateCcw } from 'lucide-react';
 import { LoadingWorkspace } from '../components/LoadingWorkspace';
+import { ImproveYourIdeaScreen } from '../components/ImproveYourIdeaScreen';
+import { validateInputsDeterministic } from '../utils/deterministicValidation';
+import type { ValidationMeta } from '../../shared/validation/types';
+import type { ResultsData } from '../stores/useJourneyStore';
 import { AnimatePresence, motion } from 'framer-motion';
+
+function isValidationPayload(data: unknown): data is { validation: ValidationMeta } {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'validation' in data &&
+    typeof (data as { validation: ValidationMeta }).validation === 'object'
+  );
+}
+
+function isAnalysisPayload(
+  data: unknown
+): data is { analysis: ResultsData; validation: ValidationMeta } {
+  return (
+    isValidationPayload(data) &&
+    'analysis' in data &&
+    typeof (data as { analysis: ResultsData }).analysis === 'object'
+  );
+}
 
 export function AnalysisScreen() {
   const navigate = useNavigate();
@@ -13,6 +36,8 @@ export function AnalysisScreen() {
     setAnalysisStatus,
     setErrorMessage,
     clearResults,
+    setValidationResult,
+    validationResult,
     errorMessage,
     analysisStatus,
   } = useJourneyStore();
@@ -22,7 +47,14 @@ export function AnalysisScreen() {
   const requestTriggered = useRef(false);
   const cooldownTimerRef = useRef<number | null>(null);
 
-  // Clear all timers on unmount
+  const handleInvalidValidation = useCallback(
+    (validation: ValidationMeta) => {
+      setValidationResult(validation);
+      setAnalysisStatus('invalid_input');
+    },
+    [setAnalysisStatus, setValidationResult]
+  );
+
   useEffect(() => {
     return () => {
       if (cooldownTimerRef.current) {
@@ -31,36 +63,163 @@ export function AnalysisScreen() {
     };
   }, []);
 
-  // Initialize on mount:
-  // FIX: also call clearResults() so stale data from a previous run is gone
-  // before the new fetch resolves (or fails). Without this, the old ResultsData
-  // object stays in the Zustand store and can leak to the results page.
   useEffect(() => {
     clearResults();
     setErrorMessage(null);
+    setValidationResult(null);
     setAnalysisStatus('idle');
     setInitialized(true);
-  }, [setAnalysisStatus, setErrorMessage, clearResults]);
+  }, [setAnalysisStatus, setErrorMessage, clearResults, setValidationResult]);
 
-  // Guard: redirect if no inputs are present
   useEffect(() => {
     if (!inputs.idea) {
       navigate('/input');
     }
   }, [inputs.idea, navigate]);
 
-  // Log every analysisStatus change
   useEffect(() => {
     console.log('[AnalysisScreen] analysisStatus changed to:', analysisStatus);
   }, [analysisStatus]);
 
-  // Cooldown countdown logic
+  const performAnalysis = useCallback(async () => {
+    console.log('[performAnalysis] called!');
+    requestTriggered.current = true;
+
+    const clientValidation = validateInputsDeterministic(inputs);
+    if (clientValidation) {
+      console.log('[performAnalysis] client deterministic validation failed');
+      handleInvalidValidation(clientValidation);
+      return;
+    }
+
+    setAnalysisStatus('analyzing');
+    setErrorMessage(null);
+    setCooldownRemaining(null);
+
+    try {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+      console.log('API_BASE =', API_BASE);
+      const cleanBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+      const response = await fetch(`${cleanBase}/api/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputs),
+      });
+
+      const text = await response.text();
+
+      console.log('HTTP Method:', 'POST');
+      console.log('Final URL =', `${cleanBase}/api/analyze`);
+      console.log('Response Status:', response.status);
+      console.log('Response Body:', text);
+
+      if (response.status === 422) {
+        let payload: unknown;
+        try {
+          payload = JSON.parse(text);
+        } catch {
+          throw new Error('Server returned invalid data.');
+        }
+        if (isValidationPayload(payload)) {
+          handleInvalidValidation(payload.validation);
+          return;
+        }
+        throw new Error('Validation failed but the server response was unexpected.');
+      }
+
+      if (!response.ok) {
+        let errorMsg = '';
+        let retryAfterSeconds: number | null = null;
+
+        try {
+          const errorData = JSON.parse(text);
+          errorMsg = errorData.error;
+          if (typeof errorData.retryAfter === 'number') {
+            retryAfterSeconds = errorData.retryAfter;
+          }
+        } catch {
+          // fall back to status code
+        }
+
+        if (!errorMsg) {
+          if (response.status === 429) {
+            errorMsg = 'Too many requests. Please try again later.';
+          } else if (response.status === 408 || response.status === 504) {
+            errorMsg = 'AI is taking longer than expected.';
+          } else if (response.status === 503 || response.status === 500) {
+            errorMsg = 'AI service is currently unavailable.';
+          } else {
+            errorMsg = 'Server error. Please try again later.';
+          }
+        }
+
+        if (response.status === 429) {
+          const waitMs = retryAfterSeconds != null ? retryAfterSeconds * 1000 : 60000;
+          localStorage.setItem('ideabridge_cooldown_end', (Date.now() + waitMs).toString());
+          setCooldownRemaining(Math.ceil(waitMs / 1000));
+        }
+
+        throw new Error(errorMsg);
+      }
+
+      localStorage.setItem('ideabridge_cooldown_end', (Date.now() + 30000).toString());
+
+      if (!text || text.trim() === '') {
+        throw new Error('Empty response from server.');
+      }
+
+      let data: unknown;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('Server returned invalid data.');
+      }
+
+      if (!isAnalysisPayload(data)) {
+        throw new Error('Server returned an unexpected response shape.');
+      }
+
+      console.log('Backend response =', data);
+      setResults(data.analysis, data.validation);
+      navigate('/results');
+    } catch (err: unknown) {
+      console.error('Analysis API Call failed:', err);
+      setAnalysisStatus('error');
+
+      let userMessage = 'Something went wrong.';
+      const msg = (err as Error).message || '';
+
+      if (msg.includes('Too many requests')) {
+        userMessage = 'Too many requests. Please try again later.';
+      } else if (msg.includes('longer than expected')) {
+        userMessage = 'AI is taking longer than expected.';
+      } else if (msg.includes('currently unavailable')) {
+        userMessage = 'AI service is currently unavailable.';
+      } else if (
+        msg.includes('invalid data') ||
+        msg.includes('invalid JSON') ||
+        msg.includes('JSON') ||
+        msg.includes('Unexpected end of JSON')
+      ) {
+        userMessage = 'Server returned invalid data.';
+      } else if (msg.includes('Empty response')) {
+        userMessage = 'Empty response from server.';
+      } else if (msg && msg !== 'Something went wrong.') {
+        userMessage = msg;
+      }
+
+      setErrorMessage(userMessage);
+    }
+  }, [inputs, navigate, setAnalysisStatus, setErrorMessage, setResults, handleInvalidValidation]);
+
   useEffect(() => {
     if (analysisStatus !== 'cooldown') return;
     console.log('[AnalysisScreen] entering cooldown');
 
     const updateCooldown = () => {
-      if (!cooldownTimerRef.current) return; // Guard against interval that's been cleared but still running
+      if (!cooldownTimerRef.current) return;
       const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
       if (cooldownEnd) {
         const remaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
@@ -68,7 +227,6 @@ export function AnalysisScreen() {
         if (remaining > 0) {
           setCooldownRemaining(remaining);
         } else {
-          // Cooldown is over, start analysis
           console.log('[AnalysisScreen] cooldown over, calling performAnalysis');
           if (cooldownTimerRef.current) {
             clearInterval(cooldownTimerRef.current);
@@ -89,154 +247,38 @@ export function AnalysisScreen() {
         cooldownTimerRef.current = null;
       }
     };
-  }, [analysisStatus]);
+  }, [analysisStatus, performAnalysis]);
 
-  const performAnalysis = async () => {
-    console.log('[performAnalysis] called!');
-    requestTriggered.current = true;
-    setAnalysisStatus('analyzing');
-    setErrorMessage(null);
-    setCooldownRemaining(null);
-
-    // FIX: do NOT write the cooldown here. Writing it before the fetch means any
-    // failed request (429, timeout, network error) still leaves the cooldown flag
-    // in localStorage, forcing the user through a countdown before they can retry.
-    // The cooldown is now set only after we know the server accepted the request.
-
-    try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
-      console.log("API_BASE =", API_BASE);
-      const cleanBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
-      const response = await fetch(`${cleanBase}/api/analyze`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(inputs),
-      });
-
-      const text = await response.text();
-
-      console.log("HTTP Method:", "POST");
-      console.log("Final URL =", `${cleanBase}/api/analyze`);
-      console.log("Response Status:", response.status);
-      console.log("Response Body:", text);
-
-      if (!response.ok) {
-        let errorMsg = "";
-        let retryAfterSeconds: number | null = null;
-
-        try {
-          const errorData = JSON.parse(text);
-          errorMsg = errorData.error;
-          // FIX: read server-computed retryAfter so cooldown is accurate, not guessed.
-          if (typeof errorData.retryAfter === 'number') {
-            retryAfterSeconds = errorData.retryAfter;
-          }
-        } catch (e) {
-          // Ignore parse error, fall back to status code
-        }
-
-        if (!errorMsg) {
-          if (response.status === 429) {
-            errorMsg = "Too many requests. Please try again later.";
-          } else if (response.status === 408 || response.status === 504) {
-            errorMsg = "AI is taking longer than expected.";
-          } else if (response.status === 503 || response.status === 500) {
-            errorMsg = "AI service is currently unavailable.";
-          } else {
-            errorMsg = "Server error. Please try again later.";
-          }
-        }
-
-        // FIX: on 429 set a cooldown using the server's own retryAfter value.
-        // For all other errors, do NOT set a cooldown — the user should be able
-        // to retry immediately without being blocked by a phantom countdown.
-        if (response.status === 429) {
-          const waitMs = retryAfterSeconds != null ? retryAfterSeconds * 1000 : 60000;
-          localStorage.setItem('ideabridge_cooldown_end', (Date.now() + waitMs).toString());
-          setCooldownRemaining(Math.ceil(waitMs / 1000));
-        }
-
-        throw new Error(errorMsg);
-      }
-
-      // FIX: set the cooldown ONLY on a successful request so that failed
-      // attempts don't leave a blocking timer behind.
-      localStorage.setItem('ideabridge_cooldown_end', (Date.now() + 30000).toString());
-
-      if (!text || text.trim() === "") {
-        throw new Error("Empty response from server.");
-      }
-
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        throw new Error("Server returned invalid data.");
-      }
-
-      console.log("Backend response =", data);
-      setResults(data);
-      navigate('/results');
-    } catch (err: any) {
-      console.error('Analysis API Call failed:', err);
-      // FIX: set status to 'error' explicitly here (no longer relying on
-      // setErrorMessage's hidden side-effect, which has been removed from the store).
-      setAnalysisStatus('error');
-
-      let userMessage = "Something went wrong.";
-      const msg = err.message || "";
-
-      if (msg.includes("Too many requests")) {
-        userMessage = "Too many requests. Please try again later.";
-      } else if (msg.includes("longer than expected")) {
-        userMessage = "AI is taking longer than expected.";
-      } else if (msg.includes("currently unavailable")) {
-        userMessage = "AI service is currently unavailable.";
-      } else if (msg.includes("invalid data") || msg.includes("invalid JSON") || msg.includes("JSON") || msg.includes("Unexpected end of JSON")) {
-        userMessage = "Server returned invalid data.";
-      } else if (msg.includes("Empty response")) {
-        userMessage = "Empty response from server.";
-      } else if (msg && msg !== "Something went wrong.") {
-        userMessage = msg;
-      }
-
-      setErrorMessage(userMessage);
-    }
-  };
-
-  // Main logic: check on mount/initialized
   useEffect(() => {
     if (!initialized || !inputs.idea || requestTriggered.current) return;
 
     const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
     if (cooldownEnd && parseInt(cooldownEnd, 10) > Date.now()) {
-      // Cooldown active, enter cooldown state
       const remaining = Math.ceil((parseInt(cooldownEnd, 10) - Date.now()) / 1000);
       setCooldownRemaining(remaining);
       setAnalysisStatus('cooldown');
     } else {
-      // No cooldown, start analysis immediately
       performAnalysis();
     }
-  }, [initialized, inputs, setAnalysisStatus]);
+  }, [initialized, inputs, setAnalysisStatus, performAnalysis]);
 
   const handleRetry = () => {
-    // Check if cooldown is finished before allowing retry
     const cooldownEnd = localStorage.getItem('ideabridge_cooldown_end');
     if (cooldownEnd && parseInt(cooldownEnd, 10) > Date.now()) {
-      alert(`Please wait for the cooldown to end (${cooldownRemaining}s remaining).`);
       return;
     }
     requestTriggered.current = false;
-    // Clear cooldown to start fresh
     localStorage.removeItem('ideabridge_cooldown_end');
-    // Force re-execution by resetting triggering flag
     window.location.reload();
   };
 
-  // Log when we're about to render error UI
+  const handleBackToEdit = () => {
+    setValidationResult(null);
+    setAnalysisStatus('idle');
+    requestTriggered.current = false;
+    navigate('/input');
+  };
+
   useEffect(() => {
     if (analysisStatus === 'error' && errorMessage) {
       console.log('[AnalysisScreen] ABOUT TO RENDER ERROR UI, errorMessage:', errorMessage);
@@ -246,8 +288,13 @@ export function AnalysisScreen() {
   return (
     <AnimatePresence>
       {!initialized ? (
-        // Show minimal state while initializing (prevent stale state render)
         <div key="init" className="min-h-screen bg-slate-950" />
+      ) : analysisStatus === 'invalid_input' && validationResult ? (
+        <ImproveYourIdeaScreen
+          key="invalid"
+          validation={validationResult}
+          onBackToEdit={handleBackToEdit}
+        />
       ) : analysisStatus === 'analyzing' || analysisStatus === 'cooldown' ? (
         <LoadingWorkspace
           key="loading"
@@ -298,8 +345,7 @@ export function AnalysisScreen() {
           </div>
         </motion.div>
       ) : (
-        // Show minimal state while waiting for analysis to begin
-        <div className="min-h-screen bg-slate-950" />
+        <div key="waiting" className="min-h-screen bg-slate-950" />
       )}
     </AnimatePresence>
   );

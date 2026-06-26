@@ -1,6 +1,7 @@
 import { create } from 'zustand';
+import type { ValidationMeta } from '../../shared/validation/types';
 
-export type AnalysisStatus = 'idle' | 'analyzing' | 'success' | 'error' | 'cooldown';
+export type AnalysisStatus = 'idle' | 'analyzing' | 'success' | 'error' | 'cooldown' | 'invalid_input';
 
 export interface IdeaInputs {
   idea: string;
@@ -58,12 +59,14 @@ interface JourneyState {
   analysisStatus: AnalysisStatus;
   results: ResultsData | null;
   errorMessage: string | null;
+  validationResult: ValidationMeta | null;
+  validationMeta: ValidationMeta | null;
   setInputs: (inputs: Partial<IdeaInputs>) => void;
   setAnalysisStatus: (status: AnalysisStatus) => void;
-  setResults: (results: ResultsData) => void;
-  // setErrorMessage ONLY sets the message — no hidden analysisStatus side-effect.
+  setResults: (results: ResultsData, validationMeta?: ValidationMeta | null) => void;
   setErrorMessage: (msg: string | null) => void;
-  // clearResults wipes stale data before a new analysis begins.
+  setValidationResult: (result: ValidationMeta | null) => void;
+  setValidationMeta: (meta: ValidationMeta | null) => void;
   clearResults: () => void;
   resetJourney: () => void;
 }
@@ -83,13 +86,32 @@ export const useJourneyStore = create<JourneyState>((set) => ({
   analysisStatus: 'idle',
   results: null,
   errorMessage: null,
+  validationResult: null,
+  validationMeta: null,
   setInputs: (inputs) => set((state) => ({ inputs: { ...state.inputs, ...inputs } })),
   setAnalysisStatus: (status) => {
     console.log('[setAnalysisStatus] called with:', status);
     return set({ analysisStatus: status });
   },
-  setResults: (results) => set({ results, analysisStatus: 'success', errorMessage: null }),
+  setResults: (results, validationMeta = null) =>
+    set({
+      results,
+      validationMeta,
+      analysisStatus: 'success',
+      errorMessage: null,
+      validationResult: null,
+    }),
   setErrorMessage: (msg) => set({ errorMessage: msg }),
-  clearResults: () => set({ results: null }),
-  resetJourney: () => set({ inputs: initialInputs, analysisStatus: 'idle', results: null, errorMessage: null }),
+  setValidationResult: (result) => set({ validationResult: result }),
+  setValidationMeta: (meta) => set({ validationMeta: meta }),
+  clearResults: () => set({ results: null, validationMeta: null }),
+  resetJourney: () =>
+    set({
+      inputs: initialInputs,
+      analysisStatus: 'idle',
+      results: null,
+      errorMessage: null,
+      validationResult: null,
+      validationMeta: null,
+    }),
 }));

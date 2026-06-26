@@ -8,7 +8,9 @@ import {
   BarChart3,
   Users,
   DollarSign,
-  ShieldAlert
+  ShieldAlert,
+  Info,
+  X
 } from 'lucide-react';
 
 import { useJourneyStore } from '../stores/useJourneyStore';
@@ -40,11 +42,13 @@ export default function ResultsWorkspace(): React.ReactElement {
   // Hook init
   const {
     results,
+    validationMeta,
     setAnalysisStatus
   } = useJourneyStore();
 
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [weakWarningDismissed, setWeakWarningDismissed] = useState(false);
 
   // Handlers
   const handleRestart = () => {
@@ -128,6 +132,30 @@ export default function ResultsWorkspace(): React.ReactElement {
           <main
             className="max-w-7xl mx-auto w-full px-4 py-5 pb-28 md:pb-6"
           >
+            {validationMeta?.quality === 'weak' && !weakWarningDismissed && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 flex items-start gap-3 p-4 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] backdrop-blur-sm"
+              >
+                <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-amber-100/90 leading-relaxed">
+                    {validationMeta.warning ||
+                      'Your idea was analyzable, but the description was quite limited. Expanding it may improve analysis accuracy.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setWeakWarningDismissed(true)}
+                  className="text-amber-400/70 hover:text-amber-200 transition shrink-0"
+                  aria-label="Dismiss warning"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </motion.div>
+            )}
+
             {/* Section 1: Report Header */}
             <ReportHeader />
 
