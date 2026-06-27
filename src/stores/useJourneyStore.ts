@@ -135,12 +135,20 @@ export const useJourneyStore = create<JourneyState>((set) => ({
     }),
   setErrorMessage: (msg) => set({ errorMessage: msg }),
   setApiError: (error) =>
-    set({
-      errorCode: error?.code ?? null,
-      errorMessage: error?.message ?? null,
-      errorRetryAfter: error?.retryAfter ?? null,
-      analysisStatus: 'error',
-    }),
+    set(
+      error
+        ? {
+            errorCode: error.code,
+            errorMessage: error.message,
+            errorRetryAfter: error.retryAfter ?? null,
+            analysisStatus: 'error',
+          }
+        : {
+            errorCode: null,
+            errorMessage: null,
+            errorRetryAfter: null,
+          }
+    ),
   setValidationResult: (result) => set({ validationResult: result }),
   setValidationMeta: (meta) => set({ validationMeta: meta }),
   clearResults: () => set({ results: null, validationMeta: null }),
