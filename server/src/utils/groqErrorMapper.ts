@@ -1,5 +1,20 @@
 import type { ApiErrorCode, StructuredErrorResponse } from '../../../shared/errors/types';
-import { StructuredApiError } from './geminiErrorMapper'; // Re-use the StructuredApiError class
+
+export class StructuredApiError extends Error {
+  public readonly status: number;
+  public readonly code: ApiErrorCode;
+  public readonly retryAfter: string | null;
+
+  constructor(response: StructuredErrorResponse, status: number) {
+    super(response.message);
+    this.name = 'StructuredApiError';
+    this.status = status;
+    this.code = response.code;
+    this.retryAfter = response.retryAfter || null;
+
+    Object.setPrototypeOf(this, StructuredApiError.prototype);
+  }
+}
 
 function httpStatusForCode(code: ApiErrorCode): number {
   switch (code) {

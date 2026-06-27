@@ -1,21 +1,17 @@
 import { Router } from 'express';
-import { generateGeminiAnalysis } from '../services/geminiService';
 import { validateIdea } from '../services/validationService';
-import { generateGroqAnalysis, generateGroqValidationResponse } from '../services/groqService';
+import { generateGroqAnalysis } from '../services/groqService';
 import { matchIncubators } from '../services/incubatorMatchingService';
 import { analysisLimiter } from '../middleware/rateLimiter';
 import { analysisSchema } from '../validators/analysisSchema';
 import { validateDeterministic } from '../validators/deterministicValidator';
 import { analysisCache } from '../utils/cache';
 import { normalizeResponse } from '../utils/responseNormalizer';
-import { mapGeminiError, sendStructuredError } from '../utils/geminiErrorMapper';
 import { mapGroqError } from '../utils/groqErrorMapper';
 import type { ValidationMeta } from '../../../shared/validation/types';
 import type { StartupAnalysisRequest, StartupAnalysisResponse } from '../types/types';
 
 const router = Router();
-
-const AI_PROVIDER = process.env.AI_PROVIDER || 'gemini'; // Default to gemini
 
 function validationFailureResponse(validation: ValidationMeta) {
   return {
@@ -39,14 +35,7 @@ function attachIncubatorRecommendations(
 router.post('/analyze', analysisLimiter, async (req, res) => {
   console.log('Incoming Request');
 
-  const AI_PROVIDER = process.env.AI_PROVIDER || 'gemini'; // Default to gemini
-  let errorMapper: (error: unknown) => any;
-
-  if (AI_PROVIDER === 'groq') {
-    errorMapper = mapGroqError;
-  } else {
-    errorMapper = mapGeminiError;
-  }
+  const errorMapper = mapGroqError;
 
   const parseResult = analysisSchema.safeParse(req.body);
   if (!parseResult.success) {
@@ -64,11 +53,10 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
   }
 
   try {
-    let rawAnalysisResult: string;
     const aiValidation: ValidationMeta = await validateIdea(requestData);
 
     if (!aiValidation.isValid || aiValidation.quality === 'invalid') {
-      console.log('[VALIDATION_FAIL]', AI_PROVIDER);
+      console.log('[VALIDATION_FAIL] Groq');
       console.log('Response Sent');
       return res.status(422).json(validationFailureResponse({
         ...aiValidation,
@@ -89,11 +77,7 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
       });
     }
 
-    if (AI_PROVIDER === 'groq') {
-      rawAnalysisResult = await generateGroqAnalysis(requestData);
-    } else {
-      rawAnalysisResult = await generateGeminiAnalysis(requestData);
-    }
+    const rawAnalysisResult = await generateGroqAnalysis(requestData);
 
     const normalizedResult = normalizeResponse(rawAnalysisResult);
 
@@ -112,7 +96,7 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
     const structured = errorMapper(error);
     console.error('API analyze route error:', structured.code, structured.message);
     console.log('Response Sent');
-    return sendStructuredError(res, structured);
+    return res.status(structured.status || 500).json({ error: structured.message });
   }
 });
 
