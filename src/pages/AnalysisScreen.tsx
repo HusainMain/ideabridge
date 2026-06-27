@@ -360,8 +360,11 @@ export function AnalysisScreen() {
 
   return (
     <AnimatePresence>
-      {!initialized ? (
-        <div key="init" className="min-h-screen bg-slate-950" />
+      {(!initialized && inputs.idea) || analysisStatus === 'analyzing' || analysisStatus === 'cooldown' ? (
+        <LoadingWorkspace
+          key="loading"
+          cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined}
+        />
       ) : analysisStatus === 'invalid_input' && validationResult ? (
         <ImproveYourIdeaScreen
           key="invalid"
@@ -382,15 +385,10 @@ export function AnalysisScreen() {
             <h2 className="text-2xl font-semibold mb-3">Too many requests</h2>
             <p className="text-slate-400 mb-2 text-sm">Retrying automatically...</p>
             <p className="text-yellow-400 text-lg font-mono">
-              Retrying in {rateLimitCountdown ?? 0}...
+              Retrying in {rateLimitCountdown ?? 0}s...
             </p>
           </div>
         </motion.div>
-      ) : analysisStatus === 'analyzing' || analysisStatus === 'cooldown' ? (
-        <LoadingWorkspace
-          key="loading"
-          cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined}
-        />
       ) : analysisStatus === 'error' && errorCode && errorMessage ? (
         <AnalysisErrorScreen
           key="error"
