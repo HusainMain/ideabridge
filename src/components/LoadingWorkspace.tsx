@@ -28,6 +28,7 @@ interface LoadingWorkspaceProps {
 }
 
 export function LoadingWorkspace({ cooldownRemaining }: LoadingWorkspaceProps) {
+  console.log("LoadingWorkspace rendered");
   const [currentStage, setCurrentStage] = useState(0);
   const [currentMessage, setCurrentMessage] = useState(0);
   const [progress, setProgress] = useState(0);

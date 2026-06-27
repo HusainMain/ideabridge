@@ -203,7 +203,9 @@ export function AnalysisScreen() {
       return;
     }
 
+    console.log("Before setAnalysisStatus(" + 'analyzing' + ")");
     setAnalysisStatus('analyzing');
+    console.log("After setAnalysisStatus(" + 'analyzing' + ")");
     setApiError(null);
     setCooldownRemaining(null);
     setRateLimitCountdown(null);
@@ -246,11 +248,14 @@ export function AnalysisScreen() {
     clearResults();
     setApiError(null);
     setValidationResult(null);
-    setAnalysisStatus('idle');
     hasAutoRetriedRateLimit.current = false;
     rateLimitRetryStarted.current = false;
     setInitialized(true);
-  }, [setAnalysisStatus, setApiError, clearResults, setValidationResult]);
+
+    if (inputs.idea) {
+      performAnalysis();
+    }
+  }, [setAnalysisStatus, setApiError, clearResults, setValidationResult, inputs.idea, performAnalysis]);
 
   useEffect(() => {
     if (!inputs.idea) navigate('/input');
@@ -358,9 +363,16 @@ export function AnalysisScreen() {
     navigate('/input');
   };
 
+  console.log("[RETURN]", {
+    initialized,
+    analysisStatus,
+    hasIdea: !!inputs.idea,
+    requestTriggered: requestTriggered.current
+  });
   return (
     <AnimatePresence>
       {(!initialized && inputs.idea) || analysisStatus === 'analyzing' || analysisStatus === 'cooldown' ? (
+        console.log("Rendering LoadingWorkspace"),
         <LoadingWorkspace
           key="loading"
           cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined}
@@ -398,6 +410,7 @@ export function AnalysisScreen() {
           onEditIdea={handleBackToEdit}
         />
       ) : (
+        console.log("Rendering Waiting Div"),
         <div key="waiting" className="min-h-screen bg-slate-950" />
       )}
     </AnimatePresence>
