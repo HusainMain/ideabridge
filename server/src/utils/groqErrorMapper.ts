@@ -3,7 +3,7 @@ import type { ApiErrorCode, StructuredErrorResponse } from '../../../shared/erro
 export class StructuredApiError extends Error {
   public readonly status: number;
   public readonly code: ApiErrorCode;
-  public readonly retryAfter: string | null;
+  public readonly retryAfter: number | null;
 
   constructor(response: StructuredErrorResponse, status: number) {
     super(response.message);
