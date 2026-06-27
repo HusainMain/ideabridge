@@ -2,23 +2,9 @@ import { GoogleGenAI } from '@google/genai';
 import { SYSTEM_PROMPT } from '../prompts/startupPrompt';
 import { StartupAnalysisRequest } from '../types/types';
 import { withTimeout } from '../utils/timeout';
+import { shouldRetryModel, getBackoffDelay } from '../utils/aiResponseParser';
 
 const MODELS_IN_ORDER = ['gemini-2.5-flash', 'gemini-2.0-flash'];
-
-function shouldRetryModel(error: any): boolean {
-  const message = (error.message || '').toLowerCase();
-  return (
-    message.includes('503') ||
-    message.includes('unavailable') ||
-    message.includes('resource_exhausted') ||
-    message.includes('rate limit')
-  );
-}
-
-function getBackoffDelay(): number {
-  // 3000ms to 5000ms random jitter
-  return 3000 + Math.random() * 2000;
-}
 
 export async function generateGeminiAnalysis(data: StartupAnalysisRequest): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
