@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { generateGeminiAnalysis } from '../services/geminiService';
-import { validateIdeaWithGemini } from '../services/validationService';
+import { validateIdea } from '../services/validationService';
 import { generateGroqAnalysis, generateGroqValidationResponse } from '../services/groqService';
 import { matchIncubators } from '../services/incubatorMatchingService';
 import { analysisLimiter } from '../middleware/rateLimiter';
@@ -40,7 +40,13 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
   console.log('Incoming Request');
 
   const AI_PROVIDER = process.env.AI_PROVIDER || 'gemini'; // Default to gemini
-  let errorMapper: (error: unknown) => any = mapGeminiError; // Initialize with default
+  let errorMapper: (error: unknown) => any;
+
+  if (AI_PROVIDER === 'groq') {
+    errorMapper = mapGroqError;
+  } else {
+    errorMapper = mapGeminiError;
+  }
 
   const parseResult = analysisSchema.safeParse(req.body);
   if (!parseResult.success) {
@@ -58,18 +64,8 @@ router.post('/analyze', analysisLimiter, async (req, res) => {
   }
 
   try {
-    let aiValidation: ValidationMeta;
     let rawAnalysisResult: string;
-
-    if (AI_PROVIDER === 'groq') {
-      console.log('[AI_PROVIDER]', 'Groq');
-      aiValidation = await generateGroqValidationResponse(requestData.idea);
-      errorMapper = mapGroqError;
-    } else {
-      console.log('[AI_PROVIDER]', 'Gemini');
-      aiValidation = await validateIdeaWithGemini(requestData);
-      errorMapper = mapGeminiError;
-    }
+    const aiValidation: ValidationMeta = await validateIdea(requestData);
 
     if (!aiValidation.isValid || aiValidation.quality === 'invalid') {
       console.log('[VALIDATION_FAIL]', AI_PROVIDER);
