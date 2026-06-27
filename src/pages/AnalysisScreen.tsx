@@ -75,6 +75,9 @@ export function AnalysisScreen() {
   const rateLimitTimerRef = useRef<number | null>(null);
   const hasAutoRetriedRateLimit = useRef(false);
   const rateLimitRetryStarted = useRef(false);
+  const cachedResponseRef = useRef<{ analysis: ResultsData; validation: ValidationMeta } | null>(null);
+  const analysisCompleteRef = useRef(false);
+  const minimumTimerRef = useRef<number>();
 
   const handleInvalidValidation = useCallback(
     (validation: ValidationMeta) => {
@@ -190,9 +193,9 @@ export function AnalysisScreen() {
       });
     }
 
-    setResults(data.analysis, data.validation);
-    navigate('/results');
-  }, [inputs, navigate, setResults, handleInvalidValidation]);
+    cachedResponseRef.current = { analysis: data.analysis, validation: data.validation };
+    analysisCompleteRef.current = true;
+  }, [inputs, handleInvalidValidation]);
 
   const performAnalysis = useCallback(async () => {
     requestTriggered.current = true;
@@ -207,10 +210,10 @@ export function AnalysisScreen() {
     setApiError(null);
     setCooldownRemaining(null);
     setRateLimitCountdown(null);
+    analysisCompleteRef.current = false;
+    cachedResponseRef.current = null;
 
-    try {
-      await runAnalysisRequest();
-    } catch (err: unknown) {
+    runAnalysisRequest().catch((err: unknown) => {
       const structured = (err as { structured?: StructuredErrorResponse }).structured;
 
       if (structured) {
@@ -232,13 +235,21 @@ export function AnalysisScreen() {
         message: (err as Error).message || 'Something unexpected went wrong.',
         retryAfter: null,
       });
-    }
+    });
+
+    minimumTimerRef.current = window.setTimeout(() => {
+      if (analysisCompleteRef.current && cachedResponseRef.current) {
+        setResults(cachedResponseRef.current.analysis, cachedResponseRef.current.validation);
+        navigate('/results');
+      }
+    }, 15000);
   }, [inputs, runAnalysisRequest, handleInvalidValidation, handleStructuredError, setAnalysisStatus, setApiError]);
 
   useEffect(() => {
     return () => {
       if (cooldownTimerRef.current) clearInterval(cooldownTimerRef.current);
       if (rateLimitTimerRef.current) clearInterval(rateLimitTimerRef.current);
+      if (minimumTimerRef.current) clearTimeout(minimumTimerRef.current);
     };
   }, []);
 
@@ -248,12 +259,14 @@ export function AnalysisScreen() {
     setValidationResult(null);
     hasAutoRetriedRateLimit.current = false;
     rateLimitRetryStarted.current = false;
+    analysisCompleteRef.current = false;
+    cachedResponseRef.current = null;
     setInitialized(true);
 
     if (inputs.idea) {
       performAnalysis();
     }
-  }, [setAnalysisStatus, setApiError, clearResults, setValidationResult, inputs.idea, performAnalysis]);
+  }, [inputs.idea, performAnalysis]);
 
   useEffect(() => {
     if (!inputs.idea) navigate('/input');
