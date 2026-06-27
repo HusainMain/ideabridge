@@ -1,4 +1,4 @@
-import type { IdeaFields, ValidationMeta } from './types';
+import type { IdeaFields, ValidationMeta } from './types.js';
 
 const KEYBOARD_PATTERNS = [
   'asdf', 'qwer', 'zxcv', 'hjkl', 'fdsa', 'ytrew', 'qwerty', 'abcdef',
