@@ -70,6 +70,7 @@ export function AnalysisScreen() {
   const [cooldownRemaining, setCooldownRemaining] = useState<number | null>(null);
   const [rateLimitCountdown, setRateLimitCountdown] = useState<number | null>(null);
   const [initialized, setInitialized] = useState(false);
+  const [apiFinished, setApiFinished] = useState(false);
   const requestTriggered = useRef(false);
   const cooldownTimerRef = useRef<number | null>(null);
   const rateLimitTimerRef = useRef<number | null>(null);
@@ -212,37 +213,35 @@ export function AnalysisScreen() {
     setRateLimitCountdown(null);
     analysisCompleteRef.current = false;
     cachedResponseRef.current = null;
+    setApiFinished(false);
 
-    runAnalysisRequest().catch((err: unknown) => {
-      const structured = (err as { structured?: StructuredErrorResponse }).structured;
+    runAnalysisRequest()
+      .then(() => {
+        setApiFinished(true);
+      })
+      .catch((err: unknown) => {
+        const structured = (err as { structured?: StructuredErrorResponse }).structured;
 
-      if (structured) {
-        handleStructuredError(structured);
-        return;
-      }
+        if (structured) {
+          handleStructuredError(structured);
+          return;
+        }
 
-      if (err instanceof TypeError || (err as Error).message?.includes('Failed to fetch')) {
+        if (err instanceof TypeError || (err as Error).message?.includes('Failed to fetch')) {
+          setApiError({
+            code: 'NETWORK_ERROR',
+            message: 'Check your internet connection and try again.',
+            retryAfter: null,
+          });
+          return;
+        }
+
         setApiError({
-          code: 'NETWORK_ERROR',
-          message: 'Check your internet connection and try again.',
+          code: 'UNKNOWN_ERROR',
+          message: (err as Error).message || 'Something unexpected went wrong.',
           retryAfter: null,
         });
-        return;
-      }
-
-      setApiError({
-        code: 'UNKNOWN_ERROR',
-        message: (err as Error).message || 'Something unexpected went wrong.',
-        retryAfter: null,
       });
-    });
-
-    minimumTimerRef.current = window.setTimeout(() => {
-      if (analysisCompleteRef.current && cachedResponseRef.current) {
-        setResults(cachedResponseRef.current.analysis, cachedResponseRef.current.validation);
-        navigate('/results');
-      }
-    }, 15000);
   }, [inputs, runAnalysisRequest, handleInvalidValidation, handleStructuredError, setAnalysisStatus, setApiError]);
 
   useEffect(() => {
@@ -356,6 +355,13 @@ export function AnalysisScreen() {
     }
   }, [initialized, inputs, setAnalysisStatus, performAnalysis]);
 
+  const handleComplete = useCallback(() => {
+    if (cachedResponseRef.current) {
+      setResults(cachedResponseRef.current.analysis, cachedResponseRef.current.validation);
+      navigate('/results');
+    }
+  }, [navigate, setResults]);
+
   const handleRetry = () => {
     requestTriggered.current = false;
     hasAutoRetriedRateLimit.current = false;
@@ -380,6 +386,8 @@ export function AnalysisScreen() {
         <LoadingWorkspace
           key="loading"
           cooldownRemaining={analysisStatus === 'cooldown' ? cooldownRemaining ?? 0 : undefined}
+          apiFinished={apiFinished}
+          onComplete={handleComplete}
         />
       ) : analysisStatus === 'invalid_input' && validationResult ? (
         <ImproveYourIdeaScreen
