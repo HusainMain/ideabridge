@@ -266,10 +266,20 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
               <div className="mb-2 flex items-center gap-3">
                 <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/12 shadow-[0_0_16px_rgba(148,163,184,0.08)]">
                   <motion.div
-                    className="h-full rounded-full bg-gradient-to-r from-sky-300 via-cyan-300 to-sky-400"
-                    style={{ width: `${progress}%` }}
-                    animate={{ boxShadow: isCompleting ? '0 0 18px rgba(103,232,249,0.72)' : '0 0 10px rgba(103,232,249,0.3)' }}
-                    transition={isCompleting ? { type: 'spring', stiffness: 55, damping: 16 } : { ease: 'easeOut' }}
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${progress}%`,
+                      background: 'linear-gradient(90deg, #67e8f9, #22d3ee, #67e8f9)',
+                      backgroundSize: '200% 100%',
+                    }}
+                    animate={{
+                      backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                      boxShadow: isCompleting ? '0 0 18px rgba(103,232,249,0.72)' : '0 0 10px rgba(103,232,249,0.3)'
+                    }}
+                    transition={{
+                      backgroundPosition: { duration: 2.5, repeat: Infinity, ease: 'linear' },
+                      boxShadow: { duration: 0.8 }
+                    }}
                   />
                 </div>
                 <span className="w-8 text-right text-xs font-medium tabular-nums text-slate-300">{Math.round(progress)}%</span>
