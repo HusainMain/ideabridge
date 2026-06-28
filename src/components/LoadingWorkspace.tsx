@@ -81,13 +81,14 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
   }, [isCompleting]);
 
   const particles = useMemo(() => {
-    return [...Array(30)].map((_, i) => ({
+    return [...Array(45)].map((_, i) => ({
       id: i,
-      size: Math.random() * 2.5 + 0.8,
+      size: Math.random() * 2.5 + 0.5,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      duration: 8 + Math.random() * 12,
-      delay: Math.random() * -18,
+      duration: 6 + Math.random() * 14,
+      delay: Math.random() * -20,
+      drift: (Math.random() - 0.5) * 60,
     }));
   }, []);
 
@@ -215,6 +216,35 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
             <circle key={cx} cx={cx} cy={index % 2 ? 160 + index * 14 : 115 + index * 21} r={index % 3 === 0 ? 2.2 : 1.4} fill={index % 2 ? '#a5b4fc' : '#67e8f9'} />
           ))}
         </svg>
+        <svg className="absolute inset-0 h-full w-full opacity-[0.06]" viewBox="0 0 800 600" preserveAspectRatio="none">
+          <motion.polygon
+            points="400,50 450,100 450,200 400,250 350,200 350,100"
+            fill="none"
+            stroke="#67e8f9"
+            strokeWidth="0.8"
+            animate={{ rotate: 360, opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
+            style={{ transformOrigin: '400px 150px' }}
+          />
+          <motion.polygon
+            points="200,300 240,330 240,390 200,420 160,390 160,330"
+            fill="none"
+            stroke="#a5b4fc"
+            strokeWidth="0.6"
+            animate={{ rotate: -360, opacity: [0.2, 0.5, 0.2] }}
+            transition={{ duration: 35, repeat: Infinity, ease: 'linear' }}
+            style={{ transformOrigin: '200px 360px' }}
+          />
+          <motion.polygon
+            points="650,150 680,175 680,225 650,250 620,225 620,175"
+            fill="none"
+            stroke="#818cf8"
+            strokeWidth="0.5"
+            animate={{ rotate: 360, opacity: [0.25, 0.55, 0.25] }}
+            transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
+            style={{ transformOrigin: '650px 200px' }}
+          />
+        </svg>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,transparent_0%,rgba(6,10,20,0.2)_42%,rgba(3,6,14,0.92)_100%)]" />
         {particles.map((particle) => (
           <motion.span
@@ -226,10 +256,34 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
               top: `${particle.y}%`,
               width: particle.size,
             }}
-            animate={{ opacity: [0, 0.55, 0], y: [0, -70] }}
-            transition={{ duration: particle.duration, delay: particle.delay, repeat: Infinity, ease: 'linear' }}
+            animate={{
+              opacity: [0, 0.6, 0],
+              y: [0, -80],
+              x: [0, particle.drift],
+            }}
+            transition={{
+              duration: particle.duration,
+              delay: particle.delay,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
           />
         ))}
+        <motion.div
+          className="absolute left-[10%] top-[60%] h-[300px] w-[300px] rounded-full bg-amber-500/10 blur-[100px]"
+          animate={{ x: [0, -20, 15, 0], y: [0, 15, -10, 0], opacity: [0.3, 0.6, 0.35] }}
+          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute right-[8%] top-[40%] h-[250px] w-[250px] rounded-full bg-fuchsia-500/10 blur-[90px]"
+          animate={{ x: [0, 12, -18, 0], y: [0, -18, 12, 0], opacity: [0.25, 0.55, 0.3] }}
+          transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute left-[50%] top-[20%] h-[200px] w-[200px] rounded-full bg-cyan-400/10 blur-[80px]"
+          animate={{ x: [0, -15, 10, 0], y: [0, 12, -8, 0], opacity: [0.35, 0.65, 0.4] }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+        />
       </div>
 
       <header className="relative z-10 flex w-full items-center justify-between">

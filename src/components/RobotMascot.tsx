@@ -177,7 +177,7 @@ export function RobotMascot({ stage = 0, isCompleted = false }: RobotMascotProps
 
         {isCompleted ? (
           <g filter="url(#cyanSoft)">
-            <path d="M88 102 Q110 82 132 102" stroke="#67e8f9" strokeWidth="5" strokeLinecap="round" fill="none" />
+            <path d="M88 102 Q110 122 132 102" stroke="#67e8f9" strokeWidth="5" strokeLinecap="round" fill="none" />
           </g>
         ) : (
           <path d="M100 103 Q110 113 120 103" stroke="#67e8f9" strokeWidth="3.5" strokeLinecap="round" opacity="0.55" fill="none" />
