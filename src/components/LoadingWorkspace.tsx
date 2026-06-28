@@ -74,6 +74,11 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
 
   const startTimeRef = useRef<number>(Date.now());
   const lastActiveStageRef = useRef<number>(-1);
+  const isCompletingRef = useRef(false);
+
+  useEffect(() => {
+    isCompletingRef.current = isCompleting;
+  }, [isCompleting]);
 
   const particles = useMemo(() => {
     return [...Array(18)].map((_, i) => ({
@@ -90,10 +95,13 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
     if (cooldownRemaining !== undefined) return;
 
     const timer = setInterval(() => {
+      if (isCompletingRef.current) {
+        clearInterval(timer);
+        return;
+      }
+
       const elapsed = Date.now() - startTimeRef.current;
       setElapsedTime(elapsed);
-
-      if (isCompleting) return;
 
       let currentProgress = 0;
       if (elapsed < 1500) {
@@ -112,7 +120,7 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
     }, 50);
 
     return () => clearInterval(timer);
-  }, [cooldownRemaining, isCompleting]);
+  }, [cooldownRemaining]);
 
   const currentStageIndex = useMemo(() => {
     if (isCompleting) return 6;
@@ -237,7 +245,7 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
       </header>
 
       <main className="relative z-10 h-[calc(100vh-76px)] min-h-[610px]">
-        <section className="absolute left-1/2 top-2 flex w-full max-w-3xl -translate-x-1/2 flex-col items-center text-center">
+        <section className="absolute left-1/2 top-2 flex w-full max-w-[1080px] -translate-x-1/2 flex-col items-center text-center">
           <div className="relative flex h-[174px] w-full items-center justify-center md:h-[184px]">
             <RobotMascot analysisStatus={isCompleting ? 'success' : 'analyzing'} stage={currentStageIndex} isCompleted={isCompleting} />
           </div>
