@@ -171,7 +171,7 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
   const timelineActiveIndex = Math.min(Math.max(currentStageIndex, 0), TIMELINE_ITEMS.length - 1);
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#060a14] px-5 py-5 font-sans text-white select-none md:px-9 md:py-6">
+    <div className="relative h-screen w-full overflow-hidden bg-[#060a14] px-5 py-5 font-sans text-white select-none md:px-9 md:py-6">
       <div className="pointer-events-none absolute inset-0 z-0">
         <motion.div
           className="absolute left-[22%] top-[-20%] h-[570px] w-[570px] rounded-full bg-cyan-400/16 blur-[120px]"
@@ -236,9 +236,9 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
         </div>
       </header>
 
-      <main className="relative z-10 flex flex-1 flex-col items-center justify-start pt-4 md:pt-2">
-        <section className="flex w-full max-w-3xl flex-col items-center text-center">
-          <div className="relative flex h-[226px] w-full items-center justify-center md:h-[238px]">
+      <main className="relative z-10 h-[calc(100vh-76px)] min-h-[610px]">
+        <section className="absolute left-1/2 top-2 flex w-full max-w-3xl -translate-x-1/2 flex-col items-center text-center">
+          <div className="relative flex h-[174px] w-full items-center justify-center md:h-[184px]">
             <RobotMascot analysisStatus={isCompleting ? 'success' : 'analyzing'} stage={currentStageIndex} isCompleted={isCompleting} />
           </div>
 
@@ -247,14 +247,14 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
             animate={{ opacity: [0.96, 1, 0.96] }}
             transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <div className="mb-2.5 inline-flex rounded-full border border-white/10 bg-white/[0.07] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-slate-200/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md">
+            <div className="mb-2 inline-flex rounded-full border border-white/10 bg-white/[0.07] px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-slate-200/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md">
               {isCompleting ? 'Analysis Complete' : 'Analyzing Your Startup'}
             </div>
-            <h1 className="mx-auto max-w-[560px] text-balance text-[30px] font-semibold leading-[1.03] tracking-[-0.02em] text-white drop-shadow-[0_2px_14px_rgba(255,255,255,0.08)] md:text-[34px]">
+            <h1 className="mx-auto max-w-[560px] text-balance text-[28px] font-semibold leading-[1.05] tracking-[-0.02em] text-white drop-shadow-[0_2px_14px_rgba(255,255,255,0.08)] md:text-[32px]">
               {isCompleting ? 'Your analysis is ready' : ideaPreview}
             </h1>
 
-            <div className="mx-auto mt-5 w-full max-w-[360px]">
+            <div className="mx-auto mt-4 w-full max-w-[360px]">
               <div className="mb-2 flex items-center gap-3">
                 <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/12 shadow-[0_0_16px_rgba(148,163,184,0.08)]">
                   <motion.div
@@ -273,7 +273,7 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
           </motion.div>
         </section>
 
-        <section className="mt-[-4px] grid w-full max-w-[1080px] grid-cols-1 gap-4 md:grid-cols-[232px_1fr_248px] md:items-end md:gap-16">
+        <section className="absolute bottom-6 left-1/2 grid w-full max-w-[1080px] -translate-x-1/2 grid-cols-1 gap-4 md:grid-cols-[232px_1fr_248px] md:items-end md:gap-16">
           <div className="rounded-lg border border-slate-300/18 bg-slate-900/38 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl md:min-h-[198px]">
             <div className="mb-3.5 text-base font-semibold tracking-[-0.01em] text-white/92">
               Analysis Timeline

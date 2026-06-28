@@ -11,17 +11,15 @@ interface RobotMascotProps {
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 export function RobotMascot({ stage = 0, isCompleted = false }: RobotMascotProps) {
-  const [blink, setBlink] = useState(false);
-  const faceRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
   const lastPointerMoveRef = useRef(0);
   const idleFrameRef = useRef<number>();
+  const [blink, setBlink] = useState(false);
 
   const targetX = useMotionValue(0);
   const targetY = useMotionValue(0);
-  const eyeX = useSpring(targetX, { stiffness: 220, damping: 30, mass: 0.55 });
-  const eyeY = useSpring(targetY, { stiffness: 220, damping: 30, mass: 0.55 });
-
-  const glowStrength = isCompleted ? 0.78 : 0.42 + Math.min(stage, 6) * 0.04;
+  const eyeX = useSpring(targetX, { stiffness: 230, damping: 31, mass: 0.55 });
+  const eyeY = useSpring(targetY, { stiffness: 230, damping: 31, mass: 0.55 });
 
   useEffect(() => {
     if (isCompleted) {
@@ -31,18 +29,14 @@ export function RobotMascot({ stage = 0, isCompleted = false }: RobotMascotProps
     }
 
     const moveEyes = (event: PointerEvent) => {
-      const face = faceRef.current;
-      if (!face) return;
-
+      const svg = svgRef.current;
+      if (!svg) return;
       lastPointerMoveRef.current = Date.now();
-      const rect = face.getBoundingClientRect();
+      const rect = svg.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const x = (event.clientX - centerX) / (rect.width / 2);
-      const y = (event.clientY - centerY) / (rect.height / 2);
-
-      targetX.set(clamp(x * 4.2, -4.2, 4.2));
-      targetY.set(clamp(y * 2.8, -2.8, 2.8));
+      const centerY = rect.top + rect.height * 0.43;
+      targetX.set(clamp(((event.clientX - centerX) / (rect.width / 2)) * 4, -4, 4));
+      targetY.set(clamp(((event.clientY - centerY) / (rect.height / 2)) * 3, -3, 3));
     };
 
     const centerEyes = () => {
@@ -70,18 +64,16 @@ export function RobotMascot({ stage = 0, isCompleted = false }: RobotMascotProps
 
   useEffect(() => {
     if (isCompleted) return;
-
-    const animateIdle = () => {
+    const idle = () => {
       const idleFor = Date.now() - lastPointerMoveRef.current;
       if (lastPointerMoveRef.current === 0 || idleFor > 1400) {
         const t = Date.now() / 1000;
-        targetX.set(Math.sin(t * 0.85) * 0.85 + Math.sin(t * 1.35) * 0.28);
-        targetY.set(Math.cos(t * 0.7) * 0.55);
+        targetX.set(Math.sin(t * 0.9) * 0.9);
+        targetY.set(Math.cos(t * 0.72) * 0.55);
       }
-      idleFrameRef.current = requestAnimationFrame(animateIdle);
+      idleFrameRef.current = requestAnimationFrame(idle);
     };
-
-    idleFrameRef.current = requestAnimationFrame(animateIdle);
+    idleFrameRef.current = requestAnimationFrame(idle);
     return () => {
       if (idleFrameRef.current) cancelAnimationFrame(idleFrameRef.current);
     };
@@ -89,7 +81,6 @@ export function RobotMascot({ stage = 0, isCompleted = false }: RobotMascotProps
 
   useEffect(() => {
     if (isCompleted) return;
-
     let timeoutId: number;
     const loop = () => {
       timeoutId = window.setTimeout(() => {
@@ -98,104 +89,85 @@ export function RobotMascot({ stage = 0, isCompleted = false }: RobotMascotProps
         loop();
       }, 3200 + Math.random() * 2600);
     };
-
     loop();
     return () => window.clearTimeout(timeoutId);
   }, [isCompleted]);
 
+  const glowOpacity = isCompleted ? 0.95 : 0.5 + Math.min(stage, 6) * 0.05;
+
   return (
-    <div className="relative h-[174px] w-[174px] md:h-[184px] md:w-[184px]">
-      <motion.div
-        className="absolute left-1/2 top-[78%] h-9 w-36 -translate-x-1/2 rounded-full bg-cyan-300/28 blur-xl"
-        animate={{
-          opacity: isCompleted ? [0.55, 0.82, 0.58] : [0.32, 0.52, 0.34],
-          scaleX: isCompleted ? [1.05, 1.24, 1.08] : [0.92, 1.05, 0.92],
-        }}
-        transition={{ duration: isCompleted ? 2.4 : 5.4, repeat: Infinity, ease: 'easeInOut' }}
-      />
+    <motion.svg
+      ref={svgRef}
+      className="h-[168px] w-[168px] md:h-[178px] md:w-[178px]"
+      viewBox="0 0 220 220"
+      fill="none"
+      aria-hidden="true"
+      animate={isCompleted ? { y: [0, -8, -4], scale: [1, 1.03, 1] } : { y: [0, -5, 0] }}
+      transition={isCompleted ? { duration: 0.8, ease: 'easeOut' } : { duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+    >
+      <defs>
+        <radialGradient id="robotGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.55" />
+          <stop offset="65%" stopColor="#38bdf8" stopOpacity="0.14" />
+          <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="metal" x1="68" y1="40" x2="155" y2="132" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#e5edf6" />
+          <stop offset="0.28" stopColor="#64748b" />
+          <stop offset="0.68" stopColor="#111827" />
+          <stop offset="1" stopColor="#030712" />
+        </linearGradient>
+        <linearGradient id="body" x1="74" y1="128" x2="146" y2="199" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#334155" />
+          <stop offset="0.55" stopColor="#050914" />
+          <stop offset="1" stopColor="#020617" />
+        </linearGradient>
+        <filter id="cyanSoft" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
 
-      <motion.div
-        className="absolute inset-x-2 top-3 h-36 rounded-full bg-gradient-to-b from-cyan-300/24 via-sky-300/8 to-transparent blur-2xl"
-        animate={{ opacity: [glowStrength * 0.68, glowStrength, glowStrength * 0.72], scale: [0.95, 1.05, 0.98] }}
-        transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }}
-      />
+      <ellipse cx="110" cy="192" rx="60" ry="14" fill="#67e8f9" opacity={glowOpacity * 0.26} filter="url(#cyanSoft)" />
+      <circle cx="110" cy="108" r="104" fill="url(#robotGlow)" opacity={glowOpacity * 0.45} />
 
-      <motion.div
-        className="absolute inset-0"
-        animate={
-          isCompleted
-            ? { y: [0, -8, -4, -5, -4], scaleY: [1, 0.96, 1.02, 1], rotate: [0, 2, -1, 0] }
-            : { y: [0, -5, 0], rotate: [0, 0.8, -0.8, 0] }
-        }
-        transition={
-          isCompleted
-            ? { duration: 0.85, ease: 'easeOut' }
-            : { duration: 5.2, repeat: Infinity, ease: 'easeInOut' }
-        }
-      >
-        <div className="absolute left-1/2 top-1 h-7 w-1 -translate-x-1/2 rounded-full bg-gradient-to-t from-slate-700 to-slate-200" />
-        <div className="absolute left-1/2 top-[-4px] h-3 w-3 -translate-x-1/2 rounded-full bg-slate-950 shadow-[inset_0_1px_2px_rgba(255,255,255,0.85),0_0_12px_rgba(103,232,249,0.75)]" />
+      <path d="M110 20V42" stroke="#94a3b8" strokeWidth="4" strokeLinecap="round" />
+      <circle cx="110" cy="17" r="7" fill="#020617" stroke="#cbd5e1" strokeWidth="2" />
 
-        <div className="absolute left-[22px] top-[62px] z-10 h-12 w-7 rounded-full border border-cyan-100/20 bg-gradient-to-b from-slate-300 via-slate-700 to-slate-950 shadow-[inset_6px_0_10px_rgba(255,255,255,0.08),0_10px_24px_rgba(0,0,0,0.36)]" />
-        <div className="absolute right-[22px] top-[62px] z-10 h-12 w-7 rounded-full border border-cyan-100/20 bg-gradient-to-b from-slate-300 via-slate-700 to-slate-950 shadow-[inset_-6px_0_10px_rgba(255,255,255,0.08),0_10px_24px_rgba(0,0,0,0.36)]" />
+      <rect x="39" y="78" width="23" height="52" rx="11.5" fill="#0f172a" stroke="#94a3b8" strokeOpacity="0.45" strokeWidth="3" />
+      <rect x="158" y="78" width="23" height="52" rx="11.5" fill="#0f172a" stroke="#94a3b8" strokeOpacity="0.45" strokeWidth="3" />
+      <rect x="51" y="73" width="18" height="62" rx="9" fill="#cbd5e1" opacity="0.35" />
+      <rect x="151" y="73" width="18" height="62" rx="9" fill="#cbd5e1" opacity="0.35" />
 
-        <div className="absolute bottom-4 left-1/2 z-10 h-[66px] w-[94px] -translate-x-1/2 rounded-[36px] border border-cyan-100/18 bg-gradient-to-b from-slate-600 via-slate-950 to-black shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-18px_26px_rgba(0,0,0,0.58),0_20px_38px_rgba(0,0,0,0.42)]" />
+      <path d="M72 138C75 120 90 111 110 111C130 111 145 120 148 138L155 174C158 190 146 203 130 203H90C74 203 62 190 65 174L72 138Z" fill="url(#body)" stroke="#67e8f9" strokeOpacity="0.45" strokeWidth="2.5" />
+      <path d="M78 139C87 146 133 146 142 139" stroke="#ffffff" strokeOpacity="0.08" strokeWidth="12" strokeLinecap="round" />
 
-        <motion.div
-          className="absolute left-[30px] top-[111px] z-20 h-12 w-6 rounded-full border border-cyan-200/24 bg-gradient-to-b from-slate-400 via-slate-900 to-slate-950 shadow-[0_0_16px_rgba(34,211,238,0.12)]"
-          animate={{ y: [0, 5, 0], rotate: [-8, -3, -8] }}
-          transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute right-[30px] top-[111px] z-20 h-12 w-6 rounded-full border border-cyan-200/24 bg-gradient-to-b from-slate-400 via-slate-900 to-slate-950 shadow-[0_0_16px_rgba(34,211,238,0.12)]"
-          animate={{ y: [3, -3, 3], rotate: [8, 3, 8] }}
-          transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }}
-        />
+      <path d="M54 143C43 156 42 180 51 189C62 184 68 158 62 145C60 141 57 140 54 143Z" fill="#0f172a" stroke="#67e8f9" strokeOpacity="0.55" strokeWidth="2.5" />
+      <path d="M166 143C177 156 178 180 169 189C158 184 152 158 158 145C160 141 163 140 166 143Z" fill="#0f172a" stroke="#67e8f9" strokeOpacity="0.55" strokeWidth="2.5" />
 
-        <div className="absolute left-1/2 top-7 z-30 h-[86px] w-[124px] -translate-x-1/2 rounded-[32px] border border-cyan-100/28 bg-gradient-to-b from-slate-100 via-slate-600 to-[#070a11] shadow-[inset_0_2px_0_rgba(255,255,255,0.46),inset_0_-18px_28px_rgba(0,0,0,0.58),0_20px_48px_rgba(0,0,0,0.55),0_0_28px_rgba(34,211,238,0.2)]">
-          <div className="absolute inset-[4px] rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.18] via-transparent to-black/28" />
-          <div className="absolute left-8 top-2 h-6 w-16 rounded-full bg-white/[0.24] blur-md" />
+      <rect x="55" y="44" width="110" height="91" rx="34" fill="url(#metal)" stroke="#cbd5e1" strokeOpacity="0.7" strokeWidth="4" />
+      <rect x="64" y="53" width="92" height="73" rx="27" fill="#020617" opacity="0.82" />
+      <path d="M75 58C92 49 130 49 146 58" stroke="#ffffff" strokeOpacity="0.2" strokeWidth="13" strokeLinecap="round" />
+      <rect x="68" y="71" width="84" height="45" rx="20" fill="#04111f" stroke="#67e8f9" strokeOpacity="0.22" strokeWidth="2" />
 
-          <div ref={faceRef} className="absolute left-1/2 top-[30px] h-[39px] w-[92px] -translate-x-1/2 rounded-[19px] border border-cyan-200/24 bg-[#050914] shadow-[inset_0_0_22px_rgba(34,211,238,0.18),0_0_22px_rgba(34,211,238,0.14)]">
-            <div className="absolute inset-0 rounded-[19px] bg-gradient-to-b from-cyan-200/[0.08] via-transparent to-black/35" />
-            <div className="absolute left-5 right-5 top-1 h-2 rounded-full bg-white/[0.08] blur-sm" />
-
-            {isCompleted ? (
-              <motion.svg
-                className="absolute left-1/2 top-1/2 h-7 w-[70px] -translate-x-1/2 -translate-y-1/2 overflow-visible"
-                viewBox="0 0 96 40"
-                initial={{ opacity: 0, scale: 0.82 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-              >
-                <path d="M14 24 Q25 10 36 24" stroke="#67e8f9" strokeWidth="5.5" strokeLinecap="round" fill="none" />
-                <path d="M60 24 Q71 10 82 24" stroke="#67e8f9" strokeWidth="5.5" strokeLinecap="round" fill="none" />
-              </motion.svg>
-            ) : (
-              <>
-                <div className="absolute left-[19px] top-[13px] h-4 w-6 overflow-hidden rounded-full">
-                  <motion.div
-                    className="absolute left-[4px] top-[2px] h-3 w-[18px] rounded-full bg-cyan-200 shadow-[0_0_14px_rgba(103,232,249,0.96),0_0_4px_rgba(103,232,249,1)]"
-                    style={{ x: eyeX, y: eyeY }}
-                  >
-                    <span className="absolute left-1 top-0.5 h-1 w-1 rounded-full bg-white/95" />
-                  </motion.div>
-                  <motion.div className="absolute inset-0 origin-center bg-slate-950" animate={{ scaleY: blink ? 1 : 0 }} transition={{ duration: 0.075, ease: 'easeInOut' }} />
-                </div>
-                <div className="absolute right-[19px] top-[13px] h-4 w-6 overflow-hidden rounded-full">
-                  <motion.div
-                    className="absolute left-[4px] top-[2px] h-3 w-[18px] rounded-full bg-cyan-200 shadow-[0_0_14px_rgba(103,232,249,0.96),0_0_4px_rgba(103,232,249,1)]"
-                    style={{ x: eyeX, y: eyeY }}
-                  >
-                    <span className="absolute left-1 top-0.5 h-1 w-1 rounded-full bg-white/95" />
-                  </motion.div>
-                  <motion.div className="absolute inset-0 origin-center bg-slate-950" animate={{ scaleY: blink ? 1 : 0 }} transition={{ duration: 0.075, ease: 'easeInOut' }} />
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </div>
+      {isCompleted ? (
+        <g filter="url(#cyanSoft)">
+          <path d="M82 93Q92 82 102 93" stroke="#67e8f9" strokeWidth="7" strokeLinecap="round" />
+          <path d="M118 93Q128 82 138 93" stroke="#67e8f9" strokeWidth="7" strokeLinecap="round" />
+        </g>
+      ) : (
+        <g>
+          <motion.g style={{ x: eyeX, y: eyeY }} filter="url(#cyanSoft)">
+            <rect x="80" y="84" width="23" height={blink ? 2 : 15} rx="7.5" fill="#67e8f9" />
+            <rect x="117" y="84" width="23" height={blink ? 2 : 15} rx="7.5" fill="#67e8f9" />
+            <circle cx="87" cy="88" r="3" fill="white" opacity="0.9" />
+            <circle cx="124" cy="88" r="3" fill="white" opacity="0.9" />
+          </motion.g>
+        </g>
+      )}
+    </motion.svg>
   );
 }
