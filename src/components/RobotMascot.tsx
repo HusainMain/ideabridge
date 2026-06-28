@@ -169,10 +169,10 @@ export function RobotMascot({ stage = 0, isCompleted = false }: RobotMascotProps
         <rect x="68" y="71" width="84" height="45" rx="20" fill="#04111f" stroke="#67e8f9" strokeOpacity="0.22" strokeWidth="2" />
 
         <motion.g style={{ x: eyeX, y: eyeY }} filter="url(#cyanSoft)">
-          <rect x="80" y="84" width="23" height={blink ? 2 : 15} rx="7.5" fill="#67e8f9" />
-          <rect x="117" y="84" width="23" height={blink ? 2 : 15} rx="7.5" fill="#67e8f9" />
-          <circle cx="87" cy="88" r="3" fill="white" opacity="0.9" />
-          <circle cx="124" cy="88" r="3" fill="white" opacity="0.9" />
+          <circle cx="95" cy="91" r={blink ? 1.5 : 5.5} fill="#67e8f9" />
+          <circle cx="125" cy="91" r={blink ? 1.5 : 5.5} fill="#67e8f9" />
+          <circle cx="95" cy="91" r="2" fill="white" opacity="0.95" />
+          <circle cx="125" cy="91" r="2" fill="white" opacity="0.95" />
         </motion.g>
 
         {isCompleted ? (
@@ -180,7 +180,7 @@ export function RobotMascot({ stage = 0, isCompleted = false }: RobotMascotProps
             <path d="M88 102 Q110 82 132 102" stroke="#67e8f9" strokeWidth="5" strokeLinecap="round" fill="none" />
           </g>
         ) : (
-          <path d="M100 105 Q110 100 120 105" stroke="#67e8f9" strokeWidth="3.5" strokeLinecap="round" opacity="0.55" fill="none" />
+          <path d="M100 103 Q110 113 120 103" stroke="#67e8f9" strokeWidth="3.5" strokeLinecap="round" opacity="0.55" fill="none" />
         )}
       </motion.g>
     </motion.svg>

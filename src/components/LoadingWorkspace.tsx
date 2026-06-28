@@ -81,12 +81,12 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
   }, [isCompleting]);
 
   const particles = useMemo(() => {
-    return [...Array(18)].map((_, i) => ({
+    return [...Array(30)].map((_, i) => ({
       id: i,
-      size: Math.random() * 2 + 1,
+      size: Math.random() * 2.5 + 0.8,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      duration: 10 + Math.random() * 10,
+      duration: 8 + Math.random() * 12,
       delay: Math.random() * -18,
     }));
   }, []);
@@ -191,6 +191,11 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
           animate={{ x: [0, -22, 14, 0], y: [0, -12, 16, 0], opacity: [0.55, 0.82, 0.58] }}
           transition={{ duration: 30, repeat: Infinity, ease: 'easeInOut' }}
         />
+        <motion.div
+          className="absolute left-[45%] bottom-[-8%] h-[400px] w-[400px] rounded-full bg-blue-500/12 blur-[110px]"
+          animate={{ x: [0, 16, -10, 0], y: [0, -14, 10, 0], opacity: [0.4, 0.7, 0.45] }}
+          transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
+        />
         <div
           className="absolute inset-0 opacity-[0.09]"
           style={{
@@ -264,7 +269,7 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
 
             <div className="mx-auto mt-4 w-full max-w-[360px]">
               <div className="mb-2 flex items-center gap-3">
-                <div className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/12 shadow-[0_0_16px_rgba(148,163,184,0.08)]">
+                <div className="h-[4px] flex-1 overflow-hidden rounded-full bg-white/20 shadow-[0_0_16px_rgba(148,163,184,0.15)]">
                   <motion.div
                     className="h-full rounded-full"
                     style={{
@@ -274,7 +279,7 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
                     }}
                     animate={{
                       backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                      boxShadow: isCompleting ? '0 0 18px rgba(103,232,249,0.72)' : '0 0 10px rgba(103,232,249,0.3)'
+                      boxShadow: isCompleting ? '0 0 18px rgba(103,232,249,0.72)' : '0 0 10px rgba(103,232,249,0.4)'
                     }}
                     transition={{
                       backgroundPosition: { duration: 2.5, repeat: Infinity, ease: 'linear' },
@@ -362,11 +367,6 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
               {[0, 1, 2].map(dot => (
                 <span key={dot} className={`h-1.5 rounded-full ${dot === 0 ? 'w-1.5 bg-cyan-200' : 'w-1.5 bg-white/28'}`} />
               ))}
-            </div>
-            <div className="absolute -bottom-1 -right-4 h-12 w-12 text-slate-200/75">
-              <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-                <path d="M24 0C27.5 14.5 33.5 20.5 48 24C33.5 27.5 27.5 33.5 24 48C20.5 33.5 14.5 27.5 0 24C14.5 20.5 20.5 14.5 24 0Z" fill="currentColor" />
-              </svg>
             </div>
           </div>
           </div>
