@@ -244,8 +244,8 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
         </div>
       </header>
 
-      <main className="relative z-10 h-[calc(100vh-76px)] min-h-[610px]">
-        <section className="absolute left-1/2 top-2 flex w-full max-w-[1080px] -translate-x-1/2 flex-col items-center text-center">
+      <main className="relative z-10 flex min-h-[calc(100vh-76px)] flex-col items-center min-h-[610px]">
+        <section className="flex w-full max-w-[1080px] flex-col items-center pt-2 text-center">
           <div className="relative flex h-[174px] w-full items-center justify-center md:h-[184px]">
             <RobotMascot analysisStatus={isCompleting ? 'success' : 'analyzing'} stage={currentStageIndex} isCompleted={isCompleting} />
           </div>
@@ -281,51 +281,52 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
           </motion.div>
         </section>
 
-        <section className="absolute bottom-6 left-1/2 grid w-full max-w-[1080px] -translate-x-1/2 grid-cols-1 gap-4 md:grid-cols-[232px_1fr_248px] md:items-end md:gap-16">
-          <div className="rounded-lg border border-slate-300/18 bg-slate-900/38 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl md:min-h-[198px]">
-            <div className="mb-3.5 text-base font-semibold tracking-[-0.01em] text-white/92">
-              Analysis Timeline
-            </div>
-            <div className="space-y-2.5">
-              {TIMELINE_ITEMS.map((item, index) => {
-                const complete = index < timelineActiveIndex || isCompleting;
-                const active = index === timelineActiveIndex && !isCompleting;
-                return (
-                  <div key={item} className="flex items-center gap-2.5 text-xs">
-                    <div className="flex h-3.5 w-3.5 items-center justify-center">
-                      {complete ? (
-                        <span className="flex h-3.5 w-3.5 items-center justify-center text-cyan-300">
-                          <Check size={12} strokeWidth={2.4} />
-                        </span>
-                      ) : active ? (
-                        <span className="relative flex h-3.5 w-3.5 items-center justify-center">
-                          <span className="absolute h-full w-full animate-ping rounded-full bg-cyan-300/35" />
-                          <span className="relative h-2.5 w-2.5 rounded-full border border-cyan-200/80 bg-slate-900 shadow-[0_0_10px_rgba(103,232,249,0.72)]">
-                            <span className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-300" />
+        <section className="mt-auto w-full max-w-[1080px] pb-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-[232px_1fr_248px] md:items-end md:gap-16">
+            <div className="rounded-lg border border-slate-300/18 bg-slate-900/38 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl md:min-h-[198px]">
+              <div className="mb-3.5 text-base font-semibold tracking-[-0.01em] text-white/92">
+                Analysis Timeline
+              </div>
+              <div className="space-y-2.5">
+                {TIMELINE_ITEMS.map((item, index) => {
+                  const complete = index < timelineActiveIndex || isCompleting;
+                  const active = index === timelineActiveIndex && !isCompleting;
+                  return (
+                    <div key={item} className="flex items-center gap-2.5 text-xs">
+                      <div className="flex h-3.5 w-3.5 items-center justify-center">
+                        {complete ? (
+                          <span className="flex h-3.5 w-3.5 items-center justify-center text-cyan-300">
+                            <Check size={12} strokeWidth={2.4} />
                           </span>
-                        </span>
-                      ) : (
-                        <Circle size={11} className="text-slate-300/35" />
-                      )}
+                        ) : active ? (
+                          <span className="relative flex h-3.5 w-3.5 items-center justify-center">
+                            <span className="absolute h-full w-full animate-ping rounded-full bg-cyan-300/35" />
+                            <span className="relative h-2.5 w-2.5 rounded-full border border-cyan-200/80 bg-slate-900 shadow-[0_0_10px_rgba(103,232,249,0.72)]">
+                              <span className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-300" />
+                            </span>
+                          </span>
+                        ) : (
+                          <Circle size={11} className="text-slate-300/35" />
+                        )}
+                      </div>
+                      <span className={complete ? 'text-slate-400' : active ? 'font-semibold text-white' : 'text-slate-300/78'}>{item}</span>
                     </div>
-                    <span className={complete ? 'text-slate-400' : active ? 'font-semibold text-white' : 'text-slate-300/78'}>{item}</span>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          <div className="order-last mx-auto flex w-full max-w-[300px] items-center gap-3 self-end rounded-lg border border-slate-200/25 bg-slate-200/[0.13] px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_18px_60px_rgba(0,0,0,0.26)] backdrop-blur-xl md:order-none md:mb-0">
-            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-lg border border-white/10 bg-white/[0.08] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-              <Lock size={18} strokeWidth={1.8} />
+            <div className="order-last mx-auto flex w-full max-w-[300px] items-center gap-3 self-end rounded-lg border border-slate-200/25 bg-slate-200/[0.13] px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_18px_60px_rgba(0,0,0,0.26)] backdrop-blur-xl md:order-none md:mb-0">
+              <div className="flex h-10 w-10 flex-none items-center justify-center rounded-lg border border-white/10 bg-white/[0.08] text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                <Lock size={18} strokeWidth={1.8} />
+              </div>
+              <div className="min-w-0 text-left">
+                <p className="text-sm font-semibold text-white/90">Private AI Analysis</p>
+                <p className="truncate text-[11px] text-slate-300/72">Your startup idea is encrypted and never shared.</p>
+              </div>
             </div>
-            <div className="min-w-0 text-left">
-              <p className="text-sm font-semibold text-white/90">Private AI Analysis</p>
-              <p className="truncate text-[11px] text-slate-300/72">Your startup idea is encrypted and never shared.</p>
-            </div>
-          </div>
 
-          <div className="relative rounded-lg border border-slate-300/18 bg-slate-900/38 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl md:min-h-[198px]">
+            <div className="relative rounded-lg border border-slate-300/18 bg-slate-900/38 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_20px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl md:min-h-[198px]">
             <div className="mb-3.5 text-base font-semibold tracking-[-0.01em] text-white/92">
               AI Thinking
             </div>
@@ -357,6 +358,7 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
                 <path d="M24 0C27.5 14.5 33.5 20.5 48 24C33.5 27.5 27.5 33.5 24 48C20.5 33.5 14.5 27.5 0 24C14.5 20.5 20.5 14.5 24 0Z" fill="currentColor" />
               </svg>
             </div>
+          </div>
           </div>
         </section>
 
