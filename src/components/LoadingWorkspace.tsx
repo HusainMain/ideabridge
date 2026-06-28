@@ -159,14 +159,14 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
         playSynthSound(523.25, 'sine', 0.3);
         setTimeout(() => playSynthSound(659.25, 'sine', 0.4), 100);
       }
-
-      const navTimer = setTimeout(() => {
-        if (onComplete) onComplete();
-      }, 750);
-
-      return () => clearTimeout(navTimer);
     }
-  }, [elapsedTime, apiFinished, isCompleting, onComplete]);
+  }, [elapsedTime, apiFinished, isCompleting]);
+
+  useEffect(() => {
+    if (!isCompleting || !onComplete) return;
+    const timer = setTimeout(onComplete, 750);
+    return () => clearTimeout(timer);
+  }, [isCompleting, onComplete]);
 
   const timelineActiveIndex = Math.min(Math.max(currentStageIndex, 0), TIMELINE_ITEMS.length - 1);
 
