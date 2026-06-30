@@ -46,7 +46,7 @@ const mentors = mentorData
       .map((n) => n.charAt(0))
       .join('')
       .toUpperCase();
-    return [initials, m.name, m.expertise, m.recommendation];
+    return [initials, m.name, m.expertise, m.bio];
   });
 
 const ecosystemNodes = [

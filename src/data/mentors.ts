@@ -5,6 +5,7 @@ export interface Mentor {
   expertise: string;
   recommendation: string;
   featured: boolean;
+  bio: string;
 }
 
 export const mentors: Mentor[] = [
@@ -15,6 +16,7 @@ export const mentors: Mentor[] = [
     expertise: 'Product-Market Fit & Agile Scaling',
     recommendation: 'Recommended to help refine your product roadmap and accelerate product-market fit.',
     featured: true,
+    bio: 'Former Product Director with 10+ years of experience launching and scaling SaaS products in high-growth ecosystems.',
   },
   {
     id: 'priyank-gupta',
@@ -23,6 +25,7 @@ export const mentors: Mentor[] = [
     expertise: 'User Experience & Product Lifecycle',
     recommendation: 'Recommended to guide your user experience strategy and optimize product adoption.',
     featured: false,
+    bio: 'UX researcher and design strategist specializing in digital product optimization and customer journey mapping.',
   },
   {
     id: 'parth-shah',
@@ -31,6 +34,7 @@ export const mentors: Mentor[] = [
     expertise: 'Enterprise Product Management',
     recommendation: 'Recommended to assist in structuring complex B2B product requirements and feature prioritization.',
     featured: false,
+    bio: 'Product executive with expertise in enterprise software architectures, requirements gathering, and B2B roadmap planning.',
   },
   {
     id: 'dev-nambiar',
@@ -39,6 +43,7 @@ export const mentors: Mentor[] = [
     expertise: 'Artificial Intelligence & Machine Learning',
     recommendation: 'Recommended to help architect your AI models and design scalable tech stacks.',
     featured: true,
+    bio: 'AI architect and former senior ML engineer specializing in neural networks, computer vision, and high-performance computing.',
   },
   {
     id: 'dr-nikunjj-chavdda',
@@ -47,6 +52,7 @@ export const mentors: Mentor[] = [
     expertise: 'Data Science & Advanced Analytics',
     recommendation: 'Recommended to assist in leveraging data engineering and predictive modeling for business intelligence.',
     featured: false,
+    bio: 'PhD in Data Science with a research focus on predictive analytics, statistical modeling, and data engineering systems.',
   },
   {
     id: 'dhruv-patel',
@@ -55,6 +61,7 @@ export const mentors: Mentor[] = [
     expertise: 'Cloud Infrastructure & DevOps',
     recommendation: 'Recommended to help optimize your cloud deployment strategies and system reliability.',
     featured: false,
+    bio: 'Cloud architect specializing in Kubernetes, AWS infrastructure cost optimization, and high-availability systems.',
   },
   {
     id: 'harsh-dua',
@@ -63,6 +70,7 @@ export const mentors: Mentor[] = [
     expertise: 'Performance Marketing & Growth Hacking',
     recommendation: 'Recommended to assist in building high-ROI digital marketing campaigns and user acquisition strategies.',
     featured: false,
+    bio: 'Growth hacker and acquisition specialist who has managed over $5M in ad spend across digital marketing platforms.',
   },
   {
     id: 'swati-vakharia',
@@ -71,6 +79,7 @@ export const mentors: Mentor[] = [
     expertise: 'Brand Strategy & Public Relations',
     recommendation: 'Recommended to help establish your brand identity and craft a compelling PR narrative.',
     featured: false,
+    bio: 'Brand specialist and public relations consultant with a proven track record of securing national media coverage for startups.',
   },
   {
     id: 'taruna-suryavanshi',
@@ -79,6 +88,7 @@ export const mentors: Mentor[] = [
     expertise: 'SEO & Content Marketing',
     recommendation: 'Recommended to guide your organic search visibility and content distribution channels.',
     featured: false,
+    bio: 'SEO consultant and content strategist focused on organic search engine visibility and inbound growth channels.',
   },
   {
     id: 'kunal-fadnis',
@@ -87,6 +97,7 @@ export const mentors: Mentor[] = [
     expertise: 'Venture Capital & Pitch Strategy',
     recommendation: 'Recommended to help refine your investor pitch deck and navigate seed-stage funding rounds.',
     featured: true,
+    bio: 'Venture partner and angel investor who has facilitated over $20M in seed and series-A capital raises.',
   },
   {
     id: 'viral-bafna',
@@ -95,6 +106,7 @@ export const mentors: Mentor[] = [
     expertise: 'Strategic Partnerships & B2B Sales',
     recommendation: 'Recommended to help secure enterprise partnership opportunities and accelerate deal-closing cycles.',
     featured: false,
+    bio: 'Corporate development lead specializing in B2B enterprise sales pipelines and strategic international partnerships.',
   },
   {
     id: 'ravindran-ramchandran',
@@ -103,6 +115,7 @@ export const mentors: Mentor[] = [
     expertise: 'Corporate Development & M&A',
     recommendation: 'Recommended to advise on long-term corporate governance and strategic alignment for fundraising.',
     featured: false,
+    bio: 'Financial analyst and corporate strategy advisor with deep experience in valuations and transactional restructuring.',
   },
   {
     id: 'ankit-parikh',
@@ -111,6 +124,7 @@ export const mentors: Mentor[] = [
     expertise: 'Operational Excellence & Scale',
     recommendation: 'Recommended to optimize your day-to-day operations and build robust organizational frameworks.',
     featured: false,
+    bio: 'Operations consultant specializing in process automation, resource optimization, and cross-functional team scaling.',
   },
   {
     id: 'vedant-makwana',
@@ -119,6 +133,7 @@ export const mentors: Mentor[] = [
     expertise: 'Legal Compliance & Venture Scaling',
     recommendation: 'Recommended to assist with early-stage business registration, IP protection, and compliance.',
     featured: false,
+    bio: 'Legal counsel specializing in IP protection, startup incorporation laws, and corporate compliance structures.',
   },
   {
     id: 'pooja-gupta',
@@ -127,6 +142,7 @@ export const mentors: Mentor[] = [
     expertise: 'Talent Acquisition & HR Strategy',
     recommendation: 'Recommended to help design recruitment processes and foster high-performing team cultures.',
     featured: false,
+    bio: 'HR consultant and talent strategist focused on building high-performance organizational cultures and recruitment pipelines.',
   },
   {
     id: 'mr-dinesh-karavadra',
@@ -135,6 +151,7 @@ export const mentors: Mentor[] = [
     expertise: 'Supply Chain & Logistics Management',
     recommendation: 'Recommended to streamline your procurement processes and global distribution channels.',
     featured: false,
+    bio: 'Logistics expert with 20+ years of experience in supply chain optimization, global distribution, and warehouse management.',
   },
   {
     id: 'ruchit-shah',
@@ -143,6 +160,7 @@ export const mentors: Mentor[] = [
     expertise: 'FinTech Regulations & Compliance',
     recommendation: 'Recommended to guide your compliance navigation in heavily regulated financial markets.',
     featured: false,
+    bio: 'FinTech compliance officer specializing in payment gateway regulatory standards and banking security integrations.',
   },
   {
     id: 'nishant-inamdar',
@@ -151,5 +169,6 @@ export const mentors: Mentor[] = [
     expertise: 'IoT Ecosystems & Hardware Manufacturing',
     recommendation: 'Recommended to advise on manufacturing lifecycle, sourcing parts, and IoT architecture.',
     featured: false,
+    bio: 'IoT solutions architect and hardware developer with expertise in embedded systems, prototyping, and smart devices.',
   },
 ];

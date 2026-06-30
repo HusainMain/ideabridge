@@ -390,7 +390,7 @@ export default function ResultsWorkspace(): React.ReactElement {
 
             {/* Mentor Recommendations */}
             <ReportSection title="Mentors & Guidance" icon={Users} delay={0.9}>
-              <MentorRecommendations mentors={mentors} />
+              <MentorRecommendations mentors={mentors} results={results} />
             </ReportSection>
 
             {/* Footer */}
