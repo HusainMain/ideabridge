@@ -6,6 +6,7 @@ import { BridgeSection } from '../components/BridgeSection';
 import { OrbController } from '../components/OrbController';
 import { RoadmapTimeline } from '../components/RoadmapTimeline';
 import { StartupStats } from '../components/StartupStats';
+import { mentors as mentorData } from '../data/mentors';
 
 const startupExamples = [
   'AI Farming Assistant',
@@ -37,12 +38,16 @@ const readinessReasons = [
   { icon: '04', heading: 'Funding sources are realistic', body: 'Funding and incubator suggestions are framed with eligibility, stage, location, and deadline context.' },
 ];
 
-const mentors = [
-  ['SJ', 'Sarah Jenkins', 'Product Manager at TechFlow', 'Matched for industry sector experience.'],
-  ['DC', 'David Chen', '2x Exit Founder', 'Matched for building and selling a similar marketplace.'],
-  ['AR', 'Aisha Rahman', 'Climate Tech VC Partner', 'Matched for deep domain fit in sustainability and hardware.'],
-  ['MK', 'Mike Kim', 'B2B SaaS Founder', 'Matched for GTM expertise in selling to enterprise buyers.'],
-];
+const mentors = mentorData
+  .filter((m) => m.featured)
+  .map((m) => {
+    const initials = m.name
+      .split(' ')
+      .map((n) => n.charAt(0))
+      .join('')
+      .toUpperCase();
+    return [initials, m.name, m.expertise, m.recommendation];
+  });
 
 const ecosystemNodes = [
   ['Top Recommendation', 'Best next step', 'Reasoning + 3 actions'],

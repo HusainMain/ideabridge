@@ -26,6 +26,8 @@ import { SevenDayPlan } from '../components/results/SevenDayPlan';
 import { IncubatorRecommendations } from '../components/results/IncubatorRecommendations';
 import { CompetitorCards } from '../components/results/CompetitorCards';
 import { FloatingActionBar } from '../components/results/FloatingActionBar';
+import { MentorRecommendations } from '../components/results/MentorRecommendations';
+import { mentors } from '../data/mentors';
 
 // ─── AI Verdict Logic ───────────────────────────────────────────────
 
@@ -385,6 +387,11 @@ export default function ResultsWorkspace(): React.ReactElement {
                 <IncubatorRecommendations recommendations={results.incubatorRecommendations} />
               </ReportSection>
             )}
+
+            {/* Mentor Recommendations */}
+            <ReportSection title="Mentors & Guidance" icon={Users} delay={0.9}>
+              <MentorRecommendations mentors={mentors} />
+            </ReportSection>
 
             {/* Footer */}
             <footer className="text-center text-slate-600 text-[0.68rem] py-6 mt-8 border-t border-white/5">
