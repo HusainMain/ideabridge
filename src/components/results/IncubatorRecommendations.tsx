@@ -12,15 +12,52 @@ import {
   Percent,
 } from 'lucide-react';
 import type { IncubatorRecommendation } from '../../stores/useJourneyStore';
+import type { StartupStage } from '../../stores/useJourneyStore';
 
 interface IncubatorRecommendationsProps {
   recommendations: IncubatorRecommendation[];
+  startupStage?: StartupStage;
+}
+
+// ─── Deterministic Scoring Function ──────────────────────────────────
+function scoreIncubator(recommendation: IncubatorRecommendation, startupStage?: StartupStage): number {
+  let score = recommendation.matchPercent;
+
+  // Stage-based prioritization boost
+  if (startupStage) {
+    const stageLabels: Record<StartupStage, string> = {
+      idea: 'idea',
+      mvp: 'prototype',
+      traction: 'early traction',
+      revenue: 'revenue',
+      scaling: 'growth',
+    };
+    const targetStage = stageLabels[startupStage];
+    if (recommendation.startupStages.some(s => 
+      s.toLowerCase().includes(targetStage) || 
+      (startupStage === 'idea' && s.toLowerCase().includes('idea')) ||
+      (startupStage === 'mvp' && (s.toLowerCase().includes('prototype') || s.toLowerCase().includes('idea'))) ||
+      (startupStage === 'traction' && (s.toLowerCase().includes('early') || s.toLowerCase().includes('users'))) ||
+      (startupStage === 'revenue' && (s.toLowerCase().includes('revenue') || s.toLowerCase().includes('paying'))) ||
+      (startupStage === 'scaling' && (s.toLowerCase().includes('scale') || s.toLowerCase().includes('growth')))
+    )) {
+      score += 20;
+    }
+  }
+
+  return score;
 }
 
 export function IncubatorRecommendations({
   recommendations,
+  startupStage,
 }: IncubatorRecommendationsProps): React.ReactElement | null {
   if (!recommendations || recommendations.length === 0) return null;
+
+  // Sort recommendations by stage-adjusted score
+  const sortedRecommendations = [...recommendations].sort(
+    (a, b) => scoreIncubator(b, startupStage) - scoreIncubator(a, startupStage)
+  );
 
   return (
     <motion.div
@@ -37,7 +74,7 @@ export function IncubatorRecommendations({
       </div>
 
       <div className="grid w-full grid-cols-1 lg:grid-cols-2 gap-4">
-        {recommendations.map((incubator, idx) => (
+        {sortedRecommendations.map((incubator, idx) => (
           <motion.article
             key={incubator.id}
             initial={{ opacity: 0, scale: 0.98 }}

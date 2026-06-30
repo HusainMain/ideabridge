@@ -2,17 +2,42 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Sparkles } from 'lucide-react';
 import type { Mentor } from '../../data/mentors';
-import type { ResultsData } from '../../stores/useJourneyStore';
+import type { ResultsData, StartupStage } from '../../stores/useJourneyStore';
 
 interface MentorRecommendationsProps {
   mentors: Mentor[];
   results: ResultsData;
+  startupStage?: StartupStage;
 }
 
 // ─── Deterministic Scoring Function ──────────────────────────────────
-function scoreMentor(results: ResultsData, mentor: Mentor): number {
+function scoreMentor(results: ResultsData, mentor: Mentor, startupStage?: StartupStage): number {
   let score = 0;
   const scores = results.scores;
+
+  // Stage-based mentor prioritization
+  if (startupStage === 'idea') {
+    if (mentor.category === 'Product Strategy') score += 40;
+    if (mentor.category === 'Entrepreneurship & Operations') score += 25;
+  }
+
+  if (startupStage === 'mvp') {
+    if (mentor.category === 'Technology & AI') score += 40;
+    if (mentor.category === 'Product Strategy') score += 25;
+  }
+
+  if (startupStage === 'traction') {
+    if (mentor.category === 'Growth & Marketing') score += 45;
+  }
+
+  if (startupStage === 'revenue') {
+    if (mentor.category === 'Funding & Business Development') score += 40;
+  }
+
+  if (startupStage === 'scaling') {
+    if (mentor.category === 'Industry Experts') score += 35;
+    if (mentor.category === 'Entrepreneurship & Operations') score += 30;
+  }
 
   if (mentor.category === 'Product Strategy') {
     // Boost if feasibility is low or overall is low (needs validation/strategy)
@@ -68,10 +93,13 @@ function scoreMentor(results: ResultsData, mentor: Mentor): number {
 }
 
 // ─── Dynamic Recommendation Generator ───────────────────────────────
-function getAIRecommendationText(results: ResultsData, mentor: Mentor): string {
+function getAIRecommendationText(results: ResultsData, mentor: Mentor, startupStage?: StartupStage): string {
   const scores = results.scores;
 
   if (mentor.category === 'Product Strategy') {
+    if (startupStage === 'idea') {
+      return `Recommended to help you validate and refine your business model.`;
+    }
     if (scores.overall < 70) {
       return `Recommended to help refine your business model and validate your core product-market fit.`;
     }
@@ -82,6 +110,9 @@ function getAIRecommendationText(results: ResultsData, mentor: Mentor): string {
   }
 
   if (mentor.category === 'Technology & AI') {
+    if (startupStage === 'mvp') {
+      return `Recommended because you're building your MVP and need technical guidance for development.`;
+    }
     if (scores.innovation >= 75) {
       return `Recommended because your report indicates high innovation potential that requires a robust, scalable AI infrastructure.`;
     }
@@ -92,6 +123,9 @@ function getAIRecommendationText(results: ResultsData, mentor: Mentor): string {
   }
 
   if (mentor.category === 'Growth & Marketing') {
+    if (startupStage === 'traction' || startupStage === 'revenue' || startupStage === 'scaling') {
+      return `Recommended to accelerate your growth and optimize customer acquisition strategies.`;
+    }
     if (scores.marketPotential < 75) {
       return `Recommended to clarify user segments, refine brand positioning, and improve customer acquisition strategies.`;
     }
@@ -102,6 +136,9 @@ function getAIRecommendationText(results: ResultsData, mentor: Mentor): string {
   }
 
   if (mentor.category === 'Funding & Business Development') {
+    if (startupStage === 'revenue' || startupStage === 'scaling') {
+      return `Recommended to scale your fundraising efforts and secure growth capital.`;
+    }
     if (scores.monetization < 65) {
       return `Recommended to structure scalable pricing models and analyze monetization channels for capital efficiency.`;
     }
@@ -112,6 +149,9 @@ function getAIRecommendationText(results: ResultsData, mentor: Mentor): string {
   }
 
   if (mentor.category === 'Entrepreneurship & Operations') {
+    if (startupStage === 'idea' || startupStage === 'mvp') {
+      return `Recommended to help set up operational foundations and optimize your execution plan.`;
+    }
     if (scores.feasibility < 70) {
       return `Recommended to optimize execution planning, automate operational workflows, and coordinate legal structures.`;
     }
@@ -119,6 +159,9 @@ function getAIRecommendationText(results: ResultsData, mentor: Mentor): string {
   }
 
   // Industry Experts
+  if (startupStage === 'scaling') {
+    return `Recommended to navigate complex scaling challenges with industry expertise.`;
+  }
   if (scores.overall < 70) {
     return `Recommended to challenge and validate industry-specific assumptions with seasoned domain knowledge.`;
   }
@@ -128,6 +171,7 @@ function getAIRecommendationText(results: ResultsData, mentor: Mentor): string {
 export function MentorRecommendations({
   mentors,
   results,
+  startupStage,
 }: MentorRecommendationsProps): React.ReactElement | null {
   if (!mentors || mentors.length === 0 || !results) return null;
 
@@ -137,7 +181,7 @@ export function MentorRecommendations({
 
   // Sort featured mentors by score
   const sortedFeatured = [...featuredMentors].sort(
-    (a, b) => scoreMentor(results, b) - scoreMentor(results, a)
+    (a, b) => scoreMentor(results, b, startupStage) - scoreMentor(results, a, startupStage)
   );
 
   const categories = [
@@ -154,7 +198,7 @@ export function MentorRecommendations({
     const categoryMentors = otherMentors.filter((m) => m.category === category);
     const avgScore =
       categoryMentors.length > 0
-        ? categoryMentors.reduce((sum, m) => sum + scoreMentor(results, m), 0) / categoryMentors.length
+        ? categoryMentors.reduce((sum, m) => sum + scoreMentor(results, m, startupStage), 0) / categoryMentors.length
         : 0;
     return { category, score: avgScore };
   });
@@ -228,9 +272,9 @@ export function MentorRecommendations({
                     </div>
                   </div>
 
-                  <p className="text-[0.88rem] text-slate-200 leading-relaxed font-normal">
-                    {getAIRecommendationText(results, mentor)}
-                  </p>
+<p className="text-[0.88rem] text-slate-200 leading-relaxed font-normal">
+                     {getAIRecommendationText(results, mentor, startupStage)}
+                   </p>
 
                   <div className="mt-auto pt-2 flex items-center justify-between">
                     <span className="text-[0.65rem] text-slate-500 uppercase tracking-wider">
@@ -259,10 +303,10 @@ export function MentorRecommendations({
             const categoryMentors = otherMentors.filter((m) => m.category === category);
             if (categoryMentors.length === 0) return null;
 
-            // Sort mentors inside this category by score
-            const sortedCategoryMentors = [...categoryMentors].sort(
-              (a, b) => scoreMentor(results, b) - scoreMentor(results, a)
-            );
+// Sort mentors inside this category by score
+             const sortedCategoryMentors = [...categoryMentors].sort(
+               (a, b) => scoreMentor(results, b, startupStage) - scoreMentor(results, a, startupStage)
+             );
 
             return (
               <div key={category} className="space-y-3">
@@ -302,9 +346,9 @@ export function MentorRecommendations({
                           </div>
                         </div>
 
-                        <p className="text-sm text-slate-300 leading-relaxed">
-                          {getAIRecommendationText(results, mentor)}
-                        </p>
+<p className="text-sm text-slate-300 leading-relaxed">
+                           {getAIRecommendationText(results, mentor, startupStage)}
+                         </p>
                       </div>
                     </motion.article>
                   ))}

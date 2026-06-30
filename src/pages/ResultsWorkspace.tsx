@@ -211,6 +211,7 @@ export default function ResultsWorkspace(): React.ReactElement {
     validationMeta,
     setAnalysisStatus,
     inputs,
+    startupStage,
   } = useJourneyStore();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -381,17 +382,17 @@ export default function ResultsWorkspace(): React.ReactElement {
               <SevenDayPlan />
             </ReportSection>
 
-            {/* Incubator Recommendations */}
-            {results.incubatorRecommendations && results.incubatorRecommendations.length > 0 && (
-              <ReportSection title="Funding & Ecosystem" icon={DollarSign} delay={0.8}>
-                <IncubatorRecommendations recommendations={results.incubatorRecommendations} />
-              </ReportSection>
-            )}
+{/* Incubator Recommendations */}
+             {results.incubatorRecommendations && results.incubatorRecommendations.length > 0 && (
+               <ReportSection title="Funding & Ecosystem" icon={DollarSign} delay={0.8}>
+                 <IncubatorRecommendations recommendations={results.incubatorRecommendations} startupStage={startupStage ?? undefined} />
+               </ReportSection>
+             )}
 
-            {/* Mentor Recommendations */}
-            <ReportSection title="Mentors & Guidance" icon={Users} delay={0.9}>
-              <MentorRecommendations mentors={mentors} results={results} />
-            </ReportSection>
+             {/* Mentor Recommendations */}
+             <ReportSection title="Mentors & Guidance" icon={Users} delay={0.9}>
+               <MentorRecommendations mentors={mentors} results={results} startupStage={startupStage ?? undefined} />
+             </ReportSection>
 
             {/* Footer */}
             <footer className="text-center text-slate-600 text-[0.68rem] py-6 mt-8 border-t border-white/5">

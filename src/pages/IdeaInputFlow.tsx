@@ -42,7 +42,7 @@ export function IdeaInputFlow() {
 
   const handleSubmit = () => {
     setInputs({ idea, industry, problem, audience, country, budget, teamSize });
-    navigate('/analysis');
+    navigate('/stage');
   };
 
   const canAdvance = () => {

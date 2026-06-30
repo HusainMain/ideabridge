@@ -11,6 +11,8 @@ export type AnalysisStatus =
   | 'invalid_input'
   | 'rate_limit_wait';
 
+export type StartupStage = 'idea' | 'mvp' | 'traction' | 'revenue' | 'scaling';
+
 export interface IdeaInputs {
   idea: string;
   industry: string;
@@ -88,6 +90,7 @@ interface JourneyState {
   errorRetryAfter: number | null;
   validationResult: ValidationMeta | null;
   validationMeta: ValidationMeta | null;
+  startupStage: StartupStage | null;
   setInputs: (inputs: Partial<IdeaInputs>) => void;
   setAnalysisStatus: (status: AnalysisStatus) => void;
   setResults: (results: ResultsData, validationMeta?: ValidationMeta | null) => void;
@@ -95,6 +98,7 @@ interface JourneyState {
   setApiError: (error: StructuredErrorResponse | null) => void;
   setValidationResult: (result: ValidationMeta | null) => void;
   setValidationMeta: (meta: ValidationMeta | null) => void;
+  setStartupStage: (stage: StartupStage) => void;
   clearResults: () => void;
   resetJourney: () => void;
 }
@@ -118,6 +122,7 @@ export const useJourneyStore = create<JourneyState>((set) => ({
   errorRetryAfter: null,
   validationResult: null,
   validationMeta: null,
+  startupStage: null,
   setInputs: (inputs) => set((state) => ({ inputs: { ...state.inputs, ...inputs } })),
   setAnalysisStatus: (status) => {
     console.log('[setAnalysisStatus] called with:', status);
@@ -151,6 +156,7 @@ export const useJourneyStore = create<JourneyState>((set) => ({
     ),
   setValidationResult: (result) => set({ validationResult: result }),
   setValidationMeta: (meta) => set({ validationMeta: meta }),
+  setStartupStage: (stage) => set({ startupStage: stage }),
   clearResults: () => set({ results: null, validationMeta: null }),
   resetJourney: () =>
     set({
@@ -162,5 +168,6 @@ export const useJourneyStore = create<JourneyState>((set) => ({
       errorRetryAfter: null,
       validationResult: null,
       validationMeta: null,
+      startupStage: null,
     }),
 }));
