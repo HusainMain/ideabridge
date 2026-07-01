@@ -6,7 +6,7 @@ import { BridgeSection } from '../components/BridgeSection';
 import { OrbController } from '../components/OrbController';
 import { RoadmapTimeline } from '../components/RoadmapTimeline';
 import { StartupStats } from '../components/StartupStats';
-import { AppFooter } from '../components/footer/AppFooter';
+import { DeveloperCredit } from '../components/footer/DeveloperCredit';
 import { mentors as mentorData } from '../data/mentors';
 
 const startupExamples = [
@@ -976,10 +976,18 @@ export function LandingPage() {
       <RoadmapTimeline />
       <LaunchPad />
 
-      <AppFooter>
-        <span style={{ fontWeight: 800, fontSize: '1.05rem', color: '#fff' }}>Idea<span style={{ color: 'var(--neon-cyan)' }}>Bridge</span></span>
-        <small style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem' }}>Bridging Ideas to Successful Startups</small>
-      </AppFooter>
+      <footer className="act-footer">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+          <span style={{ fontWeight: 800, fontSize: '1.05rem', color: '#fff' }}>Idea<span style={{ color: 'var(--neon-cyan)' }}>Bridge</span></span>
+          <small style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem' }}>Bridging Ideas to Successful Startups</small>
+        </div>
+        <div className="act-footer__links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#section-hero">Back to Top ↑</a>
+        </div>
+        <DeveloperCredit />
+      </footer>
     </main>
     </>
   );

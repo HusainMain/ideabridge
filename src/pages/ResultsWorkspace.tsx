@@ -395,13 +395,8 @@ export default function ResultsWorkspace(): React.ReactElement {
                <MentorRecommendations mentors={mentors} results={results} startupStage={startupStage ?? undefined} />
              </ReportSection>
 
-            {/* Footer */}
-            <AppFooter>
-              <p className="flex items-center justify-center gap-1.5">
-                <Sparkles className="w-3 h-3" />
-                Powered by IdeaBridge AI
-              </p>
-            </AppFooter>
+             {/* Footer */}
+             <AppFooter />
           </main>
 
           {/* Floating Actions */}

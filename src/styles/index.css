@@ -662,6 +662,16 @@ select {
   font-size: 0.8rem;
   color: var(--act-muted);
 }
+.act-footer--minimal {
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem var(--act-pad);
+}
+.act-footer--minimal .act-footer__credit {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
 .act-footer__links { display: flex; gap: 1.5rem; }
 .act-footer__links a { color: var(--act-muted); text-decoration: none; }
 .act-footer__links a:hover { color: #fff; }
