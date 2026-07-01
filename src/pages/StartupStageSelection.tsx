@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { useJourneyStore } from '../stores/useJourneyStore';
+import { AppFooter } from '../components/footer/AppFooter';
 
 const STAGE_OPTIONS = [
   {
@@ -125,6 +126,8 @@ export function StartupStageSelection() {
           </button>
         </div>
       </main>
+
+      <AppFooter />
     </div>
   );
 }

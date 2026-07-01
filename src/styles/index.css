@@ -652,16 +652,42 @@ select {
 /* Footer */
 .act-footer {
   border-top: 1px solid var(--act-border);
-  padding: 1.75rem var(--act-pad);
-  display: flex;
+  padding: 1.75rem var(--act-pad) 1.25rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
   justify-content: space-between;
+  column-gap: 2rem;
+  row-gap: 0.5rem;
   font-size: 0.8rem;
   color: var(--act-muted);
 }
 .act-footer__links { display: flex; gap: 1.5rem; }
 .act-footer__links a { color: var(--act-muted); text-decoration: none; }
 .act-footer__links a:hover { color: #fff; }
+
+.act-footer__credit {
+  grid-column: 1 / -1;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--act-border);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+.act-footer__credit-name {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  transition: color 200ms ease, filter 200ms ease;
+  cursor: pointer;
+}
+
+.act-footer__credit-name:hover {
+  color: var(--neon-cyan);
+  filter: brightness(1.25);
+}
 
 /* ═══════════════════════════════════════════
    INPUT FLOW

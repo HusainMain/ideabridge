@@ -28,6 +28,7 @@ import { CompetitorCards } from '../components/results/CompetitorCards';
 import { FloatingActionBar } from '../components/results/FloatingActionBar';
 import { MentorRecommendations } from '../components/results/MentorRecommendations';
 import { mentors } from '../data/mentors';
+import { AppFooter } from '../components/footer/AppFooter';
 
 // ─── AI Verdict Logic ───────────────────────────────────────────────
 
@@ -395,12 +396,12 @@ export default function ResultsWorkspace(): React.ReactElement {
              </ReportSection>
 
             {/* Footer */}
-            <footer className="text-center text-slate-600 text-[0.68rem] py-6 mt-8 border-t border-white/5">
+            <AppFooter>
               <p className="flex items-center justify-center gap-1.5">
                 <Sparkles className="w-3 h-3" />
                 Powered by IdeaBridge AI
               </p>
-            </footer>
+            </AppFooter>
           </main>
 
           {/* Floating Actions */}

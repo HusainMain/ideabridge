@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useJourneyStore } from '../stores/useJourneyStore';
+import { AppFooter } from '../components/footer/AppFooter';
 
 const BUDGET_OPTIONS = [
   { value: 'Bootstrap / Low (<$5k)', label: 'Bootstrap / Low', sub: 'Budget is under $5k' },
@@ -253,6 +254,8 @@ export function IdeaInputFlow() {
           )}
         </div>
       </main>
+
+      <AppFooter />
     </div>
   );
 }
