@@ -59,7 +59,18 @@ export function IdeaInputFlow() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && canAdvance()) handleNext();
+    const el = e.target as HTMLElement;
+    const isTextarea = el.tagName === 'TEXTAREA';
+
+    if (e.key !== 'Enter') return;
+
+    // In the multi-line idea field Enter must insert a newline, so advancing
+    // is moved to Cmd/Ctrl+Enter. Single-line inputs keep plain Enter.
+    if (isTextarea && !(e.metaKey || e.ctrlKey)) return;
+
+    if (!canAdvance()) return;
+    e.preventDefault();
+    handleNext();
   };
 
   return (
@@ -90,18 +101,23 @@ export function IdeaInputFlow() {
             <span className="act-question__step">01 / 07</span>
             <h1 className="act-question__heading">What is your startup idea?</h1>
             <p className="act-question__sub">Describe the startup you want to build. (Between 10 and 500 characters)</p>
-            <input
+            {/* A textarea, not an input: this field accepts 500 characters and
+                a single-line control hid everything past the viewport width,
+                leaving the user unable to check what they had typed. */}
+            <textarea
               id="idea-input"
               autoFocus
-              type="text"
+              rows={4}
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="e.g. A marketplace for local artisanal coffee roasters"
-              className="act-question__input"
+              maxLength={500}
+              className="act-question__input act-question__textarea"
             />
             <span className="act-input-hint" style={{ marginTop: '1rem' }}>
-              {idea.length} / 500 characters {idea.length < 10 && '(minimum 10 required)'}
+              {idea.length} / 500 characters
+              {idea.length > 0 && idea.length < 10 && ' — at least 10 more needed'}
             </span>
           </div>
         )}
@@ -120,6 +136,7 @@ export function IdeaInputFlow() {
               onChange={(e) => setIndustry(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="e.g. Food & Beverage"
+              maxLength={100}
               className="act-question__input"
             />
             <span className="act-input-hint" style={{ marginTop: '1rem' }}>
@@ -142,6 +159,7 @@ export function IdeaInputFlow() {
               onChange={(e) => setProblem(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="e.g. Local roasters struggle to reach urban customers, and coffee lovers can't find fresh local beans."
+              maxLength={300}
               className="act-question__input"
             />
             <span className="act-input-hint" style={{ marginTop: '1rem' }}>
@@ -164,6 +182,7 @@ export function IdeaInputFlow() {
               onChange={(e) => setAudience(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="e.g. Urban coffee enthusiasts who care about supporting local businesses"
+              maxLength={200}
               className="act-question__input"
             />
             <span className="act-input-hint" style={{ marginTop: '1rem' }}>
@@ -186,6 +205,7 @@ export function IdeaInputFlow() {
               onChange={(e) => setCountry(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="e.g. United States"
+              maxLength={100}
               className="act-question__input"
             />
             <span className="act-input-hint" style={{ marginTop: '1rem' }}>
@@ -250,7 +270,10 @@ export function IdeaInputFlow() {
             )}
           </button>
           {step < totalSteps && (
-            <span className="act-input-hint">or press <kbd>Enter ↵</kbd></span>
+            /* Step 1 is a multi-line field where Enter inserts a newline. */
+            <span className="act-input-hint">
+              or press <kbd>{step === 1 ? 'Ctrl/⌘ + Enter ↵' : 'Enter ↵'}</kbd>
+            </span>
           )}
         </div>
       </main>

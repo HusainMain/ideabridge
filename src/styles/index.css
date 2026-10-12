@@ -2,18 +2,108 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Print styles for PDF export ───────────────────────── */
+/* ── Print styles for PDF export ──────────────────────────────
+   The report is a dark UI. Printing it needs the whole surface
+   inverted to ink-on-paper: kill the neon chrome, force a white
+   page, and remap every text utility to a dark, printable value.
+   Matching on inline-style strings is too brittle — target the
+   real Tailwind utilities instead.                                */
 @media print {
-  body { background: #fff !important; color: #111 !important; }
-  .print\:hidden { display: none !important; }
-  .fixed, [style*="position: fixed"] { position: static !important; }
+  @page {
+    margin: 14mm;
+  }
 
-  /* Force white background on cards for print legibility */
-  [style*="background"] { background: transparent !important; }
+  html,
+  body,
+  #root {
+    background: #fff !important;
+    color: #111827 !important;
+    min-height: 0 !important;
+  }
 
-  /* Keep text readable */
-  [style*="color: rgba(255,255,255"] { color: #333 !important; }
-  .text-white { color: #111 !important; }
+  /* App chrome and decorative layers never belong in the document. */
+  .print\:hidden,
+  header.sticky,
+  .fixed.pointer-events-none,
+  [class*="blur-3xl"] {
+    display: none !important;
+  }
+
+  /* The floating action bar is fixed; let it flow instead. */
+  .fixed {
+    position: static !important;
+  }
+
+  /* Shadows and blur washes render as grey smudges on paper. */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  /* Inline-styled panels (gradients used for the hero cards). */
+  [style*="background"] {
+    background: transparent !important;
+  }
+
+  /* Dark surface utilities -> white. */
+  .bg-slate-950,
+  .bg-slate-900,
+  .bg-slate-900\/70,
+  .bg-slate-950\/70,
+  .bg-black {
+    background: #fff !important;
+  }
+
+  /* Light text -> ink.
+     Matched by class substring rather than exact class so the opacity
+     variants Tailwind emits (text-slate-300/90, text-cyan-200/90, ...)
+     are covered by the same rule instead of each needing an entry. */
+  [class*="text-white"] { color: #111827 !important; }
+  [class*="text-slate-100"],
+  [class*="text-slate-200"],
+  [class*="text-slate-300"] { color: #1f2937 !important; }
+  [class*="text-slate-400"] { color: #374151 !important; }
+  [class*="text-slate-500"] { color: #4b5563 !important; }
+
+  /* Accent utilities -> dark enough to read on white. */
+  [class*="text-cyan-400"] { color: #0e7490 !important; }
+  [class*="text-cyan-300"],
+  [class*="text-cyan-200"] { color: #155e75 !important; }
+  [class*="text-amber-400"],
+  [class*="text-amber-100"] { color: #92400e !important; }
+  [class*="text-emerald-400"] { color: #065f46 !important; }
+  [class*="text-blue-400"] { color: #1e40af !important; }
+  [class*="text-rose-400"] { color: #9f1239 !important; }
+  [class*="text-purple-400"] { color: #6b21a8 !important; }
+
+  /* Tinted fills become light paper tints so sections stay distinct. */
+  .bg-cyan-500\/10 { background: #f0f9ff !important; }
+  .bg-amber-500\/\[0\.06\] { background: #fffbeb !important; }
+  .border-white\/10,
+  .border-white\/5 { border-color: #d1d5db !important; }
+
+  /* Keep sections intact across page breaks. */
+  header,
+  section,
+  article,
+  [class*="rounded-xl"],
+  [class*="rounded-2xl"] {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  /* Links should read as text, not as blue underlines. */
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
 }
 
 /* ── Mobile safe-area padding ───────────────────────────── */
@@ -509,6 +599,12 @@ select {
   background: var(--act-bg);
   color: var(--act-text);
   font-family: var(--act-sans);
+  /* Several decorative layers (ambient glows, scanner pulses) sit at a
+     negative inset to bleed past their section. Without this they widen
+     the document and give phones a sideways scroll. `clip` rather than
+     `hidden` so no scroll container is created and position:sticky on the
+     pinned sections keeps working. */
+  overflow-x: clip;
 }
 
 /* Manifesto */
@@ -673,7 +769,16 @@ select {
   border-top: none;
 }
 .act-footer__links { display: flex; gap: 1.5rem; }
-.act-footer__links a { color: var(--act-muted); text-decoration: none; }
+/* Inline text links are hard to hit accurately on a touchscreen. Padding
+   gives every footer link a ~44px target without changing the look. */
+.act-footer__links a {
+  color: var(--act-muted);
+  text-decoration: none;
+  display: inline-block;
+  /* Vertical padding gets these to 44px tall; the small horizontal padding
+     widens the very narrow ones ("Back to Top") into an easier target. */
+  padding: 0.75rem 0.5rem;
+}
 .act-footer__links a:hover { color: #fff; }
 
 .act-footer__credit {
@@ -692,6 +797,8 @@ select {
   text-decoration: none;
   transition: color 200ms ease, filter 200ms ease;
   cursor: pointer;
+  display: inline-block;
+  padding: 0.85rem 0.5rem;
 }
 
 .act-footer__credit-name:hover {
@@ -754,7 +861,9 @@ select {
   color: var(--act-muted);
   font-size: 0.85rem;
   cursor: pointer;
-  padding: 0;
+  /* 44px touch target — the label alone was 16px tall. */
+  padding: 0.6rem 0.5rem 0.6rem 0;
+  min-height: 44px;
   transition: color 0.2s;
 }
 .act-input-back:hover { color: #fff; }
@@ -820,6 +929,15 @@ select {
 }
 .act-question__input::placeholder { color: rgba(255,255,255,0.2); }
 .act-question__input:focus { border-color: var(--act-cyan); }
+
+/* Multi-line variant for the long "idea" field. */
+.act-question__textarea {
+  resize: vertical;
+  min-height: 6.5rem;
+  max-height: 40vh;
+  line-height: 1.45;
+  font-family: inherit;
+}
 
 .act-stage-grid {
   display: grid;

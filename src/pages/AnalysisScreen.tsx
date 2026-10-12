@@ -56,6 +56,7 @@ export function AnalysisScreen() {
   const navigate = useNavigate();
   const {
     inputs,
+    startupStage,
     setResults,
     setAnalysisStatus,
     setApiError,
@@ -114,7 +115,11 @@ export function AnalysisScreen() {
     const response = await fetch(`${cleanBase}/api/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(inputs),
+      // startupStage is the stage the founder explicitly picked on the
+      // previous step. It was being dropped here, so the server could only
+      // guess the stage from teamSize/budget and the client had to
+      // second-guess its ranking.
+      body: JSON.stringify({ ...inputs, startupStage }),
     });
 
     const text = await response.text();

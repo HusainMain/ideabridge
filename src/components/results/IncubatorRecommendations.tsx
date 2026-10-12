@@ -12,51 +12,22 @@ import {
   Percent,
 } from 'lucide-react';
 import type { IncubatorRecommendation } from '../../stores/useJourneyStore';
-import type { StartupStage } from '../../stores/useJourneyStore';
 
 interface IncubatorRecommendationsProps {
   recommendations: IncubatorRecommendation[];
-  startupStage?: StartupStage;
-}
-
-// ─── Deterministic Scoring Function ──────────────────────────────────
-function scoreIncubator(recommendation: IncubatorRecommendation, startupStage?: StartupStage): number {
-  let score = recommendation.matchPercent;
-
-  // Stage-based prioritization boost
-  if (startupStage) {
-    const stageLabels: Record<StartupStage, string> = {
-      idea: 'idea',
-      mvp: 'prototype',
-      traction: 'early traction',
-      revenue: 'revenue',
-      scaling: 'growth',
-    };
-    const targetStage = stageLabels[startupStage];
-    if (recommendation.startupStages.some(s => 
-      s.toLowerCase().includes(targetStage) || 
-      (startupStage === 'idea' && s.toLowerCase().includes('idea')) ||
-      (startupStage === 'mvp' && (s.toLowerCase().includes('prototype') || s.toLowerCase().includes('idea'))) ||
-      (startupStage === 'traction' && (s.toLowerCase().includes('early') || s.toLowerCase().includes('users'))) ||
-      (startupStage === 'revenue' && (s.toLowerCase().includes('revenue') || s.toLowerCase().includes('paying'))) ||
-      (startupStage === 'scaling' && (s.toLowerCase().includes('scale') || s.toLowerCase().includes('growth')))
-    )) {
-      score += 20;
-    }
-  }
-
-  return score;
 }
 
 export function IncubatorRecommendations({
   recommendations,
-  startupStage,
 }: IncubatorRecommendationsProps): React.ReactElement | null {
   if (!recommendations || recommendations.length === 0) return null;
 
-  // Sort recommendations by stage-adjusted score
+  // The server already ranks these and already weighs the founder's chosen
+  // startup stage. Re-sorting here with a second, local score made the
+  // displayed order disagree with the displayed match percentage (a 89%
+  // program could render above a 98% one). Sort by the same number we show.
   const sortedRecommendations = [...recommendations].sort(
-    (a, b) => scoreIncubator(b, startupStage) - scoreIncubator(a, startupStage)
+    (a, b) => b.matchPercent - a.matchPercent
   );
 
   return (
@@ -91,12 +62,18 @@ export function IncubatorRecommendations({
 
             <div className="p-5 flex flex-col gap-4 flex-1">
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-start gap-3 min-w-0">
                   <div className="w-11 h-11 rounded-full bg-gradient-to-br from-cyan-500/30 to-purple-500/30 border border-cyan-500/20 flex items-center justify-center text-cyan-200 font-bold text-sm shrink-0">
                     {incubator.name.charAt(0)}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-base font-semibold text-white truncate">{incubator.name}</h3>
+                    {/* Wrap rather than truncate: on a phone the name column is
+                        ~164px and "AIC Chhattisgarh (NIT Raipur)" was reduced to
+                        "AIC Chhattisgarh (NIT…". The program name is the whole
+                        point of the card. */}
+                    <h3 className="text-base font-semibold text-white leading-snug break-words">
+                      {incubator.name}
+                    </h3>
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
                       <MapPin className="w-3 h-3 shrink-0" />
                       <span className="truncate">{incubator.country}</span>
@@ -168,7 +145,7 @@ export function IncubatorRecommendations({
                 href={incubator.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 mt-auto px-4 py-2.5 rounded-lg bg-cyan-500/10 border border-cyan-500/25 text-cyan-300 text-sm font-medium hover:bg-cyan-500/20 hover:border-cyan-400/40 transition-colors"
+                className="inline-flex items-center justify-center gap-2 mt-auto px-4 py-3 rounded-lg bg-cyan-500/10 border border-cyan-500/25 text-cyan-300 text-sm font-medium hover:bg-cyan-500/20 hover:border-cyan-400/40 transition-colors min-h-[44px]"
               >
                 Visit official website
                 <ExternalLink className="w-4 h-4" />

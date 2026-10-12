@@ -8,7 +8,19 @@ const SCORE_STAGE = 25;
 const SCORE_COUNTRY = 15;
 const SCORE_REMOTE = 10;
 const SCORE_TECH = 10;
-const MAX_SCORE = SCORE_INDUSTRY + SCORE_STAGE + SCORE_COUNTRY + SCORE_REMOTE + SCORE_TECH;
+const SCORE_PRIMARY_INDUSTRY = 8;
+const SCORE_THEME_TIEBREAK = 2;
+// The ceiling has to include the two bonuses awarded in scoreIncubator.
+// Leaving them out pushed every strong match past 100, where the clamp
+// flattened the whole top of the ranking into a wall of "100% MATCH".
+const MAX_SCORE =
+  SCORE_INDUSTRY +
+  SCORE_STAGE +
+  SCORE_COUNTRY +
+  SCORE_REMOTE +
+  SCORE_TECH +
+  SCORE_PRIMARY_INDUSTRY +
+  SCORE_THEME_TIEBREAK;
 
 const INDUSTRY_ALIASES: Record<string, string[]> = {
   healthcare: ['health', 'healthcare', 'medical', 'hospital', 'clinical', 'biotech', 'pharma', 'telemedicine', 'diagnostics', 'wellness'],
@@ -69,6 +81,22 @@ function detectIndustryCategories(text: string): Set<string> {
 
 function inferStartupStages(request: StartupAnalysisRequest): Set<string> {
   const stages = new Set<string>(['idea']);
+
+  // The founder picks a stage explicitly in the intake flow. That answer is
+  // the strongest signal available, so it takes precedence over the guesses
+  // made from team size and budget below.
+  const explicit = normalize(request.startupStage ?? '');
+  if (explicit) {
+    const EXPLICIT_STAGES: Record<string, string[]> = {
+      idea: ['idea', 'pre-seed'],
+      mvp: ['pre-seed', 'seed'],
+      traction: ['seed', 'early'],
+      revenue: ['early', 'growth'],
+      scaling: ['growth', 'scale'],
+    };
+    EXPLICIT_STAGES[explicit]?.forEach((s) => stages.add(s));
+  }
+
   const team = normalize(request.teamSize);
   const budget = normalize(request.budget);
 
@@ -275,7 +303,7 @@ function scoreIncubator(
     primaryCategory &&
     incubator.industries.map((i) => normalize(i)).includes(primaryCategory)
   ) {
-    score += 8;
+    score += SCORE_PRIMARY_INDUSTRY;
     reasons.unshift(`Programs tailored for ${primaryCategory} startups`);
   }
 
@@ -284,7 +312,7 @@ function scoreIncubator(
     [analysis.summary.join(' '), analysis.scores.rationale, request.idea].join(' ')
   );
   if (incubator.tags.some((tag) => analysisText.includes(normalize(tag)))) {
-    score += 2;
+    score += SCORE_THEME_TIEBREAK;
   }
 
   return { score, reasons };

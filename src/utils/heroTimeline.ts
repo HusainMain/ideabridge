@@ -103,7 +103,7 @@ export function getMomentPresence(progress: number, moment: HeroMoment) {
   const local = clamp01((progress - moment.holdStart) / span);
   const enter = easeInOut(local / 0.28);
   const exit = easeInOut((1 - local) / 0.28);
-  const presence = Math.min(enter, exit);
+  const presence = clamp01(Math.min(enter, exit));
 
   return {
     local,

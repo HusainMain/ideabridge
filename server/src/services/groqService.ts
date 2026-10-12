@@ -6,8 +6,12 @@ import { withTimeout } from '../utils/timeout';
 import { shouldRetryModel, getBackoffDelay, parseValidationJson } from '../utils/aiResponseParser';
 import type { ValidationMeta } from '../../../shared/validation/types';
 
-const GROQ_VALIDATION_MODEL = process.env.GROQ_VALIDATION_MODEL || 'llama-3.1-8b-instant';
-const GROQ_ANALYSIS_MODEL = process.env.GROQ_ANALYSIS_MODEL || 'llama-3.3-70b-versatile';
+// Defaults target models that are currently served by Groq. The previous
+// pair (llama-3.1-8b-instant / llama-3.3-70b-versatile) has been retired and
+// returned 404 model_not_found on every request. Override per deployment via
+// GROQ_ANALYSIS_MODEL / GROQ_VALIDATION_MODEL if your account differs.
+const GROQ_VALIDATION_MODEL = process.env.GROQ_VALIDATION_MODEL || 'openai/gpt-oss-20b';
+const GROQ_ANALYSIS_MODEL = process.env.GROQ_ANALYSIS_MODEL || 'openai/gpt-oss-120b';
 
 function buildPromptContent(data: StartupAnalysisRequest): string {
   return `Startup Idea: ${data.idea}

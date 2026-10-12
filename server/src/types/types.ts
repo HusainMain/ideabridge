@@ -6,6 +6,8 @@ export interface StartupAnalysisRequest {
   country: string;
   budget: string;
   teamSize: string;
+  /** Stage the founder explicitly selected in the intake flow, if any. */
+  startupStage?: string;
 }
 
 /** AI-generated business viability scores (0–100 each). */

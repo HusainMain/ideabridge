@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { ValidationMeta } from '../../shared/validation/types';
 import type { ApiErrorCode, StructuredErrorResponse } from '../../shared/errors/types';
 
@@ -91,6 +92,7 @@ interface JourneyState {
   validationResult: ValidationMeta | null;
   validationMeta: ValidationMeta | null;
   startupStage: StartupStage | null;
+  completedAt: number | null;
   setInputs: (inputs: Partial<IdeaInputs>) => void;
   setAnalysisStatus: (status: AnalysisStatus) => void;
   setResults: (results: ResultsData, validationMeta?: ValidationMeta | null) => void;
@@ -113,53 +115,9 @@ const initialInputs: IdeaInputs = {
   teamSize: '',
 };
 
-export const useJourneyStore = create<JourneyState>((set) => ({
-  inputs: initialInputs,
-  analysisStatus: 'idle',
-  results: null,
-  errorMessage: null,
-  errorCode: null,
-  errorRetryAfter: null,
-  validationResult: null,
-  validationMeta: null,
-  startupStage: null,
-  setInputs: (inputs) => set((state) => ({ inputs: { ...state.inputs, ...inputs } })),
-  setAnalysisStatus: (status) => {
-    console.log('[setAnalysisStatus] called with:', status);
-    return set({ analysisStatus: status });
-  },
-  setResults: (results, validationMeta = null) =>
-    set({
-      results,
-      validationMeta,
-      analysisStatus: 'success',
-      errorMessage: null,
-      validationResult: null,
-      errorCode: null,
-      errorRetryAfter: null,
-    }),
-  setErrorMessage: (msg) => set({ errorMessage: msg }),
-  setApiError: (error) =>
-    set(
-      error
-        ? {
-            errorCode: error.code,
-            errorMessage: error.message,
-            errorRetryAfter: error.retryAfter ?? null,
-            analysisStatus: 'error',
-          }
-        : {
-            errorCode: null,
-            errorMessage: null,
-            errorRetryAfter: null,
-          }
-    ),
-  setValidationResult: (result) => set({ validationResult: result }),
-  setValidationMeta: (meta) => set({ validationMeta: meta }),
-  setStartupStage: (stage) => set({ startupStage: stage }),
-  clearResults: () => set({ results: null, validationMeta: null }),
-  resetJourney: () =>
-    set({
+export const useJourneyStore = create<JourneyState>()(
+  persist(
+    (set) => ({
       inputs: initialInputs,
       analysisStatus: 'idle',
       results: null,
@@ -169,5 +127,68 @@ export const useJourneyStore = create<JourneyState>((set) => ({
       validationResult: null,
       validationMeta: null,
       startupStage: null,
+      completedAt: null,
+      setInputs: (inputs) => set((state) => ({ inputs: { ...state.inputs, ...inputs } })),
+      setAnalysisStatus: (status) => set({ analysisStatus: status }),
+      setResults: (results, validationMeta = null) =>
+        set({
+          results,
+          validationMeta,
+          completedAt: Date.now(),
+          analysisStatus: 'success',
+          errorMessage: null,
+          validationResult: null,
+          errorCode: null,
+          errorRetryAfter: null,
+        }),
+      setErrorMessage: (msg) => set({ errorMessage: msg }),
+      setApiError: (error) =>
+        set(
+          error
+            ? {
+                errorCode: error.code,
+                errorMessage: error.message,
+                errorRetryAfter: error.retryAfter ?? null,
+                analysisStatus: 'error',
+              }
+            : {
+                errorCode: null,
+                errorMessage: null,
+                errorRetryAfter: null,
+              }
+        ),
+      setValidationResult: (result) => set({ validationResult: result }),
+      setValidationMeta: (meta) => set({ validationMeta: meta }),
+      setStartupStage: (stage) => set({ startupStage: stage }),
+      clearResults: () => set({ results: null, validationMeta: null }),
+      resetJourney: () =>
+        set({
+          inputs: initialInputs,
+          analysisStatus: 'idle',
+          results: null,
+          errorMessage: null,
+          errorCode: null,
+          errorRetryAfter: null,
+          validationResult: null,
+          validationMeta: null,
+          startupStage: null,
+          completedAt: null,
+        }),
     }),
-}));
+    {
+      name: 'ideabridge-journey',
+      storage: createJSONStorage(() => localStorage),
+      // Only the durable parts of the journey are written. Transient
+      // request state (analyzing/error/cooldown) is rebuilt on load so a
+      // refresh can never restore a spinner that will never finish.
+      partialize: (state) => ({
+        inputs: state.inputs,
+        results: state.results,
+        validationMeta: state.validationMeta,
+        startupStage: state.startupStage,
+        completedAt: state.completedAt,
+      }),
+      version: 1,
+    }
+  )
+);

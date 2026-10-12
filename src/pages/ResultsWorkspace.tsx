@@ -21,6 +21,12 @@ import {
 } from 'lucide-react';
 
 import { useJourneyStore } from '../stores/useJourneyStore';
+import {
+  buildReportHtml,
+  buildReportSummary,
+  downloadTextFile,
+  slugify,
+} from '../utils/reportExport';
 import { PriorityActions } from '../components/results/PriorityActions';
 import { SevenDayPlan } from '../components/results/SevenDayPlan';
 import { IncubatorRecommendations } from '../components/results/IncubatorRecommendations';
@@ -210,9 +216,10 @@ export default function ResultsWorkspace(): React.ReactElement {
   const {
     results,
     validationMeta,
-    setAnalysisStatus,
     inputs,
     startupStage,
+    completedAt,
+    resetJourney,
   } = useJourneyStore();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -224,11 +231,39 @@ export default function ResultsWorkspace(): React.ReactElement {
   }, [results, navigate]);
 
   const handleRestart = () => {
-    setAnalysisStatus('idle');
+    resetJourney();
     navigate('/');
   };
 
-  const handleExport = () => window.print();
+  // The three actions are deliberately distinct and honestly labelled:
+  // Export downloads a portable file, Print opens the browser's PDF
+  // dialog, Share copies a paste-able summary. Previously "Export"
+  // silently called window.print() and nothing could be shared.
+  const handleExport = () => {
+    if (!results) return;
+    const html = buildReportHtml(results, {
+      idea: inputs.idea,
+      industry: inputs.industry,
+      generatedAt: new Date(),
+    });
+    downloadTextFile(`ideabridge-${slugify(inputs.idea)}.html`, html, 'text/html');
+  };
+
+  const handlePrint = () => window.print();
+
+  const [shareState, setShareState] = useState<'idle' | 'copied' | 'failed'>('idle');
+
+  const handleShare = async () => {
+    if (!results) return;
+    const summary = buildReportSummary(results, inputs.idea);
+    try {
+      await navigator.clipboard.writeText(summary);
+      setShareState('copied');
+    } catch {
+      setShareState('failed');
+    }
+    setTimeout(() => setShareState('idle'), 2500);
+  };
 
   if (isLoading || !results) {
     return (
@@ -241,8 +276,16 @@ export default function ResultsWorkspace(): React.ReactElement {
     );
   }
 
-  const ideaTitle = inputs.idea.length > 40 ? `${inputs.idea.substring(0, 37)}...` : inputs.idea;
   const verdict = getVerdict(results.scores.overall);
+
+  // Report when the analysis actually completed, not when this page was
+  // last opened — it is persisted, so the label survives a reload.
+  const generatedLabel = completedAt
+    ? new Date(completedAt).toLocaleString(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      })
+    : 'recently';
 
   return (
     <div className="min-h-screen w-full bg-slate-950 text-slate-100 overflow-x-hidden relative">
@@ -262,7 +305,7 @@ export default function ResultsWorkspace(): React.ReactElement {
           {/* Navigation Header */}
           <header className="sticky top-0 z-40 backdrop-blur-xl bg-slate-950/70 border-b border-white/5">
             <div className="flex items-center justify-between max-w-7xl mx-auto px-4 py-3">
-              <button onClick={handleRestart} className="group flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 text-sm">
+              <button onClick={handleRestart} className="group flex items-center gap-2 px-3 py-2.5 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 text-sm min-h-[44px]">
                 <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
                 <span className="text-sm font-medium">Back</span>
               </button>
@@ -293,14 +336,16 @@ export default function ResultsWorkspace(): React.ReactElement {
             {/* Hero Section */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center mb-12">
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">Analysis Complete</h1>
-              <p className="text-xl md:text-2xl text-cyan-400 font-mono mb-4">{ideaTitle}</p>
+              <p className="text-lg md:text-xl text-cyan-400 max-w-3xl mx-auto leading-snug mb-4 break-words">
+                {inputs.idea}
+              </p>
               <p className="text-slate-400 max-w-2xl mx-auto leading-relaxed">
                 AI-powered strategic analysis delivering actionable insights for your startup concept.
               </p>
-              <div className="flex items-center justify-center gap-4 mt-6 text-slate-500 text-sm">
-                <span>Generated today</span>
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-6 text-slate-500 text-sm">
+                <span>Generated {generatedLabel}</span>
                 <span className="w-1 h-1 rounded-full bg-slate-500" />
-                <span>Confidential Report</span>
+                <span>Saved to this browser</span>
               </div>
             </motion.div>
 
@@ -386,7 +431,7 @@ export default function ResultsWorkspace(): React.ReactElement {
 {/* Incubator Recommendations */}
              {results.incubatorRecommendations && results.incubatorRecommendations.length > 0 && (
                <ReportSection title="Funding & Ecosystem" icon={DollarSign} delay={0.8}>
-                 <IncubatorRecommendations recommendations={results.incubatorRecommendations} startupStage={startupStage ?? undefined} />
+                 <IncubatorRecommendations recommendations={results.incubatorRecommendations} />
                </ReportSection>
              )}
 
@@ -400,7 +445,13 @@ export default function ResultsWorkspace(): React.ReactElement {
           </main>
 
           {/* Floating Actions */}
-          <FloatingActionBar onExport={handleExport} onAnalyzeAgain={handleRestart} />
+          <FloatingActionBar
+          onExport={handleExport}
+          onPrint={handlePrint}
+          onShare={handleShare}
+          shareState={shareState}
+          onAnalyzeAgain={handleRestart}
+        />
         </motion.div>
       </AnimatePresence>
     </div>

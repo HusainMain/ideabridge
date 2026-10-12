@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && node -e \"require('fs').cpSync('src/data','dist/server/src/data',{recursive:true}); require('fs').cpSync('scripts','dist/scripts',{recursive:true})\"",
     "start": "node dist/server/src/index.js",
-    "dev": "ts-node --esm -r dotenv/config src/index.ts"
+    "dev": "ts-node -r dotenv/config src/index.ts"
   },
   "dependencies": {
     "@google/genai": "^2.9.0",

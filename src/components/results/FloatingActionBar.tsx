@@ -1,14 +1,23 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Download, Edit3, RotateCcw, ChevronUp } from 'lucide-react';
+import { Download, Edit3, RotateCcw, ChevronUp, Printer, Share2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface FloatingActionBarProps {
   onExport: () => void;
+  onPrint: () => void;
+  onShare: () => void;
+  shareState: 'idle' | 'copied' | 'failed';
   onAnalyzeAgain: () => void;
 }
 
-export function FloatingActionBar({ onExport, onAnalyzeAgain }: FloatingActionBarProps) {
+export function FloatingActionBar({
+  onExport,
+  onPrint,
+  onShare,
+  shareState,
+  onAnalyzeAgain,
+}: FloatingActionBarProps) {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -57,11 +66,13 @@ export function FloatingActionBar({ onExport, onAnalyzeAgain }: FloatingActionBa
             />
             <div className="w-px h-6 mx-1" style={{ background: 'rgba(255,255,255,0.1)' }} />
             <ActionBtn
-              icon={Download}
-              label="Export PDF"
-              onClick={onExport}
-              variant="accent"
+              icon={shareState === 'copied' ? Check : Share2}
+              label={shareState === 'copied' ? 'Copied' : shareState === 'failed' ? 'Copy failed' : 'Share'}
+              onClick={onShare}
+              variant="ghost"
             />
+            <ActionBtn icon={Printer} label="Print" onClick={onPrint} variant="ghost" />
+            <ActionBtn icon={Download} label="Export" onClick={onExport} variant="accent" />
           </motion.div>
 
           {/* Mobile sticky bottom bar */}
@@ -90,7 +101,7 @@ export function FloatingActionBar({ onExport, onAnalyzeAgain }: FloatingActionBa
               Edit
             </button>
             <button
-              onClick={onAnalyzeAgain}
+              onClick={onShare}
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-colors"
               style={{
                 background: 'rgba(255,255,255,0.05)',
@@ -98,8 +109,20 @@ export function FloatingActionBar({ onExport, onAnalyzeAgain }: FloatingActionBa
                 border: '1px solid rgba(255,255,255,0.08)',
               }}
             >
-              <RotateCcw size={14} />
-              Retry
+              {shareState === 'copied' ? <Check size={14} /> : <Share2 size={14} />}
+              {shareState === 'copied' ? 'Copied' : 'Share'}
+            </button>
+            <button
+              onClick={onPrint}
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-colors"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                color: 'rgba(255,255,255,0.72)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <Printer size={14} />
+              Print
             </button>
             <button
               onClick={onExport}
@@ -157,7 +180,7 @@ function ActionBtn({ icon: Icon, label, onClick, variant }: ActionBtnProps) {
       onClick={onClick}
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.97 }}
-      className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-colors"
+      className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-colors min-h-[44px]"
       style={
         variant === 'accent'
           ? {

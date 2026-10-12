@@ -8,14 +8,13 @@ import { RoadmapTimeline } from '../components/RoadmapTimeline';
 import { StartupStats } from '../components/StartupStats';
 import { DeveloperCredit } from '../components/footer/DeveloperCredit';
 import { mentors as mentorData } from '../data/mentors';
+import { useJourneyStore } from '../stores/useJourneyStore';
 
 const startupExamples = [
   'AI Farming Assistant',
   'Solar-Powered Coffee Roaster',
   'Smart Waste Management Platform',
 ];
-
-const chatLines = startupExamples.map((idea) => `Analyze this idea: ${idea}`);
 
 const howItWorks = [
   ['Enter Your Idea', 'Describe the startup you want to build in plain language.'],
@@ -66,42 +65,29 @@ const fundingCards = [
 ];
 
 function ChatPreview() {
-  const [lineIndex, setLineIndex] = useState(0);
-  const charSpanRef = useRef<HTMLSpanElement>(null);
-  const typedRef = useRef('');
-  const tickRef = useRef<number | null>(null);
-  const pauseRef = useRef<number | null>(null);
+  const navigate = useNavigate();
+  const setInputs = useJourneyStore((s) => s.setInputs);
 
-  useEffect(() => {
-    const line = chatLines[lineIndex];
-    typedRef.current = '';
-    if (charSpanRef.current) charSpanRef.current.textContent = '';
-
-    const type = () => {
-      if (typedRef.current.length < line.length) {
-        typedRef.current = line.slice(0, typedRef.current.length + 1);
-        if (charSpanRef.current) charSpanRef.current.textContent = typedRef.current;
-        tickRef.current = window.setTimeout(type, 24);
-      } else {
-        pauseRef.current = window.setTimeout(() => {
-          setLineIndex((i) => (i + 1) % chatLines.length);
-        }, 1300);
-      }
-    };
-
-    tickRef.current = window.setTimeout(type, 80);
-    return () => {
-      if (tickRef.current) window.clearTimeout(tickRef.current);
-      if (pauseRef.current) window.clearTimeout(pauseRef.current);
-    };
-  }, [lineIndex]);
-
+  // This used to run a decorative typing loop that looked like a live input
+  // but could not be clicked, competing with the two real CTAs. It is now the
+  // same ideas as working shortcuts, so the loop is gone.
   return (
     <div className="glass-panel--elevated chat-preview-container" style={{ padding: '1rem' }}>
-      <div className="chat-message-user">{startupExamples[lineIndex]}</div>
-      <div className="chat-message-ai">
-        <span ref={charSpanRef} />
-        <span className="chat-cursor" />
+      <div className="chat-preview-label">Try an example</div>
+      <div className="chat-example-chips">
+        {startupExamples.map((idea) => (
+          <button
+            key={idea}
+            type="button"
+            className="chat-example-chip"
+            onClick={() => {
+              setInputs({ idea });
+              navigate('/input');
+            }}
+          >
+            {idea}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -219,14 +205,7 @@ function ReadinessSection() {
             </p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 320px 1fr',
-            gap: '2rem',
-            alignItems: 'center',
-            minHeight: '440px',
-            position: 'relative',
-          }}>
+          <div className="readiness-triple">
             {/* Left Column (Cards 1 & 3) */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               {[0, 2].map((idx) => {
@@ -237,7 +216,7 @@ function ReadinessSection() {
                     initial={{ opacity: 0.22, x: -15 }}
                     animate={{ opacity: activatedCards[idx] ? 1 : 0.22, x: activatedCards[idx] ? 0 : -15 }}
                     transition={{ duration: 0.4 }}
-                    className={`glass-panel readiness-reason-card glow-card-${idx % 2 === 0 ? 'cyan' : 'purple'} ${!activatedCards[idx] ? 'readiness-reason-card--inactive' : ''}`}
+                    className={`glass-panel readiness-reason-card readiness-reason-card--motion glow-card-${idx % 2 === 0 ? 'cyan' : 'purple'} ${!activatedCards[idx] ? 'readiness-reason-card--inactive' : ''}`}
                     style={{ minHeight: '150px', padding: '1.25rem', willChange: 'opacity, transform' }}
                   >
                     <span className="readiness-reason-card__icon">{item.icon}</span>
@@ -249,13 +228,16 @@ function ReadinessSection() {
             </div>
 
             {/* Center Column (Orb Container) */}
-            <div style={{
-              position: 'relative',
-              height: '320px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
+            <div
+              className="readiness-orb-column"
+              style={{
+                position: 'relative',
+                height: '320px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               {/* Glass circular boundary for orb focus */}
               <motion.div 
                 animate={{ 
@@ -301,7 +283,7 @@ function ReadinessSection() {
                     initial={{ opacity: 0.22, x: 15 }}
                     animate={{ opacity: activatedCards[idx] ? 1 : 0.22, x: activatedCards[idx] ? 0 : 15 }}
                     transition={{ duration: 0.4 }}
-                    className={`glass-panel readiness-reason-card glow-card-${idx % 2 === 0 ? 'cyan' : 'purple'} ${!activatedCards[idx] ? 'readiness-reason-card--inactive' : ''}`}
+                    className={`glass-panel readiness-reason-card readiness-reason-card--motion glow-card-${idx % 2 === 0 ? 'cyan' : 'purple'} ${!activatedCards[idx] ? 'readiness-reason-card--inactive' : ''}`}
                     style={{ minHeight: '150px', padding: '1.25rem', willChange: 'opacity, transform' }}
                   >
                     <span className="readiness-reason-card__icon">{item.icon}</span>

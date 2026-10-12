@@ -105,16 +105,21 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
       setElapsedTime(elapsed);
 
       let currentProgress = 0;
-      if (elapsed < 1500) {
-        currentProgress = (elapsed / 1500) * 30;
-      } else if (elapsed < 5000) {
-        currentProgress = 30 + ((elapsed - 1500) / 3500) * 30;
-      } else if (elapsed < 10000) {
-        currentProgress = 60 + ((elapsed - 5000) / 5000) * 25;
-      } else if (elapsed < 15000) {
-        currentProgress = 85 + ((elapsed - 10000) / 5000) * 9;
+      // The old curve reached ~94% at 15s, but a real analysis takes
+      // 20-25s, so the bar sat stalled near the top for 10+ seconds and
+      // read as "hung". This one is paced against the observed duration.
+      if (elapsed < 2000) {
+        currentProgress = (elapsed / 2000) * 22;
+      } else if (elapsed < 6000) {
+        currentProgress = 22 + ((elapsed - 2000) / 4000) * 23;
+      } else if (elapsed < 12000) {
+        currentProgress = 45 + ((elapsed - 6000) / 6000) * 20;
+      } else if (elapsed < 19000) {
+        currentProgress = 65 + ((elapsed - 12000) / 7000) * 15;
+      } else if (elapsed < 26000) {
+        currentProgress = 80 + ((elapsed - 19000) / 7000) * 10;
       } else {
-        currentProgress = 94 + Math.sin(elapsed / 400) * 0.4;
+        currentProgress = 90 + Math.sin(elapsed / 400) * 0.4;
       }
 
       setProgress(Math.min(currentProgress, 94.5));
@@ -125,12 +130,12 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
 
   const currentStageIndex = useMemo(() => {
     if (isCompleting) return 6;
-    if (elapsedTime < 2000) return 0;
-    if (elapsedTime < 4500) return 1;
-    if (elapsedTime < 7500) return 2;
-    if (elapsedTime < 10000) return 3;
-    if (elapsedTime < 12500) return 4;
-    if (elapsedTime < 15000) return 5;
+    if (elapsedTime < 2500) return 0;
+    if (elapsedTime < 6000) return 1;
+    if (elapsedTime < 10000) return 2;
+    if (elapsedTime < 14000) return 3;
+    if (elapsedTime < 18000) return 4;
+    if (elapsedTime < 22000) return 5;
     return 6;
   }, [elapsedTime, isCompleting]);
 
@@ -346,6 +351,14 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
               <p className="text-sm tracking-normal text-slate-300/72">
                 {isCompleting ? 'Preparing your personalized report...' : STATUS_LINES[currentStageIndex]}
               </p>
+              {!isCompleting && (
+                // Without this the screen gave no way to tell a slow call
+                // from a hung one — the only cue was a percentage that
+                // crawled. Say how long it has been and what to expect.
+                <p className="mt-1.5 text-xs tracking-normal text-slate-400/70">
+                  {Math.floor(elapsedTime / 1000)}s elapsed · a full analysis usually takes 20–30 seconds
+                </p>
+              )}
             </div>
           </motion.div>
         </section>

@@ -81,6 +81,7 @@ function MilestoneCard({
 
   return (
     <motion.div
+      className="roadmap-card"
       style={{
         position: 'absolute',
         top: `${verticalPos}%`,
@@ -113,6 +114,7 @@ function MilestoneCard({
         </ul>
         {/* Connector pointer to centerline */}
         <div
+          className="roadmap-connector"
           style={{
             position: 'absolute',
             top: '50%',
@@ -193,7 +195,10 @@ export const RoadmapTimeline: React.FC = () => {
           </div>
 
           {/* Timeline Wrapper */}
-          <div style={{ position: 'relative', width: '100%', height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            className="roadmap-stage"
+            style={{ position: 'relative', width: '100%', height: '80%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
             {/* Center Line Track */}
             <div className="timeline-centerline">
               <motion.div className="timeline-progress-fill" style={{ height: lineFillHeight }} />
@@ -215,7 +220,7 @@ export const RoadmapTimeline: React.FC = () => {
             />
 
             {/* Milestones — rendered as proper components, no hooks in loops */}
-            <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+            <div className="roadmap-track" style={{ width: '100%', height: '100%', position: 'relative' }}>
               {milestones.map((m, i) => (
                 <MilestoneCard
                   key={m.title}
