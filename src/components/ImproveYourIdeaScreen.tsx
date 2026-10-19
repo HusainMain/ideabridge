@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Lightbulb, AlertTriangle } from 'lucide-react';
 import type { ValidationMeta } from '../../shared/validation/types';
@@ -9,6 +10,14 @@ interface ImproveYourIdeaScreenProps {
 
 export function ImproveYourIdeaScreen({ validation, onBackToEdit }: ImproveYourIdeaScreenProps) {
   const { reason, missing, suggestions } = validation;
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // The validation outcome replaces the whole page; without moving focus a
+  // screen-reader user stays on the (now unmounted) previous view and hears
+  // nothing. Focus the heading so the change is announced.
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   return (
     <div className="act-input-shell">
@@ -33,7 +42,12 @@ export function ImproveYourIdeaScreen({ validation, onBackToEdit }: ImproveYourI
             <p className="act-question__step">Input validation</p>
           </div>
 
-          <h1 className="act-question__heading" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}>
+          <h1
+            ref={headingRef}
+            tabIndex={-1}
+            className="act-question__heading focus:outline-none"
+            style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}
+          >
             We couldn&apos;t generate a reliable startup analysis
           </h1>
           <p className="act-question__sub" style={{ marginBottom: '1.5rem' }}>

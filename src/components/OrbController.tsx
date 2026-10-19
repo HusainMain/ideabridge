@@ -1,257 +1,183 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { frame } from 'framer-motion';
 import { InteractiveOrb, OrbStage } from './InteractiveOrb';
+import { buildPath, evaluatePath, type OrbPath, type WaypointRect } from './orbPath';
 
-interface OrbState {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
+// The orb renders inside a fixed 220px box (the largest authored anchor — the
+// hero) and is placed every frame with a single transform: translate3d to the
+// path position + uniform scale to the waypoint size. No layout properties are
+// written after mount.
+const BASE_SIZE = 220;
+
+interface OrbMeta {
   stage: OrbStage;
   progress: number;
   isLaunching: boolean;
 }
 
-// Lerp utility – moves 'current' toward 'target' by 'factor' per frame
-function lerp(current: number, target: number, factor: number) {
-  return current + (target - current) * factor;
-}
-
 export const OrbController: React.FC = () => {
-  const divRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const pathRef = useRef<OrbPath | null>(null);
+  const writtenRef = useRef({ x: -9999, y: -9999, s: -1 });
+  const metaRef = useRef<OrbMeta>({ stage: 1, progress: 0, isLaunching: false });
+  const [orbMeta, setOrbMeta] = React.useState<OrbMeta>(metaRef.current);
 
-  // Live render state tracked in refs to avoid React re-render overhead
-  const current = useRef<OrbState>({
-    left: typeof window !== 'undefined' ? window.innerWidth / 2 : 0,
-    top: typeof window !== 'undefined' ? window.innerHeight / 2 : 0,
-    width: 150,
-    height: 150,
-    stage: 1,
-    progress: 0,
-    isLaunching: false,
-  });
-
-  const target = useRef<OrbState>({ ...current.current });
-  const rafRef = useRef<number | null>(null);
-  const stageRef = useRef<OrbStage>(1);
-  const progressRef = useRef(0);
-  const isLaunchingRef = useRef(false);
-
-  // ─── Anchor selection ───────────────────────────────────────────────
-  const computeTarget = useCallback((): OrbState | null => {
-    const anchors = Array.from(
-      document.querySelectorAll<HTMLElement>('.orb-anchor'),
-    );
-    if (anchors.length === 0) return null;
-
-    const vMid = window.innerHeight / 2;
-    let best: HTMLElement | null = null;
-    let bestScore = Infinity;
-
-    for (const anchor of anchors) {
-      if (anchor.dataset.orbActive === 'false') continue;
-
-      const rect = anchor.getBoundingClientRect();
-      // Skip anchors that are hidden (display: none) or far outside viewport
-      if ((rect.width === 0 && rect.height === 0) || rect.bottom < -200 || rect.top > window.innerHeight + 200) continue;
-
-      const sectionId = anchor.getAttribute('data-section-id');
-      const section = sectionId ? document.getElementById(sectionId) : null;
-      const secRect = section?.getBoundingClientRect();
-
-      // Heavily prefer the anchor whose section straddles the viewport midpoint
-      const inSection =
-        secRect && secRect.top <= vMid && secRect.bottom >= vMid ? 0 : 400;
-
-      const anchorMidY = rect.top + rect.height / 2;
-      const score = Math.abs(anchorMidY - vMid) + inSection;
-
-      if (score < bestScore) {
-        bestScore = score;
-        best = anchor;
-      }
-    }
-
-    if (!best) {
-      // Absolute fallback: closest by raw distance
-      best = anchors.reduce<HTMLElement | null>((closest, a) => {
-        const d = Math.abs(a.getBoundingClientRect().top + a.getBoundingClientRect().height / 2 - vMid);
-        const cd = closest
-          ? Math.abs(closest.getBoundingClientRect().top + closest.getBoundingClientRect().height / 2 - vMid)
-          : Infinity;
-        return d < cd ? a : closest;
-      }, null);
-    }
-
-    if (!best) return null;
-
-    const rect = best.getBoundingClientRect();
-    const stageAttr = best.getAttribute('data-stage');
-    const sectionId = best.getAttribute('data-section-id');
-    const stage = (stageAttr ? parseInt(stageAttr, 10) : 1) as OrbStage;
-
-    let progress = 0;
-    let isLaunching = false;
-
-    if (sectionId) {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        const secRect = section.getBoundingClientRect();
-        const isPinned = section.classList.contains('pinned-section-container');
-
-        if (isPinned) {
-          const launchProgressAttr = sectionId === 'section-launch' ? section.getAttribute('data-launch-progress') : null;
-          if (launchProgressAttr) {
-            progress = Math.max(0, Math.min(1, parseFloat(launchProgressAttr)));
-          } else {
-            const scrollRange = secRect.height - window.innerHeight;
-            if (scrollRange > 0) {
-              progress = Math.max(0, Math.min(1, -secRect.top / scrollRange));
-            }
-          }
-        } else {
-          const enterPoint = window.innerHeight;
-          const exitPoint = -secRect.height;
-          const travel = enterPoint - exitPoint;
-          progress = Math.max(0, Math.min(1, (enterPoint - secRect.top) / travel));
-        }
-
-        if (sectionId === 'section-launch') {
-          isLaunching = section.getAttribute('data-launching') === 'true' || progress > 0.4;
-        }
-      }
-    }
-
-    return {
-      left: rect.left + rect.width / 2,
-      top: rect.top + rect.height / 2,
-      width: rect.width,
-      height: rect.height,
-      stage,
-      progress,
-      isLaunching,
-    };
+  // ─── Waypoint registry (rebuilds when layout can have changed) ──────
+  const rebuild = useCallback(() => {
+    const launching =
+      document.getElementById('section-launch')?.getAttribute('data-launching') === 'true';
+    if (launching) return; // scroll space is collapsed by the launch lock
+    pathRef.current = buildPath(window.innerHeight);
   }, []);
-
-  // ─── rAF animation loop ─────────────────────────────────────────────
-  const animate = useCallback(() => {
-    rafRef.current = requestAnimationFrame(animate);
-
-    const t = target.current;
-    const c = current.current;
-
-    // Position lerp — 0.06 gives the orb inertia and weight, not cursor-chasing
-    const POS_LERP  = 0.06;
-    const SIZE_LERP = 0.18;
-    c.left   = lerp(c.left,   t.left,   POS_LERP);
-    c.top    = lerp(c.top,    t.top,    POS_LERP);
-    c.width  = lerp(c.width,  t.width,  SIZE_LERP);
-    c.height = lerp(c.height, t.height, SIZE_LERP);
-
-    const div = innerRef.current;
-    if (div) {
-      div.style.left   = `${c.left}px`;
-      div.style.top    = `${c.top}px`;
-      div.style.width  = `${c.width}px`;
-      div.style.height = `${c.height}px`;
-    }
-  }, []);
-
-  // ─── Scroll + resize handler ────────────────────────────────────────
-  const onScrollOrResize = useCallback(() => {
-    const next = computeTarget();
-    if (!next) return;
-
-    target.current.left   = next.left;
-    target.current.top    = next.top;
-    target.current.width  = next.width;
-    target.current.height = next.height;
-
-    // Stage and progress changes are discrete — apply immediately
-    if (next.stage !== stageRef.current) {
-      stageRef.current = next.stage;
-      // Force a React re-render only on stage change
-      forceStageUpdate(next.stage, next.progress, next.isLaunching);
-    } else if (Math.abs(next.progress - progressRef.current) > 0.004) {
-      progressRef.current = next.progress;
-      forceStageUpdate(next.stage, next.progress, next.isLaunching);
-    }
-
-    if (next.isLaunching !== isLaunchingRef.current) {
-      isLaunchingRef.current = next.isLaunching;
-      forceStageUpdate(next.stage, next.progress, next.isLaunching);
-    }
-  }, [computeTarget]);
-
-  // Minimal React state update — only fires on stage/progress/launching change
-  const [orbMeta, setOrbMeta] = React.useState<{
-    stage: OrbStage;
-    progress: number;
-    isLaunching: boolean;
-  }>({ stage: 1, progress: 0, isLaunching: false });
-
-  const forceStageUpdate = useCallback(
-    (stage: OrbStage, progress: number, isLaunching: boolean) => {
-      setOrbMeta({ stage, progress, isLaunching });
-    },
-    [],
-  );
 
   useEffect(() => {
-    // Seed initial position before first scroll event
-    const seed = computeTarget();
-    if (seed) {
-      target.current = { ...seed };
-      current.current = { ...seed };
-      const div = innerRef.current;
-      if (div) {
-        div.style.left   = `${seed.left}px`;
-        div.style.top    = `${seed.top}px`;
-        div.style.width  = `${seed.width}px`;
-        div.style.height = `${seed.height}px`;
-      }
-      stageRef.current = seed.stage;
-      setOrbMeta({ stage: seed.stage, progress: seed.progress, isLaunching: seed.isLaunching });
+    rebuild();
+    const settleTimer = window.setTimeout(rebuild, 400); // late font/image shifts
+    const onResize = () => rebuild();
+    window.addEventListener('resize', onResize, { passive: true });
+    window.addEventListener('load', rebuild);
+    if (document.fonts?.ready) {
+      void document.fonts.ready.then(() => rebuild()).catch(() => undefined);
     }
 
-    rafRef.current = requestAnimationFrame(animate);
-    window.addEventListener('scroll', onScrollOrResize, { passive: true });
-    window.addEventListener('resize', onScrollOrResize, { passive: true });
-    window.addEventListener('launch-timeline-update', onScrollOrResize);
+    // Live rect of the launch anchor that is active right now (fuel 0-3s,
+    // core 3s+ of the sequence). During the launch lock both are static.
+    const launchRect = (): WaypointRect | null => {
+      const section = document.getElementById('section-launch');
+      if (!section) return null;
+      const anchor =
+        section.querySelector<HTMLElement>('.orb-anchor[data-orb-active="true"]') ??
+        section.querySelector<HTMLElement>('.orb-anchor');
+      if (!anchor) return null;
+      const r = anchor.getBoundingClientRect();
+      return {
+        x: r.left + r.width / 2,
+        y: r.top + r.height / 2,
+        size: (r.width + r.height) / 2,
+      };
+    };
+
+    const update = () => {
+      const wrap = wrapRef.current;
+      const path = pathRef.current;
+      if (!wrap || !path) return;
+
+      const sample = evaluatePath(path, window.scrollY, { launchRect });
+
+      // Position + size, transform-only.
+      const s = sample.size > 0 ? sample.size / BASE_SIZE : writtenRef.current.s;
+      const nx = sample.x - BASE_SIZE / 2;
+      const ny = sample.y - BASE_SIZE / 2;
+      const w = writtenRef.current;
+      if (Math.abs(nx - w.x) > 0.1 || Math.abs(ny - w.y) > 0.1 || Math.abs(s - w.s) > 0.0005) {
+        wrap.style.transform = `translate3d(${nx.toFixed(2)}px, ${ny.toFixed(2)}px, 0) scale(${s.toFixed(4)})`;
+        wrap.style.visibility = 'visible';
+        w.x = nx;
+        w.y = ny;
+        w.s = s;
+      }
+
+      // Stage / progress / launching — same semantics as the previous
+      // controller, now driven by the path's dominant waypoint.
+      let progress = 0;
+      let isLaunching = false;
+      if (sample.sectionId) {
+        const section = document.getElementById(sample.sectionId);
+        if (section) {
+          const secRect = section.getBoundingClientRect();
+          if (section.classList.contains('pinned-section-container')) {
+            if (sample.sectionId === 'section-launch') {
+              const attr = section.getAttribute('data-launch-progress');
+              progress = attr ? Math.max(0, Math.min(1, parseFloat(attr))) : 0;
+            } else {
+              const scrollRange = secRect.height - window.innerHeight;
+              if (scrollRange > 0) progress = Math.max(0, Math.min(1, -secRect.top / scrollRange));
+            }
+          } else {
+            const enterPoint = window.innerHeight;
+            const exitPoint = -secRect.height;
+            const travel = enterPoint - exitPoint;
+            progress = Math.max(0, Math.min(1, (enterPoint - secRect.top) / travel));
+          }
+          if (sample.sectionId === 'section-launch') {
+            isLaunching = section.getAttribute('data-launching') === 'true' || progress > 0.4;
+          }
+        }
+      }
+
+      const meta = metaRef.current;
+      const nextStage = sample.stage as OrbStage;
+      if (
+        nextStage !== meta.stage ||
+        Math.abs(progress - meta.progress) > 0.004 ||
+        isLaunching !== meta.isLaunching
+      ) {
+        const next: OrbMeta = { stage: nextStage, progress, isLaunching };
+        metaRef.current = next;
+        setOrbMeta(next);
+      }
+    };
+
+    // Run inside framer's postRender so anchor rects (driven by motion
+    // values on the same frame) are already committed when we read them.
+    // Fallback: plain rAF (may read one frame stale on moving rails).
+    let stopped = false;
+    let raf = 0;
+    let usingFrameApi = typeof frame?.postRender === 'function';
+    const schedule = () => {
+      frame.postRender(() => {
+        if (stopped) return;
+        update();
+        schedule();
+      });
+    };
+    if (usingFrameApi) {
+      try {
+        schedule();
+      } catch {
+        usingFrameApi = false;
+      }
+    }
+    if (!usingFrameApi) {
+      const loop = () => {
+        if (stopped) return;
+        raf = requestAnimationFrame(loop);
+        update();
+      };
+      loop();
+    }
 
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      window.removeEventListener('scroll', onScrollOrResize);
-      window.removeEventListener('resize', onScrollOrResize);
-      window.removeEventListener('launch-timeline-update', onScrollOrResize);
+      stopped = true;
+      if (raf) cancelAnimationFrame(raf);
+      window.clearTimeout(settleTimer);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('load', rebuild);
     };
-  }, [animate, computeTarget, onScrollOrResize]);
+  }, [rebuild]);
 
   return (
     <div
-      ref={divRef}
+      ref={wrapRef}
+      data-orb-root=""
       style={{
         position: 'fixed',
-        inset: 0,
+        left: 0,
+        top: 0,
+        width: BASE_SIZE,
+        height: BASE_SIZE,
+        transform: `translate3d(-${BASE_SIZE * 2}px, -${BASE_SIZE * 2}px, 0)`,
+        visibility: 'hidden',
         pointerEvents: 'none',
         zIndex: 40,
-        overflow: 'hidden',
+        willChange: 'transform',
       }}
     >
-      <div
-        ref={innerRef}
-        style={{
-          position: 'absolute',
-          transform: 'translate(-50%, -50%)',
-          willChange: 'left, top, width, height',
-        }}
-      >
-        <InteractiveOrb
-          stage={orbMeta.stage}
-          progress={orbMeta.progress}
-          isLaunching={orbMeta.isLaunching}
-        />
-      </div>
+      <InteractiveOrb
+        stage={orbMeta.stage}
+        progress={orbMeta.progress}
+        isLaunching={orbMeta.isLaunching}
+      />
     </div>
   );
 };

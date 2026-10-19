@@ -328,7 +328,14 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
 
             <div className="mx-auto mt-4 w-full max-w-[360px]">
               <div className="mb-2 flex items-center gap-3">
-                <div className="h-[4px] flex-1 overflow-hidden rounded-full bg-white/20 shadow-[0_0_16px_rgba(148,163,184,0.15)]">
+                <div
+                  className="h-[4px] flex-1 overflow-hidden rounded-full bg-white/20 shadow-[0_0_16px_rgba(148,163,184,0.15)]"
+                  role="progressbar"
+                  aria-label="Analysis progress"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(progress)}
+                >
                   <motion.div
                     className="h-full rounded-full"
                     style={{
@@ -348,7 +355,12 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
                 </div>
                 <span className="w-8 text-right text-xs font-medium tabular-nums text-slate-300">{Math.round(progress)}%</span>
               </div>
-              <p className="text-sm tracking-normal text-slate-300/72">
+              <p
+                className="text-sm tracking-normal text-slate-300/72"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
                 {isCompleting ? 'Preparing your personalized report...' : STATUS_LINES[currentStageIndex]}
               </p>
               {!isCompleting && (
@@ -421,7 +433,7 @@ export function LoadingWorkspace({ cooldownRemaining, apiFinished = false, onCom
                       initial={{ opacity: 0, y: 4, filter: 'blur(2px)' }}
                       animate={{ opacity: step.isActive ? 0.92 : 0.62, y: 0, filter: 'blur(0px)' }}
                       exit={{ opacity: 0, y: -8 }}
-                      transition={{ type: 'spring', stiffness: 150, damping: 20 }}
+                      transition={{ duration: 0.28, ease: 'easeOut' }}
                       className={step.isActive ? 'truncate text-sm font-medium text-white' : 'truncate text-sm font-normal text-slate-300/86'}
                     >
                       {step.text}

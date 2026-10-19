@@ -136,6 +136,13 @@ body,
   -webkit-font-smoothing: antialiased;
 }
 
+/* framer-motion's dev-only guard warns when the scroll container
+   (<html> by default) computes as position: static. Relative here is
+   visually inert and satisfies the measurement assumption. */
+html {
+  position: relative;
+}
+
 body {
   overflow-x: hidden;
 }
@@ -965,6 +972,16 @@ select {
 .act-stage-card__label { font-weight: 600; font-size: 0.95rem; color: #fff; }
 .act-stage-card__sub { font-size: 0.8rem; color: var(--act-muted); }
 
+/* Keyboard focus: Tailwind-styled buttons (stage cards, CTA-ish controls)
+   previously fell back to a faint UA ring. One explicit, high-contrast
+   outline keeps focus findable on every interactive element. */
+.act-stage-card:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--act-cyan);
+  outline-offset: 2px;
+}
+
 .act-input-actions {
   display: flex;
   align-items: center;
@@ -996,6 +1013,35 @@ select {
   padding: 0.1em 0.4em;
   font-family: inherit;
   font-size: 0.8rem;
+}
+.act-input-restored {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--act-border);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.03);
+  color: var(--act-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.act-input-restored__action {
+  flex: none;
+  background: none;
+  border: none;
+  color: var(--act-cyan);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.4rem 0.2rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.act-input-restored__action:hover { color: #fff; }
+@media (max-width: 520px) {
+  .act-input-restored { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
 }
 
 /* ═══════════════════════════════════════════

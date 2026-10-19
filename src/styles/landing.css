@@ -1832,6 +1832,19 @@
     grid-template-columns: 1fr;
   }
 
+  /* Once the hero stacks, the chat panel sits directly under the orb. Give
+     the panel more height and pull the orb up/smaller so it never covers
+     the "Try an example" label or its chips. */
+  .hero-orb-panel {
+    min-height: 460px;
+  }
+
+  .hero-orb-anchor {
+    top: 12%;
+    width: 180px;
+    height: 180px;
+  }
+
   .pinned-section-container--short {
     height: 140vh;
   }
@@ -2012,7 +2025,72 @@
   .connector-line,
   .rocket-vehicle.shaking,
   .rocket-thrust-flame,
-  .launch-fuel-particles span {
+  .launch-fuel-particles span,
+  .chat-cursor,
+  .bridge-laser-outline,
+  .scanner-beam,
+  .radar-circle,
+  .readiness-reason-card--inactive::after,
+  .launch-stars__star,
+  .story-accent,
+  .scanner-diagnostics span,
+  .scanner-pulse,
+  .launch-fuel-focus,
+  .launch-energy-transfer,
+  .skip-link {
     animation: none;
+    transition: none;
   }
+}
+
+/* Visually hidden until focused; first tab stop on the landing page. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2000;
+  transform: translateY(-250%);
+  background: var(--neon-cyan);
+  color: #041018;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: transform 0.15s ease;
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid #041018;
+  outline-offset: 2px;
+}
+
+/* The skip target is a full-page container; a focus ring around all of it
+   would be noise. Focus moving here is announced by assistive tech anyway. */
+.actualize-landing:focus {
+  outline: none;
+}
+
+/* Escape hatch for the launch sequence: visible from the moment the
+   timeline starts until it ends (or the user skips). */
+.launch-skip {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 30;
+  background: rgba(5, 16, 24, 0.72);
+  color: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.launch-skip:hover {
+  color: #fff;
+  border-color: rgba(0, 240, 255, 0.7);
 }

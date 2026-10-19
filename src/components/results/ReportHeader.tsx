@@ -16,7 +16,7 @@ export function ReportHeader(): React.ReactElement {
     <div className="flex items-center gap-2">
       <Icon className="w-4 h-4 text-cyan-400" />
       <div className="flex flex-col">
-        <span className="text-[0.7rem] font-mono text-slate-500 uppercase tracking-wider">{label}</span>
+        <span className="text-[0.7rem] font-mono text-slate-400 uppercase tracking-wider">{label}</span>
         <span className="text-sm font-semibold text-slate-200">{value}</span>
       </div>
     </div>

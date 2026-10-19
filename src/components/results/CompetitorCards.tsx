@@ -45,7 +45,7 @@ export function CompetitorCards(): React.ReactElement | null {
               
               <div className="space-y-4 flex-1">
                 <div>
-                  <div className="flex items-center gap-1.5 text-[0.68rem] text-slate-500 uppercase tracking-widest mb-2">
+                  <div className="flex items-center gap-1.5 text-[0.68rem] text-slate-400 uppercase tracking-widest mb-2">
                     <Shield className="w-3.5 h-3.5 text-yellow-400" />
                     <span>Weakness</span>
                   </div>
@@ -53,7 +53,7 @@ export function CompetitorCards(): React.ReactElement | null {
                 </div>
                 
                 <div>
-                  <div className="flex items-center gap-1.5 text-[0.68rem] text-slate-500 uppercase tracking-widest mb-2">
+                  <div className="flex items-center gap-1.5 text-[0.68rem] text-slate-400 uppercase tracking-widest mb-2">
                     <Zap className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Your Advantage</span>
                   </div>

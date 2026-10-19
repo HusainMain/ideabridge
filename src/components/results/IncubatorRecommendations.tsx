@@ -74,7 +74,7 @@ export function IncubatorRecommendations({
                     <h3 className="text-base font-semibold text-white leading-snug break-words">
                       {incubator.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
                       <MapPin className="w-3 h-3 shrink-0" />
                       <span className="truncate">{incubator.country}</span>
                     </div>
@@ -82,7 +82,7 @@ export function IncubatorRecommendations({
                 </div>
                 <div className="shrink-0 text-right">
                   <div className="text-lg font-bold text-cyan-400">{incubator.matchPercent}%</div>
-                  <div className="text-[0.62rem] uppercase tracking-widest text-slate-500">Match</div>
+                  <div className="text-[0.62rem] uppercase tracking-widest text-slate-400">Match</div>
                 </div>
               </div>
 
@@ -90,14 +90,14 @@ export function IncubatorRecommendations({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
-                  <div className="flex items-center gap-1.5 text-[0.65rem] text-slate-500 uppercase tracking-widest mb-1.5">
+                  <div className="flex items-center gap-1.5 text-[0.65rem] text-slate-400 uppercase tracking-widest mb-1.5">
                     <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
                     Funding
                   </div>
                   <p className="text-slate-300 text-xs leading-relaxed">{incubator.funding}</p>
                 </div>
                 <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
-                  <div className="flex items-center gap-1.5 text-[0.65rem] text-slate-500 uppercase tracking-widest mb-1.5">
+                  <div className="flex items-center gap-1.5 text-[0.65rem] text-slate-400 uppercase tracking-widest mb-1.5">
                     <Percent className="w-3.5 h-3.5 text-amber-400" />
                     Equity
                   </div>

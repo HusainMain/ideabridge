@@ -1,4 +1,5 @@
 import type { ResultsData } from '../stores/useJourneyStore';
+import { getVerdict } from './verdict';
 
 /**
  * Report serialisation for the two things a user expects from "Export"
@@ -21,11 +22,7 @@ function list(items?: string[]): string {
 }
 
 export function getVerdictLabel(score: number): string {
-  if (score >= 75) return 'Strong Signal';
-  if (score >= 60) return 'Promising';
-  if (score >= 45) return 'Needs Validation';
-  if (score >= 30) return 'High Risk';
-  return 'Not Yet Viable';
+  return getVerdict(score);
 }
 
 /** A self-contained HTML file — no external CSS, fonts, or scripts. */

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useJourneyStore } from '../stores/useJourneyStore';
 import { LoadingWorkspace } from '../components/LoadingWorkspace';
 import { ImproveYourIdeaScreen } from '../components/ImproveYourIdeaScreen';
@@ -54,6 +54,10 @@ function parseErrorResponse(text: string, status: number): StructuredErrorRespon
 
 export function AnalysisScreen() {
   const navigate = useNavigate();
+  const location = useLocation();
+  // "Analyze Again" reuses the current inputs. In that case the existing
+  // report must survive the retry; only a brand-new analysis clears it.
+  const isRerun = Boolean((location.state as { rerun?: boolean } | null)?.rerun);
   const {
     inputs,
     startupStage,
@@ -258,7 +262,7 @@ export function AnalysisScreen() {
   }, []);
 
   useEffect(() => {
-    clearResults();
+    if (!isRerun) clearResults();
     setApiError(null);
     setValidationResult(null);
     hasAutoRetriedRateLimit.current = false;
@@ -270,7 +274,7 @@ export function AnalysisScreen() {
     if (inputs.idea) {
       performAnalysis();
     }
-  }, [inputs.idea, performAnalysis]);
+  }, [inputs.idea, performAnalysis, isRerun, clearResults, setApiError, setValidationResult]);
 
   useEffect(() => {
     if (!inputs.idea) navigate('/input');

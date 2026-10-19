@@ -35,26 +35,7 @@ import { FloatingActionBar } from '../components/results/FloatingActionBar';
 import { MentorRecommendations } from '../components/results/MentorRecommendations';
 import { mentors } from '../data/mentors';
 import { AppFooter } from '../components/footer/AppFooter';
-
-// ─── AI Verdict Logic ───────────────────────────────────────────────
-
-function getVerdict(score: number): string {
-  if (score >= 85) return 'Exceptional Potential';
-  if (score >= 75) return 'Strong Opportunity';
-  if (score >= 65) return 'Viable with Refinement';
-  if (score >= 50) return 'Needs Validation';
-  return 'High Risk Concept';
-}
-
-function getVerdictDescription(score: number): string {
-  if (score >= 80) {
-    return "Your idea shows exceptional market viability and execution potential. The analysis indicates strong differentiation and clear path to market.";
-  }
-  if (score >= 65) {
-    return "Your idea addresses a genuine market need with reasonable execution risk. Refinement in specific areas could significantly improve outcomes.";
-  }
-  return "Your idea has potential but faces notable challenges. Consider validating core assumptions before significant investment.";
-}
+import { getVerdict, getVerdictDescription } from '../utils/verdict';
 
 // ─── Circular Score Component ─────────────────────────────────────────
 
@@ -219,7 +200,6 @@ export default function ResultsWorkspace(): React.ReactElement {
     inputs,
     startupStage,
     completedAt,
-    resetJourney,
   } = useJourneyStore();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -230,10 +210,14 @@ export default function ResultsWorkspace(): React.ReactElement {
     else setIsLoading(false);
   }, [results, navigate]);
 
-  const handleRestart = () => {
-    resetJourney();
-    navigate('/');
-  };
+  // "Back" is navigation, not deletion. Keeping the persisted journey means a
+  // founder can return to their report (browser back) instead of losing it.
+  const handleBackHome = () => navigate('/');
+
+  // Re-run the analysis against the same inputs. The analysis screen keeps the
+  // existing report until the new one succeeds, so a failed retry cannot erase
+  // the report the user already had.
+  const handleAnalyzeAgain = () => navigate('/analysis', { state: { rerun: true } });
 
   // The three actions are deliberately distinct and honestly labelled:
   // Export downloads a portable file, Print opens the browser's PDF
@@ -305,11 +289,11 @@ export default function ResultsWorkspace(): React.ReactElement {
           {/* Navigation Header */}
           <header className="sticky top-0 z-40 backdrop-blur-xl bg-slate-950/70 border-b border-white/5">
             <div className="flex items-center justify-between max-w-7xl mx-auto px-4 py-3">
-              <button onClick={handleRestart} className="group flex items-center gap-2 px-3 py-2.5 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 text-sm min-h-[44px]">
+              <button onClick={handleBackHome} className="group flex items-center gap-2 px-3 py-2.5 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-200 text-sm min-h-[44px]">
                 <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
                 <span className="text-sm font-medium">Back</span>
               </button>
-              <div className="flex items-center gap-1.5 text-[0.65rem] text-slate-500">
+              <div className="flex items-center gap-1.5 text-[0.65rem] text-slate-400">
                 <Sparkles className="w-3 h-3 text-cyan-400" />
                 <span>IDEA BRIDGE AI REPORT</span>
               </div>
@@ -342,7 +326,7 @@ export default function ResultsWorkspace(): React.ReactElement {
               <p className="text-slate-400 max-w-2xl mx-auto leading-relaxed">
                 AI-powered strategic analysis delivering actionable insights for your startup concept.
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-6 text-slate-500 text-sm">
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-6 text-slate-400 text-sm">
                 <span>Generated {generatedLabel}</span>
                 <span className="w-1 h-1 rounded-full bg-slate-500" />
                 <span>Saved to this browser</span>
@@ -385,19 +369,19 @@ export default function ResultsWorkspace(): React.ReactElement {
             <ReportSection title="Reality Check" icon={AlertCircle} delay={0.4}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Biggest Assumption</p>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Biggest Assumption</p>
                   <p className="text-sm text-slate-300">{results.realityCheck.biggestAssumption}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Biggest Risk</p>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Biggest Risk</p>
                   <p className="text-sm text-slate-300">{results.realityCheck.biggestRisk}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Why It Could Fail</p>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Why It Could Fail</p>
                   <p className="text-sm text-slate-300">{results.realityCheck.whyItCouldFail}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Hardest Challenge</p>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">Hardest Challenge</p>
                   <p className="text-sm text-slate-300">{results.realityCheck.hardestExecutionChallenge}</p>
                 </div>
               </div>
@@ -450,7 +434,7 @@ export default function ResultsWorkspace(): React.ReactElement {
           onPrint={handlePrint}
           onShare={handleShare}
           shareState={shareState}
-          onAnalyzeAgain={handleRestart}
+          onAnalyzeAgain={handleAnalyzeAgain}
         />
         </motion.div>
       </AnimatePresence>

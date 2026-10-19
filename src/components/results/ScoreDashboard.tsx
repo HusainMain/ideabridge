@@ -153,7 +153,7 @@ export function ScoreDashboard({ scores }: ScoreDashboardProps) {
         <div className="flex flex-col items-center gap-2 flex-shrink-0">
           <CircularScore score={scores.overall} size={180} />
           <div className="text-center">
-            <div className="text-[0.72rem] text-slate-500">Overall Viability</div>
+            <div className="text-[0.72rem] text-slate-400">Overall Viability</div>
           </div>
         </div>
 

@@ -72,7 +72,7 @@ export function RealityCheckCard({ realityCheck }: RealityCheckCardProps) {
               >
                 {label}
               </div>
-              <div className="text-[0.68rem] mt-0.5 leading-snug text-slate-500">
+              <div className="text-[0.68rem] mt-0.5 leading-snug text-slate-400">
                 {sublabel}
               </div>
             </div>

@@ -59,8 +59,7 @@ SocialiteInternship/
 │   │   ├── BridgeSection.tsx     # Section styling for the landing page narrative
 │   │   ├── RoadmapTimeline.tsx   # Interactive milestones roadmap
 │   │   ├── StartupStats.tsx      # Diagnostic scores and progress gauges
-│   │   ├── ContentLayer.tsx      # Page scrolling layouts
-│   │   └── ProjectionLayer.tsx   # HTML overlay elements on WebGL canvas
+│   │   └── ContentLayer.tsx      # Page scrolling layouts
 │   │
 │   ├── pages/                 # Full screen page views
 │   │   ├── LandingPage.tsx       # Immersive entrance page

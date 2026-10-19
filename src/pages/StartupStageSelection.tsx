@@ -71,13 +71,16 @@ export function StartupStageSelection() {
           <p className="act-question__sub">Help us personalize your AI recommendations.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mt-8" role="group" aria-label="Startup stage">
           {STAGE_OPTIONS.map((stage) => {
             const isSelected = startupStage === stage.value;
             return (
               <motion.button
                 key={stage.value}
+                type="button"
                 onClick={() => handleSelect(stage)}
+                aria-pressed={isSelected}
+                aria-label={`${stage.title}. ${stage.description}`}
                 whileHover={{
                   y: -4,
                   scale: 1.02,

@@ -38,6 +38,15 @@ export function FloatingActionBar({
     <AnimatePresence>
       {visible && (
         <>
+          {/* One shared live region: announces the copy result without
+              changing any visible button text for sighted users. */}
+          <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {shareState === 'copied'
+              ? 'Report summary copied to clipboard'
+              : shareState === 'failed'
+                ? 'Could not copy the summary. Clipboard access is unavailable in this browser.'
+                : ''}
+          </span>
           {/* Desktop floating bar — bottom-right */}
           <motion.div
             initial={{ opacity: 0, y: 24, scale: 0.95 }}
@@ -89,7 +98,7 @@ export function FloatingActionBar({
             }}
           >
             <button
-              onClick={() => navigate('/input')}
+              onClick={onAnalyzeAgain}
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-colors"
               style={{
                 background: 'rgba(255,255,255,0.05)',
@@ -97,8 +106,8 @@ export function FloatingActionBar({
                 border: '1px solid rgba(255,255,255,0.08)',
               }}
             >
-              <Edit3 size={14} />
-              Edit
+              <RotateCcw size={14} />
+              Redo
             </button>
             <button
               onClick={onShare}
@@ -110,7 +119,7 @@ export function FloatingActionBar({
               }}
             >
               {shareState === 'copied' ? <Check size={14} /> : <Share2 size={14} />}
-              {shareState === 'copied' ? 'Copied' : 'Share'}
+              {shareState === 'copied' ? 'Copied' : shareState === 'failed' ? 'Copy failed' : 'Share'}
             </button>
             <button
               onClick={onPrint}

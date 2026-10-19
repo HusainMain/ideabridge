@@ -175,11 +175,20 @@ function isGeneralIndustry(industry: string): boolean {
 
 function getIndustryScore(
   userCategories: Set<string>,
-  incubator: Incubator
+  incubator: Incubator,
+  primaryCategory: string | null
 ): { points: number; reason: string | null } {
   const incIndustries = incubator.industries.map((i) => normalize(i));
 
-  for (const category of userCategories) {
+  // The industry the founder explicitly typed outranks categories inferred
+  // from wording elsewhere in the submission. Without this, an incidental
+  // keyword in the idea text could label an unrelated program a "strong
+  // match" for the wrong sector.
+  const orderedCategories = primaryCategory
+    ? [primaryCategory, ...[...userCategories].filter((c) => c !== primaryCategory)]
+    : [...userCategories];
+
+  for (const category of orderedCategories) {
     if (incIndustries.includes(category)) {
       const nonGeneralCount = incIndustries.filter((i) => !isGeneralIndustry(i)).length;
       const points = nonGeneralCount <= 2 ? SCORE_INDUSTRY : 28;
@@ -269,7 +278,7 @@ function scoreIncubator(
   const userCountryNorm = normalizeCountry(request.country);
   const incCountryNorm = normalizeCountry(incubator.country);
 
-  const industryResult = getIndustryScore(userCategories, incubator);
+  const industryResult = getIndustryScore(userCategories, incubator, primaryCategory);
   if (industryResult.points > 0) {
     score += industryResult.points;
     if (industryResult.reason) reasons.push(industryResult.reason);
@@ -324,13 +333,15 @@ export function matchIncubators(
   limit = 5
 ): IncubatorRecommendation[] {
   const incubators = loadIncubators();
+  // Industry detection uses only what the founder told us. The AI summary can
+  // mention adjacent themes (e.g. "carbon footprint" in a customer segment)
+  // that are not the startup's sector; those stay in the theme tie-breaker
+  // below instead of being promoted to a "strong alignment" reason.
   const contextText = [
     request.idea,
     request.industry,
     request.problem,
     request.audience,
-    analysis.summary.join(' '),
-    analysis.customers.join(' '),
   ].join(' ');
 
   const primaryCategory = getPrimaryCategory(request);

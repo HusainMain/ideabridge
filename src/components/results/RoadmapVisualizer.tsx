@@ -70,7 +70,7 @@ export function RoadmapVisualizer(): React.ReactElement | null {
                     >
                       Phase {idx + 1}
                     </span>
-                    <span className="text-[0.62rem] font-mono text-slate-500">
+                    <span className="text-[0.62rem] font-mono text-slate-400">
                       Step {idx + 1} of {results.roadmap.length}
                     </span>
                   </div>
