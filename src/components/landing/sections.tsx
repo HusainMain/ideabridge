@@ -10,6 +10,7 @@ import {
   SCAN_ORB_TOPS,
 } from './constants';
 import { OrbAnchor } from './HeroPanels';
+import { useSmoothProgress } from '../useSmoothProgress';
 
 export function HowItWorksSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -18,18 +19,21 @@ export function HowItWorksSection() {
     offset: ['start start', 'end end'],
   });
 
-  // Orb dwells at each step, then moves to next
+  // Orb dwells at each step, then moves to next. The spring keeps the rail
+  // moving between wheel notches instead of stepping 25% of the pipeline at
+  // once.
+  const smoothProgress = useSmoothProgress(scrollYProgress);
   const orbLeft = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.08, 0.30, 0.52, 0.74, 1],
     ['12.5%', '12.5%', '37.5%', '62.5%', '87.5%', '87.5%'],
   );
 
   const stepOpacity = [
-    useTransform(scrollYProgress, [0, 0.08], [0.4, 1]),
-    useTransform(scrollYProgress, [0.18, 0.30], [0.4, 1]),
-    useTransform(scrollYProgress, [0.40, 0.52], [0.4, 1]),
-    useTransform(scrollYProgress, [0.62, 0.74], [0.4, 1]),
+    useTransform(smoothProgress, [0, 0.08], [0.4, 1]),
+    useTransform(smoothProgress, [0.18, 0.30], [0.4, 1]),
+    useTransform(smoothProgress, [0.40, 0.52], [0.4, 1]),
+    useTransform(smoothProgress, [0.62, 0.74], [0.4, 1]),
   ];
 
   return (
@@ -264,7 +268,8 @@ export function AIAnalysisSection({ scanVariants }: { scanVariants: Variants }) 
     offset: ['start start', 'end end'],
   });
 
-  const scanOrbTop = useTransform(scrollYProgress, SCAN_ORB_PROGRESS, SCAN_ORB_TOPS);
+  const smoothProgress = useSmoothProgress(scrollYProgress);
+  const scanOrbTop = useTransform(smoothProgress, SCAN_ORB_PROGRESS, SCAN_ORB_TOPS);
   // Completion glow fades in after all cards activate
   const completionOpacity = useTransform(scrollYProgress, [0.76, 0.88, 0.94, 1], [0, 1, 1, 0]);
   const completionScale = useTransform(scrollYProgress, [0.76, 0.88], [0.94, 1]);

@@ -9,6 +9,16 @@ import { buildPath, evaluatePath, type OrbPath, type WaypointRect } from './orbP
 // written after mount.
 const BASE_SIZE = 220;
 
+// Maximum distance, in px, the smoothed scroll parameter may trail the real
+// one. Large enough to bridge a ~100px wheel notch; small enough that a fast
+// flick never leaves the orb visibly behind the page.
+const MAX_SCROLL_LAG = 140;
+
+// Exponential smoothing time constant, in ms, for the scroll parameter.
+// 0 = exact scroll glue; higher = more inertia. 80 ms bridges a wheel notch
+// without reading as lag.
+const SMOOTHING_TAU = 80;
+
 interface OrbMeta {
   stage: OrbStage;
   progress: number;
@@ -21,6 +31,17 @@ export const OrbController: React.FC = () => {
   const writtenRef = useRef({ x: -9999, y: -9999, s: -1 });
   const metaRef = useRef<OrbMeta>({ stage: 1, progress: 0, isLaunching: false });
   const [orbMeta, setOrbMeta] = React.useState<OrbMeta>(metaRef.current);
+
+  // Mouse wheels deliver scrollY in coarse steps (~100px per notch). Feeding
+  // that straight into the path makes the orb jump, then sit still until the
+  // next notch — the "stopping between waypoints" feel. We smooth the scroll
+  // *parameter* over time instead of smoothing the orb position, so it keeps
+  // gliding between notches while still snapping exactly to an anchor's live
+  // rect during a dwell (that path ignores the parameter entirely).
+  const smoothScrollRef = useRef(0);
+  const lastFrameTsRef = useRef(0);
+  const hasSampleRef = useRef(false);
+  const reduceMotionRef = useRef(false);
 
   // ─── Waypoint registry (rebuilds when layout can have changed) ──────
   const rebuild = useCallback(() => {
@@ -36,6 +57,13 @@ export const OrbController: React.FC = () => {
     const onResize = () => rebuild();
     window.addEventListener('resize', onResize, { passive: true });
     window.addEventListener('load', rebuild);
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    reduceMotionRef.current = motionQuery.matches;
+    const onMotionPreference = (e: MediaQueryListEvent) => {
+      reduceMotionRef.current = e.matches;
+    };
+    motionQuery.addEventListener('change', onMotionPreference);
     if (document.fonts?.ready) {
       void document.fonts.ready.then(() => rebuild()).catch(() => undefined);
     }
@@ -62,7 +90,33 @@ export const OrbController: React.FC = () => {
       const path = pathRef.current;
       if (!wrap || !path) return;
 
-      const sample = evaluatePath(path, window.scrollY, { launchRect });
+      // Smooth the scroll parameter in time so coarse wheel notches become
+      // continuous motion. Dwell stops read the anchor's live rect and ignore
+      // this value, so rail accuracy is unchanged.
+      const target = window.scrollY;
+      const now = performance.now();
+      const dt = lastFrameTsRef.current ? Math.min(64, now - lastFrameTsRef.current) : 16;
+      lastFrameTsRef.current = now;
+
+      if (!hasSampleRef.current || reduceMotionRef.current) {
+        smoothScrollRef.current = target;
+        hasSampleRef.current = true;
+      } else if (Math.abs(target - smoothScrollRef.current) > window.innerHeight * 1.5) {
+        // Anchor jumps and scroll restoration move several screens at once;
+        // don't fly the orb across them.
+        smoothScrollRef.current = target;
+      } else {
+        const alpha = 1 - Math.exp(-dt / SMOOTHING_TAU);
+        smoothScrollRef.current += (target - smoothScrollRef.current) * alpha;
+        if (Math.abs(target - smoothScrollRef.current) < 0.1) smoothScrollRef.current = target;
+        // Cap the lag so a fast flick still feels attached to the page.
+        const lag = target - smoothScrollRef.current;
+        if (Math.abs(lag) > MAX_SCROLL_LAG) {
+          smoothScrollRef.current = target - Math.sign(lag) * MAX_SCROLL_LAG;
+        }
+      }
+
+      const sample = evaluatePath(path, smoothScrollRef.current, { launchRect });
 
       // Position + size, transform-only.
       const s = sample.size > 0 ? sample.size / BASE_SIZE : writtenRef.current.s;
@@ -153,6 +207,7 @@ export const OrbController: React.FC = () => {
       window.clearTimeout(settleTimer);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('load', rebuild);
+      motionQuery.removeEventListener('change', onMotionPreference);
     };
   }, [rebuild]);
 

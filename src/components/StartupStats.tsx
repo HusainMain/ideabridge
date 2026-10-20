@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useSmoothProgress } from './useSmoothProgress';
 
 const workspaceModules = [
   {
@@ -35,7 +36,8 @@ export const StartupStats: React.FC = () => {
     target: sectionRef,
     offset: ['start end', 'end start'],
   });
-  const orbLeft = useTransform(scrollYProgress, [0.12, 0.88], ['8%', '92%']);
+  const smoothProgress = useSmoothProgress(scrollYProgress);
+  const orbLeft = useTransform(smoothProgress, [0.12, 0.88], ['8%', '92%']);
 
   return (
     <section ref={sectionRef} id="section-stats" className="workspace-section">

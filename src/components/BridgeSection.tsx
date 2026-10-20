@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useSmoothProgress } from './useSmoothProgress';
 
 interface BridgeSectionProps {
   id: string;
@@ -73,9 +74,12 @@ export const BridgeSection: React.FC<BridgeSectionProps> = ({ id, label, stage, 
     ];
   }, [rhythm]);
 
-  // Orb follows the actual drawn S-curve bezier
-  const leftPos = useTransform(scrollYProgress, scrollInput, LEFT_OUTPUT);
-  const topPos  = useTransform(scrollYProgress, scrollInput, TOP_OUTPUT);
+  // Orb follows the actual drawn S-curve bezier. The spring turns a wheel
+  // notch into a glide along the curve instead of a jump across a quarter of
+  // it; the orb reads this anchor live, so it inherits the smoothing.
+  const smoothProgress = useSmoothProgress(scrollYProgress);
+  const leftPos = useTransform(smoothProgress, scrollInput, LEFT_OUTPUT);
+  const topPos  = useTransform(smoothProgress, scrollInput, TOP_OUTPUT);
 
   const glowRange = rhythm === 'pulse' ? [0.2, 0.45, 1, 0.7, 0.3] : [0.25, 0.55, 1, 0.85, 0.45];
   const bridgeGlow = useTransform(scrollYProgress, [0, 0.12, 0.58, 0.92, 1], glowRange);

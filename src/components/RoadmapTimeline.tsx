@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useSmoothProgress } from './useSmoothProgress';
 
 interface Milestone {
   title: string;
@@ -143,8 +144,9 @@ export const RoadmapTimeline: React.FC = () => {
     offset: ['start start', 'end end'],
   });
 
-  const orbTop = useTransform(scrollYProgress, [0, 1], ['15%', '85%']);
-  const lineFillHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
+  const smoothProgress = useSmoothProgress(scrollYProgress);
+  const orbTop = useTransform(smoothProgress, [0, 1], ['15%', '85%']);
+  const lineFillHeight = useTransform(smoothProgress, [0, 1], ['0%', '100%']);
 
   return (
     <div
@@ -226,7 +228,7 @@ export const RoadmapTimeline: React.FC = () => {
                   key={m.title}
                   milestone={m}
                   index={i}
-                  scrollYProgress={scrollYProgress}
+                  scrollYProgress={smoothProgress}
                 />
               ))}
             </div>
